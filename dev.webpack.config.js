@@ -29,5 +29,5 @@ module.exports = {
       ...config.module.rules,
     ],
   },
-  plugins: [new ReactRefreshWebpackPlugin()],
+  plugins: [new ReactRefreshWebpackPlugin(), ...config.plugins],
 };
