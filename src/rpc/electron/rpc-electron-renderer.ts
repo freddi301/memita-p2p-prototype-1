@@ -3,6 +3,8 @@ import { jsonSerializable } from "../framework/rpc-framwork-json-serializable";
 import { localRpcDefinition } from "../rpc";
 import { RCP_ELECTRON_CHANNEL } from "./rpc-electron-common";
 
+// TODO improve performance using only one subscribe
+
 export const rpcElectronRenderer = makeRpcClient(
   jsonSerializable,
   localRpcDefinition(jsonSerializable),

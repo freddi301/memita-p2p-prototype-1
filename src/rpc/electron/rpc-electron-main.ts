@@ -1,7 +1,10 @@
-import { ipcMain } from "electron";
+import { ipcMain, ipcRenderer } from "electron";
 import { RCP_ELECTRON_CHANNEL } from "./rpc-electron-common";
+import { PrismaClient } from "@prisma/client";
 
-ipcMain.on(RCP_ELECTRON_CHANNEL, (event, arg) => {
+const prisma = new PrismaClient();
+
+ipcMain.on(RCP_ELECTRON_CHANNEL, async (event, arg) => {
   console.log(arg);
   // TODO
 });
