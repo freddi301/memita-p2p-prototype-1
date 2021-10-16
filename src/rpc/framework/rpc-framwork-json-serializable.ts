@@ -80,4 +80,16 @@ export const jsonSerializable: DescriptionImplementation<unknown> = {
       },
     };
   },
+  custom(description) {
+    return {
+      serialize(value) {
+        return description.intermediate.serialize(description.serialize(value));
+      },
+      deserialize(data) {
+        return description.deserialize(
+          description.intermediate.deserialize(data)
+        );
+      },
+    };
+  },
 };

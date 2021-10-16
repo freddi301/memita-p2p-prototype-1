@@ -1,4 +1,4 @@
-import libsodium from "libsodium-wrappers";
+import libsodium, { from_hex } from "libsodium-wrappers";
 import {
   DescriptionImplementation,
   ensureRpcDefinition,
@@ -8,11 +8,21 @@ export const localRpcDefinition = <Serialized>({
   object,
   string,
   enumeration,
+  custom,
 }: DescriptionImplementation<Serialized>) =>
   ensureRpcDefinition<Serialized>()({
     saveContact: {
       request: object({
         name: string,
+        accountPublicKey: custom({
+          intermediate: string,
+          serialize(accountPublicKey: AccountPublicKey) {
+            return accountPublicKey.toBase64();
+          },
+          deserialize(hex) {
+            return AccountPublicKey.fromBase64(hex);
+          },
+        }),
       }),
       response: enumeration({
         ok: object({}),
@@ -29,10 +39,34 @@ export class AccountPublicKey {
       throw new Error();
     this.publicKey = publickKey;
   }
+  toUint8Array() {
+    return this.publicKey;
+  }
+  static fromUint8Array(uint8Array: Uint8Array) {
+    return new AccountPublicKey(uint8Array);
+  }
+  toBase64(): string {
+    return libsodium.to_base64(this.publicKey);
+  }
+  static fromBase64(Base64: string) {
+    return new AccountPublicKey(libsodium.from_base64(Base64));
+  }
   toHex(): string {
     return libsodium.to_hex(this.publicKey);
   }
   static fromHex(hex: string) {
     return new AccountPublicKey(libsodium.from_hex(hex));
+  }
+}
+
+export class AccountSecretKey {
+  readonly publicKey: AccountPublicKey;
+  private privateKey: Uint8Array;
+  private constructor(keyPair: libsodium.KeyPair) {
+    this.publicKey = AccountPublicKey.fromUint8Array(keyPair.publicKey);
+    this.privateKey = keyPair.privateKey;
+  }
+  static create() {
+    return new AccountSecretKey(libsodium.crypto_box_keypair());
   }
 }

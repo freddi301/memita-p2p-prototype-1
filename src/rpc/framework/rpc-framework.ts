@@ -30,6 +30,18 @@ export type DescriptionImplementation<Serialized> = {
     }[keyof Entries],
     Serialized
   >;
+  custom<
+    Deserialized,
+    Intermediate extends Description<any, Serialized>
+  >(params: {
+    intermediate: Intermediate;
+    serialize: (
+      deserialized: Deserialized
+    ) => DeserializedOfDescription<Intermediate>;
+    deserialize: (
+      serialized: DeserializedOfDescription<Intermediate>
+    ) => Deserialized;
+  }): Description<Deserialized, Serialized>;
 };
 
 type RpcDefinitionShape<Serialized> = {

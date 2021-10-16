@@ -7,6 +7,7 @@ import { MessagesScreen } from "./screens/MessagesScreen";
 import { AddContactScreen } from "./screens/AddContactScreen";
 import { StyleProvider } from "./components/StyleProvider";
 import { rpcElectronRenderer } from "./rpc/electron/rpc-electron-renderer";
+import { AccountPublicKey, AccountSecretKey } from "./rpc/rpc";
 
 ReactDOM.render(<App />, document.getElementById("root"));
 
@@ -22,7 +23,10 @@ function App() {
     setState({ screen: "conversations" });
   };
   const saveContact = () => {
-    rpcElectronRenderer.saveContact({ name: "frederik" });
+    rpcElectronRenderer.saveContact({
+      name: "frederik",
+      accountPublicKey: AccountSecretKey.create().publicKey,
+    });
     openContactsScreen();
   };
   return (
