@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
+import "./rpc/electron/rpc-electron-main";
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
