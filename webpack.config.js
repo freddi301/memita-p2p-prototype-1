@@ -6,6 +6,18 @@ module.exports = {
   devtool: "source-map",
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
+    fallback: {
+      // path: require.resolve("path-browserify"),
+      // crypto: require.resolve("crypto-browserify"),
+      // buffer: require.resolve("buffer-browserify"),
+      // stream: require.resolve("stream-browserify"),
+      // assert: require.resolve("assert-browserify"),
+      path: false,
+      crypto: false,
+      buffer: false,
+      stream: false,
+      assert: false,
+    },
   },
   module: {
     rules: [
