@@ -12,6 +12,6 @@ generator client {
 }
 
 model Contact {
-  publicAccountKey String @unique
+  accountPublicKey String @unique
   name             String @unique
 }

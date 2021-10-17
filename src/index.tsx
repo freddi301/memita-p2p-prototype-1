@@ -7,7 +7,7 @@ import { MessagesScreen } from "./screens/MessagesScreen";
 import { AddContactScreen } from "./screens/AddContactScreen";
 import { StyleProvider } from "./components/StyleProvider";
 import { rpcElectronRenderer } from "./rpc/electron/rpc-electron-renderer";
-import { AccountPublicKey, AccountSecretKey } from "./rpc/rpc";
+import { AccountPublicKey, AccountSecretKey } from "./rpc/localRpcDefinition";
 import { rpcWebsocketClient } from "./rpc/websocket/rpc-websocket-client";
 
 ReactDOM.render(<App />, document.getElementById("root"));
@@ -23,11 +23,11 @@ function App() {
   const openConversationsScreen = () => {
     setState({ screen: "conversations" });
   };
-  const saveContact = () => {
-    // TODO
+  const saveContact = (name: string) => {
+    // TODO move to appropriate level of abstraction
     const rpc = window.rendererIpc ? rpcElectronRenderer : rpcWebsocketClient;
     rpc.saveContact({
-      name: "frederik",
+      name,
       accountPublicKey: AccountSecretKey.create().publicKey,
     });
     openContactsScreen();

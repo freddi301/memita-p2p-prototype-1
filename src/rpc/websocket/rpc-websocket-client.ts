@@ -1,6 +1,6 @@
 import { makeRpcClient } from "../framework/rpc-framework";
 import { jsonSerializable } from "../framework/rpc-framwork-json-serializable";
-import { localRpcDefinition } from "../rpc";
+import { localRpcDefinition } from "../localRpcDefinition";
 import { RPC_WEBSOCKET_PORT, RPC_WEBSOCKET_HOST } from "./rpc-websocket-common";
 
 // TODO improve performance using only one message listener

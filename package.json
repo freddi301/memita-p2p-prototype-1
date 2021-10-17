@@ -8,7 +8,7 @@
   "scripts": {
     "build:electron": "tsc && cp public/index.html dist/index.html",
     "build:react": "webpack",
-    "build:prisma": "prisma generate",
+    "build:prisma": "prisma migrate dev",
     "build": "yarn build:prisma && yarn build:electron && yarn build:react",
     "start": "yarn build && electron dist/main.js",
     "dev:frontend": "webpack serve --config dev.webpack.config.js",

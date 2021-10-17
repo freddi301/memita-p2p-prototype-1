@@ -87,3 +87,19 @@ export function makeRpcClient<
     })
   ) as any;
 }
+
+type InterpreterShape<D extends RpcDefinitionShape<any>> = {
+  [Key in keyof D]: (
+    request: DeserializedOfDescription<D[Key]["request"]>
+  ) => DeserializedOfDescription<D[Key]["response"]>;
+};
+
+export const ensureRpcInterpreter = <
+  Serialized,
+  D extends RpcDefinitionShape<any>,
+  I extends InterpreterShape<D>
+>(
+  descriptionImplementation: DescriptionImplementation<Serialized>,
+  rpcDefinition: D,
+  implementation: I
+) => implementation;

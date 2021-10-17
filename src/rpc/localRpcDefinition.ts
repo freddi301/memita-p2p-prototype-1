@@ -7,7 +7,6 @@ import {
 export const localRpcDefinition = <Serialized>({
   object,
   string,
-  enumeration,
   custom,
 }: DescriptionImplementation<Serialized>) =>
   ensureRpcDefinition<Serialized>()({
@@ -24,13 +23,11 @@ export const localRpcDefinition = <Serialized>({
           },
         }),
       }),
-      response: enumeration({
-        ok: object({}),
-        ko: object({}),
-      }),
+      response: object({}),
     },
   });
 
+// TODO move to own file
 // https://libsodium.gitbook.io/doc/public-key_cryptography/authenticated_encryption
 export class AccountPublicKey {
   private publicKey: Uint8Array;

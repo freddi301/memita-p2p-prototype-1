@@ -14,9 +14,10 @@ import { Close, Save } from "@mui/icons-material";
 
 type AddContactScreenProps = {
   onCancel(): void;
-  onSave(): void;
+  onSave(name: string): void;
 };
 export function AddContactScreen({ onCancel, onSave }: AddContactScreenProps) {
+  const [name, setName] = React.useState("");
   return (
     <React.Fragment>
       <AppBar position="static">
@@ -44,6 +45,8 @@ export function AddContactScreen({ onCancel, onSave }: AddContactScreenProps) {
               id="name"
               label="name"
               fullWidth={true}
+              value={name}
+              onChange={(event) => setName(event.currentTarget.value)}
             />
           </ListItem>
           <ListItem>
@@ -59,7 +62,7 @@ export function AddContactScreen({ onCancel, onSave }: AddContactScreenProps) {
         </List>
       </Box>
       <Box sx={{ position: "fixed", bottom: 16, right: 16 }}>
-        <Fab color="primary" aria-label="add" onClick={onSave}>
+        <Fab color="primary" aria-label="add" onClick={() => onSave(name)}>
           <Save />
         </Fab>
       </Box>
