@@ -1,9 +1,7 @@
 import React from "react";
 import {
-  Avatar,
   Fab,
   ListItem,
-  ListItemAvatar,
   ListItemButton,
   ListItemText,
   Box,
@@ -11,22 +9,23 @@ import {
   Toolbar,
   IconButton,
 } from "@mui/material";
-import { Add, Cached } from "@mui/icons-material";
+import { Cached, Create } from "@mui/icons-material";
 import { FixedSizeList } from "react-window";
 import { AutoSizer } from "react-virtualized";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
-import { useAllContacts } from "../data-hooks";
+import { useAllDrafts } from "../data-hooks";
 
-type ContactScreenProps = {
-  onAdd(): void;
+type DraftsScreenProps = {
+  onCreate(): void;
+  onUpdate(id: string): void;
 };
-export function ContactsScreen({ onAdd }: ContactScreenProps) {
-  const contacts = useAllContacts();
+export function DraftsScreen({ onCreate, onUpdate }: DraftsScreenProps) {
+  const drafts = useAllDrafts();
   return (
     <React.Fragment>
       <FullScreenNavigationLayout
         top={
-          <AppBar>
+          <AppBar position="static">
             <Toolbar>
               <div style={{ flexGrow: 1 }}></div>
               <IconButton
@@ -34,7 +33,7 @@ export function ContactsScreen({ onAdd }: ContactScreenProps) {
                 aria-label="display more actions"
                 edge="end"
                 color="inherit"
-                onClick={() => contacts.reload()}
+                onClick={() => drafts.reload()}
               >
                 <Cached />
               </IconButton>
@@ -49,25 +48,31 @@ export function ContactsScreen({ onAdd }: ContactScreenProps) {
                   width={width}
                   height={height}
                   itemSize={72}
-                  itemCount={contacts.data.length}
+                  itemCount={drafts.data.length}
                   overscanCount={5}
                 >
                   {({ index, style }) => {
-                    const contact = contacts.data[index];
+                    const draft = drafts.data[index];
                     return (
                       <ListItem
                         style={style}
                         key={index}
                         component="div"
                         disablePadding
+                        onClick={() => onUpdate(draft.id)}
                       >
                         <ListItemButton>
-                          <ListItemAvatar>
-                            <Avatar>{contact.name[0].toUpperCase()}</Avatar>
-                          </ListItemAvatar>
                           <ListItemText
-                            primary={contact.name}
-                            secondary={contact.accountPublicKey.toHex()}
+                            primary={"no recipient"}
+                            secondary={
+                              draft.text ? (
+                                <TruncatedLine
+                                  text={draft.text.split("\n")[0]}
+                                />
+                              ) : (
+                                "empty"
+                              )
+                            }
                           />
                         </ListItemButton>
                       </ListItem>
@@ -80,10 +85,31 @@ export function ContactsScreen({ onAdd }: ContactScreenProps) {
         }
       />
       <Box sx={{ position: "fixed", bottom: 16, right: 16 }}>
-        <Fab color="primary" aria-label="add" onClick={onAdd}>
-          <Add />
+        <Fab color="primary" aria-label="add" onClick={onCreate}>
+          <Create />
         </Fab>
       </Box>
     </React.Fragment>
+  );
+}
+
+function TruncatedLine({ text }: { text: string }) {
+  return (
+    <span style={{ position: "relative", display: "block" }}>
+      <span style={{ color: "transparent" }}>X</span>
+      <span
+        style={{
+          display: "block",
+          position: "absolute",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          width: "100%",
+          top: 0,
+        }}
+      >
+        {text}
+      </span>
+    </span>
   );
 }

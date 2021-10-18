@@ -38,7 +38,6 @@ export const rpcWebsocketClient = makeRpcClient(
     return new Promise((resolve) => {
       socket.addEventListener("message", function listener(event) {
         const parsed = JSON.parse(event.data);
-        console.log(parsed.requestId, requestId);
         if (parsed.requestId === requestId) {
           resolve(parsed.payload);
           socket.removeEventListener("message", listener);

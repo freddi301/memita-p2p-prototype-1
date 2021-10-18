@@ -12,6 +12,13 @@ generator client {
 }
 
 model Contact {
-  accountPublicKey String @unique
-  name             String @unique
+  id               String @unique
+  accountPublicKey String
+  name             String
+}
+
+model Draft {
+  id         String   @unique
+  text       String
+  lastUpdate DateTime @updatedAt
 }

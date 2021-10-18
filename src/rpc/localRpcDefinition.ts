@@ -3,6 +3,7 @@ import {
   DescriptionImplementation,
   ensureRpcDefinition,
 } from "./framework/rpc-framework";
+import { DateTime } from "luxon";
 
 export const localRpcDefinition = <Serialized>({
   object,
@@ -11,6 +12,7 @@ export const localRpcDefinition = <Serialized>({
   empty,
   enumeration,
   array,
+  number,
 }: DescriptionImplementation<Serialized>) => {
   const accountPublicKey = custom({
     intermediate: string,
@@ -20,6 +22,20 @@ export const localRpcDefinition = <Serialized>({
     deserialize(hex) {
       return AccountPublicKey.fromBase64(hex);
     },
+  });
+  const date = custom({
+    intermediate: number,
+    serialize(dateTime: DateTime) {
+      return dateTime.toMillis();
+    },
+    deserialize(millis) {
+      return DateTime.fromMillis(millis);
+    },
+  });
+  const draft = object({
+    id: string,
+    text: string,
+    updatedAt: date,
   });
   return ensureRpcDefinition<Serialized>()({
     saveContact: {
@@ -39,6 +55,33 @@ export const localRpcDefinition = <Serialized>({
           accountPublicKey,
         })
       ),
+    },
+    createDraft: {
+      request: object({
+        text: string,
+      }),
+      response: object({
+        id: string,
+      }),
+    },
+    updateDraft: {
+      request: object({
+        id: string,
+        text: string,
+      }),
+      response: empty,
+    },
+    allDrafts: {
+      request: object({
+        orderBy: enumeration({ "date-descending": empty }),
+      }),
+      response: array(draft),
+    },
+    draftById: {
+      request: object({
+        id: string,
+      }),
+      response: draft,
     },
   });
 };

@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import React from "react";
 import { rpcElectronRenderer } from "./rpc/electron/rpc-electron-renderer";
 import { AccountPublicKey } from "./rpc/localRpcDefinition";
@@ -23,16 +24,56 @@ export function useAllContacts() {
     Array<{ name: string; accountPublicKey: AccountPublicKey }>
   >([]);
   const getAll = React.useCallback(async () => {
-    console.log("bug");
     const all = await rpc.allContacts({
       orderBy: { type: "name-ascending", payload: null },
     });
-    console.log(all);
     setAll(all);
   }, []);
   React.useEffect(() => {
     getAll();
   }, [getAll]);
-  console.log(all);
   return { data: all, reload: getAll };
+}
+
+export function useCreateDraft() {
+  const createDraft = ({ text }: { text: string }) => {
+    return rpc.createDraft({ text });
+  };
+  return createDraft;
+}
+
+export function useAllDrafts() {
+  const [all, setAll] = React.useState<
+    Array<{ id: string; text: string; updatedAt: DateTime }>
+  >([]);
+  const getAll = React.useCallback(async () => {
+    const all = await rpc.allDrafts({
+      orderBy: { type: "date-descending", payload: null },
+    });
+    setAll(all);
+  }, []);
+  React.useEffect(() => {
+    getAll();
+  }, [getAll]);
+  return { data: all, reload: getAll };
+}
+
+export function useDraftEdit(id: string) {
+  const [text, setText] = React.useState("");
+  const setText_ = (text: string) => {
+    setText(text);
+    rpc.updateDraft({ id, text });
+  };
+  React.useEffect(() => {
+    let active = true;
+    rpc.draftById({ id }).then((draft) => {
+      if (active) {
+        setText(draft.text);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [id, setText]);
+  return { text, setText: setText_ };
 }

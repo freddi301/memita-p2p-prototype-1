@@ -24,8 +24,10 @@
     "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest",
     "@mui/styled-engine-sc": "^5.0.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
+    "@prisma/client": "^3.2.1",
     "@types/electron": "^1.6.10",
     "@types/libsodium-wrappers": "^0.7.9",
+    "@types/luxon": "^2.0.5",
     "@types/react": "^17.0.30",
     "@types/react-dom": "^17.0.9",
     "@types/react-virtualized": "^9.21.13",
@@ -49,6 +51,7 @@
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.2.1-alpha-fd5e01c2e-20210913",
     "libsodium-wrappers": "^0.7.9",
+    "luxon": "^2.0.2",
     "path-browserify": "^1.0.1",
     "prisma": "^3.2.1",
     "react": "^17.0.2",
@@ -66,9 +69,7 @@
     "webpack-dev-server": "^4.3.1",
     "ws": "^8.2.3"
   },
-  "dependencies": {
-    "@prisma/client": "^3.2.1"
-  },
+  "dependencies": {},
   "resolutions": {
     "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
   }
