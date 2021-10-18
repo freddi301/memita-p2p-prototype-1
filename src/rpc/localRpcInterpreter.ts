@@ -2,7 +2,7 @@ import {
   DescriptionImplementation,
   ensureRpcInterpreter,
 } from "./framework/rpc-framework";
-import { localRpcDefinition } from "./localRpcDefinition";
+import { AccountPublicKey, localRpcDefinition } from "./localRpcDefinition";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -18,7 +18,18 @@ export const localRpcInterpreter = <Serialized>(
         await prisma.contact.create({
           data: { name, accountPublicKey: accountPublicKey.toBase64() },
         });
-        return {};
+        return null;
+      },
+      async allContacts({ orderBy }) {
+        const all = await prisma.contact.findMany({ orderBy: { name: "asc" } });
+        return all.map((contact) => {
+          return {
+            name: contact.name,
+            accountPublicKey: AccountPublicKey.fromBase64(
+              contact.accountPublicKey
+            ),
+          };
+        });
       },
     }
   );

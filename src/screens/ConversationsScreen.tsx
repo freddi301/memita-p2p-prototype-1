@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { FixedSizeList } from "react-window";
 import { AutoSizer } from "react-virtualized";
-import { FullScreenBottomNavigationLayout } from "../components/FullScreenBottomNavigationLayout";
+import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { MainBottomNavigation } from "../components/MainBottomNavigation";
 
 type ConversationsScreenProps = {
@@ -22,8 +22,8 @@ export function ConversationsScreen({
   onConversations,
 }: ConversationsScreenProps) {
   return (
-    <FullScreenBottomNavigationLayout
-      top={
+    <FullScreenNavigationLayout
+      middle={
         <AutoSizer>
           {({ width, height }) => {
             return (

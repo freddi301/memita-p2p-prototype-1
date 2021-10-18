@@ -11,13 +11,24 @@ import {
   Fab,
 } from "@mui/material";
 import { Close, Save } from "@mui/icons-material";
+import { AccountPublicKey } from "../rpc/localRpcDefinition";
 
 type AddContactScreenProps = {
   onCancel(): void;
-  onSave(name: string): void;
+  onSave(name: string, accountPublicKey: AccountPublicKey): void;
 };
 export function AddContactScreen({ onCancel, onSave }: AddContactScreenProps) {
   const [name, setName] = React.useState("");
+  const [accountPublicKeyString, setAccountPublicKeyString] =
+    React.useState("");
+  const accountPublicKey = React.useMemo(() => {
+    try {
+      return AccountPublicKey.fromHex(accountPublicKeyString);
+    } catch (error) {
+      return null;
+    }
+  }, [accountPublicKeyString]);
+  const canSave = name.length > 0 && accountPublicKey !== null;
   return (
     <React.Fragment>
       <AppBar position="static">
@@ -55,14 +66,26 @@ export function AddContactScreen({ onCancel, onSave }: AddContactScreenProps) {
               id="id"
               label="id"
               multiline
-              maxRows={4}
               fullWidth={true}
+              value={accountPublicKeyString}
+              onChange={(event) =>
+                setAccountPublicKeyString(event.currentTarget.value)
+              }
             />
           </ListItem>
         </List>
       </Box>
       <Box sx={{ position: "fixed", bottom: 16, right: 16 }}>
-        <Fab color="primary" aria-label="add" onClick={() => onSave(name)}>
+        <Fab
+          color="primary"
+          aria-label="add"
+          onClick={() => {
+            if (canSave && accountPublicKey) {
+              onSave(name, accountPublicKey);
+            }
+          }}
+          disabled={!canSave}
+        >
           <Save />
         </Fab>
       </Box>

@@ -7,6 +7,7 @@ type DeserializedOfDescription<D> = D extends Description<infer T, any>
   : never;
 
 export type DescriptionImplementation<Serialized> = {
+  empty: Description<null, Serialized>;
   string: Description<string, Serialized>;
   boolean: Description<boolean, Serialized>;
   number: Description<number, Serialized>;
@@ -91,7 +92,7 @@ export function makeRpcClient<
 type InterpreterShape<D extends RpcDefinitionShape<any>> = {
   [Key in keyof D]: (
     request: DeserializedOfDescription<D[Key]["request"]>
-  ) => DeserializedOfDescription<D[Key]["response"]>;
+  ) => Promise<DeserializedOfDescription<D[Key]["response"]>>;
 };
 
 export const ensureRpcInterpreter = <

@@ -15,11 +15,18 @@ socket.addEventListener("close", (event) => {
 socket.addEventListener("error", (event) => {
   // console.log("websocket error", event);
 });
+const ready = new Promise<void>((resolve) => {
+  socket.addEventListener("open", function listener(event) {
+    resolve();
+    socket.removeEventListener("open", listener);
+  });
+});
 
 export const rpcWebsocketClient = makeRpcClient(
   jsonSerializable,
   localRpcDefinition(jsonSerializable),
-  ({ type, payload }) => {
+  async ({ type, payload }) => {
+    await ready;
     const requestId = Math.random();
     socket.send(
       JSON.stringify({
@@ -31,6 +38,7 @@ export const rpcWebsocketClient = makeRpcClient(
     return new Promise((resolve) => {
       socket.addEventListener("message", function listener(event) {
         const parsed = JSON.parse(event.data);
+        console.log(parsed.requestId, requestId);
         if (parsed.requestId === requestId) {
           resolve(parsed.payload);
           socket.removeEventListener("message", listener);

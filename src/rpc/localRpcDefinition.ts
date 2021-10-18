@@ -1,4 +1,4 @@
-import libsodium, { from_hex } from "libsodium-wrappers";
+import libsodium from "libsodium-wrappers";
 import {
   DescriptionImplementation,
   ensureRpcDefinition,
@@ -8,24 +8,40 @@ export const localRpcDefinition = <Serialized>({
   object,
   string,
   custom,
-}: DescriptionImplementation<Serialized>) =>
-  ensureRpcDefinition<Serialized>()({
+  empty,
+  enumeration,
+  array,
+}: DescriptionImplementation<Serialized>) => {
+  const accountPublicKey = custom({
+    intermediate: string,
+    serialize(accountPublicKey: AccountPublicKey) {
+      return accountPublicKey.toBase64();
+    },
+    deserialize(hex) {
+      return AccountPublicKey.fromBase64(hex);
+    },
+  });
+  return ensureRpcDefinition<Serialized>()({
     saveContact: {
       request: object({
         name: string,
-        accountPublicKey: custom({
-          intermediate: string,
-          serialize(accountPublicKey: AccountPublicKey) {
-            return accountPublicKey.toBase64();
-          },
-          deserialize(hex) {
-            return AccountPublicKey.fromBase64(hex);
-          },
-        }),
+        accountPublicKey,
       }),
-      response: object({}),
+      response: empty,
+    },
+    allContacts: {
+      request: object({
+        orderBy: enumeration({ "name-ascending": empty }),
+      }),
+      response: array(
+        object({
+          name: string,
+          accountPublicKey,
+        })
+      ),
     },
   });
+};
 
 // TODO move to own file
 // https://libsodium.gitbook.io/doc/public-key_cryptography/authenticated_encryption

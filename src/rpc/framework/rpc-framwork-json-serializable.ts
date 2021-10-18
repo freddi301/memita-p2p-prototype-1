@@ -1,6 +1,15 @@
 import { DescriptionImplementation } from "./rpc-framework";
 
 export const jsonSerializable: DescriptionImplementation<unknown> = {
+  empty: {
+    serialize(value) {
+      return value;
+    },
+    deserialize(data) {
+      if (data !== null) throw new Error();
+      return data;
+    },
+  },
   boolean: {
     serialize(value) {
       return value;
@@ -69,7 +78,7 @@ export const jsonSerializable: DescriptionImplementation<unknown> = {
       deserialize(data) {
         if (!(data instanceof Object)) throw new Error();
         if (!("type" in data)) throw new Error();
-        if (!("playload" in data)) throw new Error();
+        if (!("payload" in data)) throw new Error();
         if (!((data as any).type in entriesDescription)) throw new Error();
         return {
           type: (data as any).type,

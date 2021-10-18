@@ -7,12 +7,16 @@ import {
   ListItemButton,
   ListItemText,
   Box,
+  AppBar,
+  Toolbar,
+  IconButton,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, Cached } from "@mui/icons-material";
 import { FixedSizeList } from "react-window";
 import { AutoSizer } from "react-virtualized";
-import { FullScreenBottomNavigationLayout } from "../components/FullScreenBottomNavigationLayout";
+import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { MainBottomNavigation } from "../components/MainBottomNavigation";
+import { useAllContacts } from "../data-hooks";
 
 type ContactScreenProps = {
   onAdd(): void;
@@ -24,10 +28,27 @@ export function ContactsScreen({
   onConversations,
   onContacts,
 }: ContactScreenProps) {
+  const contacts = useAllContacts();
   return (
     <React.Fragment>
-      <FullScreenBottomNavigationLayout
+      <FullScreenNavigationLayout
         top={
+          <AppBar>
+            <Toolbar>
+              <div style={{ flexGrow: 1 }}></div>
+              <IconButton
+                size="large"
+                aria-label="display more actions"
+                edge="end"
+                color="inherit"
+                onClick={() => contacts.reload()}
+              >
+                <Cached />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+        }
+        middle={
           <AutoSizer>
             {({ width, height }) => {
               return (
@@ -35,11 +56,25 @@ export function ContactsScreen({
                   width={width}
                   height={height}
                   itemSize={72}
-                  itemCount={contacts.length}
+                  itemCount={contacts.data.length}
                   overscanCount={5}
                 >
                   {({ index, style }) => {
-                    const name = contacts[index];
+                    if (index === 0) {
+                      return (
+                        <ListItem
+                          style={style}
+                          key={index}
+                          component="div"
+                          disablePadding
+                        >
+                          <ListItemButton>
+                            <ListItemText secondary="Refresh" />
+                          </ListItemButton>
+                        </ListItem>
+                      );
+                    }
+                    const contact = contacts.data[index - 1];
                     return (
                       <ListItem
                         style={style}
@@ -49,11 +84,11 @@ export function ContactsScreen({
                       >
                         <ListItemButton>
                           <ListItemAvatar>
-                            <Avatar>{name[0].toUpperCase()}</Avatar>
+                            <Avatar>{contact.name[0].toUpperCase()}</Avatar>
                           </ListItemAvatar>
                           <ListItemText
-                            primary={name}
-                            secondary={"description"}
+                            primary={contact.name}
+                            secondary={contact.accountPublicKey.toHex()}
                           />
                         </ListItemButton>
                       </ListItem>
@@ -80,5 +115,3 @@ export function ContactsScreen({
     </React.Fragment>
   );
 }
-
-const contacts = ["Pippo", "Pluto", "Paperino"];
