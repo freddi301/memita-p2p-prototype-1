@@ -17,10 +17,10 @@ export const localRpcDefinition = <Serialized>({
   const accountPublicKey = custom({
     intermediate: string,
     serialize(accountPublicKey: AccountPublicKey) {
-      return accountPublicKey.toBase64();
+      return accountPublicKey.toHex();
     },
     deserialize(hex) {
-      return AccountPublicKey.fromBase64(hex);
+      return AccountPublicKey.fromHex(hex);
     },
   });
   const date = custom({
@@ -31,11 +31,6 @@ export const localRpcDefinition = <Serialized>({
     deserialize(millis) {
       return DateTime.fromMillis(millis);
     },
-  });
-  const draft = object({
-    id: string,
-    text: string,
-    updatedAt: date,
   });
   return ensureRpcDefinition<Serialized>()({
     saveContact: {
@@ -56,32 +51,51 @@ export const localRpcDefinition = <Serialized>({
         })
       ),
     },
-    createDraft: {
-      request: object({
-        text: string,
-      }),
+    contactByAccountPublicKey: {
+      request: object({ accountPublicKey }),
       response: object({
-        id: string,
+        name: string,
+        accountPublicKey,
       }),
     },
-    updateDraft: {
+    sendMessage: {
       request: object({
-        id: string,
+        sender: accountPublicKey,
+        recipient: accountPublicKey,
         text: string,
+        createdAt: date,
       }),
       response: empty,
     },
-    allDrafts: {
+    allConversations: {
       request: object({
+        myAccountPublicKey: accountPublicKey,
         orderBy: enumeration({ "date-descending": empty }),
       }),
-      response: array(draft),
+      response: array(
+        object({
+          contact: object({
+            name: string,
+            accountPublicKey,
+          }),
+          lastMessage: object({ text: string, createdAt: date }),
+          newMessagesCount: number,
+        })
+      ),
     },
-    draftById: {
+    conversation: {
       request: object({
-        id: string,
+        myAccountPublicKey: accountPublicKey,
+        otherAccountPublicKey: accountPublicKey,
       }),
-      response: draft,
+      response: array(
+        object({
+          sender: accountPublicKey,
+          recipient: accountPublicKey,
+          text: string,
+          createdAt: date,
+        })
+      ),
     },
   });
 };
@@ -113,6 +127,9 @@ export class AccountPublicKey {
   static fromHex(hex: string) {
     return new AccountPublicKey(libsodium.from_hex(hex));
   }
+  equals(other: AccountPublicKey) {
+    return compareBuffers(this.publicKey.buffer, other.publicKey.buffer);
+  }
 }
 
 export class AccountSecretKey {
@@ -125,4 +142,16 @@ export class AccountSecretKey {
   static create() {
     return new AccountSecretKey(libsodium.crypto_box_keypair());
   }
+}
+
+function compareBuffers(buf1: ArrayBuffer, buf2: ArrayBuffer) {
+  if (buf1 === buf2) return true;
+  if (buf1.byteLength !== buf2.byteLength) return false;
+  const view1 = new DataView(buf1);
+  const view2 = new DataView(buf2);
+  let i = buf1.byteLength;
+  while (i--) {
+    if (view1.getUint8(i) !== view2.getUint8(i)) return false;
+  }
+  return true;
 }

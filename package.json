@@ -59,6 +59,7 @@
     "react-refresh": "^0.10.0",
     "react-virtualized": "^9.22.3",
     "react-window": "^1.8.6",
+    "source-map-support": "^0.5.20",
     "stream-browserify": "^3.0.0",
     "style-loader": "^3.3.0",
     "styled-components": "^5.3.1",

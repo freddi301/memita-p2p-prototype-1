@@ -1,27 +1,64 @@
 import React from "react";
 import {
+  AppBar,
   Avatar,
   Badge,
-  Fab,
+  IconButton,
   ListItem,
   ListItemAvatar,
   ListItemButton,
-  ListItemSecondaryAction,
   ListItemText,
+  Stack,
+  Toolbar,
+  Typography,
 } from "@mui/material";
 import { FixedSizeList } from "react-window";
 import { AutoSizer } from "react-virtualized";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { Box } from "@mui/system";
-import { Create } from "@mui/icons-material";
+import { Cached } from "@mui/icons-material";
+import { AccountPublicKey } from "../rpc/localRpcDefinition";
+import { useReadRpcCall } from "../data-hooks";
+import { DateTime } from "luxon";
+import { myAccountPublicKey } from "./ConversationScreen";
+import { TruncatedLine } from "../components/TruncatedLine";
 
 type ConversationsScreenProps = {
-  onCompose(): void;
+  onConversation(accountPublicKey: AccountPublicKey): void;
 };
-export function ConversationsScreen({ onCompose }: ConversationsScreenProps) {
+export function ConversationsScreen({
+  onConversation,
+}: ConversationsScreenProps) {
+  const conversations = useReadRpcCall(
+    "allConversations",
+    React.useMemo(
+      () => ({
+        myAccountPublicKey,
+        orderBy: { type: "date-descending", payload: null },
+      }),
+      []
+    ),
+    []
+  );
   return (
     <React.Fragment>
       <FullScreenNavigationLayout
+        top={
+          <AppBar position="static">
+            <Toolbar>
+              <Box sx={{ flexGrow: 1 }}></Box>
+              <IconButton
+                size="large"
+                aria-label="display more actions"
+                edge="end"
+                color="inherit"
+                onClick={() => conversations.reload()}
+              >
+                <Cached />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+        }
         middle={
           <AutoSizer>
             {({ width, height }) => {
@@ -30,11 +67,11 @@ export function ConversationsScreen({ onCompose }: ConversationsScreenProps) {
                   width={width}
                   height={height}
                   itemSize={72}
-                  itemCount={conversations.length}
+                  itemCount={conversations.response.length}
                   overscanCount={5}
                 >
                   {({ index, style }) => {
-                    const conversation = conversations[index];
+                    const conversation = conversations.response[index];
                     return (
                       <ListItem
                         style={style}
@@ -42,21 +79,57 @@ export function ConversationsScreen({ onCompose }: ConversationsScreenProps) {
                         component="div"
                         disablePadding
                       >
-                        <ListItemButton>
+                        <ListItemButton
+                          onClick={() =>
+                            onConversation(
+                              conversation.contact.accountPublicKey
+                            )
+                          }
+                        >
                           <ListItemAvatar>
                             <Avatar>
-                              {conversation.contactName[0].toUpperCase()}
+                              {conversation.contact.name[0].toUpperCase()}
                             </Avatar>
                           </ListItemAvatar>
                           <ListItemText
-                            primary={conversation.contactName}
-                            secondary={conversation.lastMessageText}
+                            primary={conversation.contact.name}
+                            secondary={
+                              <TruncatedLine
+                                text={conversation.lastMessage.text}
+                              />
+                            }
                           />
-                          <ListItemSecondaryAction>
-                            <Badge badgeContent={4} color="primary">
-                              2021-1-1
+                          <Box>
+                            <Badge
+                              badgeContent={conversation.newMessagesCount}
+                              color="primary"
+                            >
+                              <Stack alignItems="end">
+                                <Typography
+                                  sx={{
+                                    color: "rgba(255,255,255,0.7)",
+                                    fontWeight: 400,
+                                    fontSize: "0.875rem",
+                                  }}
+                                >
+                                  {conversation.lastMessage.createdAt.toLocaleString(
+                                    DateTime.DATE_SHORT
+                                  )}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    color: "rgba(255,255,255,0.7)",
+                                    fontWeight: 400,
+                                    fontSize: "0.875rem",
+                                  }}
+                                >
+                                  {conversation.lastMessage.createdAt.toLocaleString(
+                                    DateTime.TIME_WITH_SECONDS
+                                  )}
+                                </Typography>
+                              </Stack>
                             </Badge>
-                          </ListItemSecondaryAction>
+                          </Box>
                         </ListItemButton>
                       </ListItem>
                     );
@@ -67,32 +140,6 @@ export function ConversationsScreen({ onCompose }: ConversationsScreenProps) {
           </AutoSizer>
         }
       />
-      <Box sx={{ position: "fixed", bottom: 16, right: 16 }}>
-        <Fab color="primary" aria-label="add" onClick={onCompose}>
-          <Create />
-        </Fab>
-      </Box>
     </React.Fragment>
   );
 }
-
-const conversations = [
-  {
-    contactName: "Pippo",
-    lastMessageText: "Hi",
-    lastMessageDate: new Date("2019"),
-    newMessageCount: 1,
-  },
-  {
-    contactName: "Pluto",
-    lastMessageText: "Hello",
-    lastMessageDate: new Date("2020"),
-    newMessageCount: 2,
-  },
-  {
-    contactName: "Paperino",
-    lastMessageText: "Bye",
-    lastMessageDate: new Date("2021"),
-    newMessageCount: 3,
-  },
-];

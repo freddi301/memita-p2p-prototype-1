@@ -3,7 +3,7 @@ import {
   ensureRpcInterpreter,
 } from "./framework/rpc-framework";
 import { AccountPublicKey, localRpcDefinition } from "./localRpcDefinition";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Message, Contact } from "@prisma/client";
 import { DateTime } from "luxon";
 
 const prisma = new PrismaClient();
@@ -16,9 +16,8 @@ export const localRpcInterpreter = <Serialized>(
     localRpcDefinition(descriptionImplementation),
     {
       async saveContact({ name, accountPublicKey }) {
-        const id = String(Math.random());
         await prisma.contact.create({
-          data: { id, name, accountPublicKey: accountPublicKey.toBase64() },
+          data: { name, accountPublicKey: accountPublicKey.toHex() },
         });
         return null;
       },
@@ -27,48 +26,104 @@ export const localRpcInterpreter = <Serialized>(
         return all.map((contact) => {
           return {
             name: contact.name,
-            accountPublicKey: AccountPublicKey.fromBase64(
+            accountPublicKey: AccountPublicKey.fromHex(
               contact.accountPublicKey
             ),
           };
         });
       },
-      async createDraft({ text }) {
-        const id = String(Math.random());
-        await prisma.draft.create({
-          data: { id, text },
+      async contactByAccountPublicKey({ accountPublicKey }) {
+        const contact = await prisma.contact.findFirst({
+          where: {
+            accountPublicKey: accountPublicKey.toHex(),
+          },
         });
-        return { id: id };
+        if (!contact) throw new Error();
+        return {
+          name: contact.name,
+          accountPublicKey: AccountPublicKey.fromHex(contact.accountPublicKey),
+        };
       },
-      async updateDraft({ id, text }) {
-        await prisma.draft.update({
-          where: { id },
-          data: { text },
+      async allConversations({ myAccountPublicKey, orderBy }) {
+        // TODO better performance
+        const messages = await prisma.message.findMany({});
+        const byConversation: Record<string, Array<Message>> = {};
+        for (const message of messages) {
+          if (message.sender === myAccountPublicKey.toHex()) {
+            const key = message.recipient;
+            if (!byConversation[key]) byConversation[key] = [];
+            byConversation[key].push(message);
+          }
+          if (message.recipient === myAccountPublicKey.toHex()) {
+            const key = message.sender;
+            if (!byConversation[key]) byConversation[key] = [];
+            byConversation[key].push(message);
+          }
+        }
+        for (const messages of Object.values(byConversation)) {
+          messages.sort(
+            (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+          );
+        }
+        return Promise.all(
+          Object.entries(byConversation).map(async ([key, messages]) => {
+            const { text, createdAt } = messages[messages.length - 1];
+            const contact = (await prisma.contact.findFirst({
+              where: {
+                accountPublicKey: key,
+              },
+            })) as Contact;
+            return {
+              contact: {
+                name: contact.name,
+                accountPublicKey: AccountPublicKey.fromHex(key),
+              },
+              lastMessage: {
+                text,
+                createdAt: DateTime.fromJSDate(createdAt),
+              },
+              newMessagesCount: 0,
+            };
+          })
+        );
+      },
+      async sendMessage({ sender, recipient, text, createdAt }) {
+        await prisma.message.create({
+          data: {
+            sender: sender.toHex(),
+            recipient: recipient.toHex(),
+            text,
+            createdAt: createdAt.toJSDate(),
+          },
         });
         return null;
       },
-      async allDrafts({ orderBy }) {
-        const all = await prisma.draft.findMany({
-          orderBy: { lastUpdate: "desc" },
+      async conversation({ myAccountPublicKey, otherAccountPublicKey }) {
+        const messages = await prisma.message.findMany({
+          where: {
+            OR: [
+              {
+                sender: myAccountPublicKey.toHex(),
+                recipient: otherAccountPublicKey.toHex(),
+              },
+              {
+                sender: otherAccountPublicKey.toHex(),
+                recipient: myAccountPublicKey.toHex(),
+              },
+            ],
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
         });
-        return all.map((draft) => {
+        return messages.map((message) => {
           return {
-            id: draft.id,
-            text: draft.text,
-            updatedAt: DateTime.fromJSDate(draft.lastUpdate),
+            sender: AccountPublicKey.fromHex(message.sender),
+            recipient: AccountPublicKey.fromHex(message.recipient),
+            text: message.text,
+            createdAt: DateTime.fromJSDate(message.createdAt),
           };
         });
-      },
-      async draftById({ id }) {
-        const draft = await prisma.draft.findFirst({
-          where: { id },
-        });
-        if (!draft) throw new Error();
-        return {
-          id: draft.id,
-          text: draft.text,
-          updatedAt: DateTime.fromJSDate(draft.lastUpdate),
-        };
       },
     }
   );

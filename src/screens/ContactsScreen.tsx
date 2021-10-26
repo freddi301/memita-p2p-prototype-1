@@ -15,20 +15,32 @@ import { Add, Cached } from "@mui/icons-material";
 import { FixedSizeList } from "react-window";
 import { AutoSizer } from "react-virtualized";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
-import { useAllContacts } from "../data-hooks";
+import { useReadRpcCall } from "../data-hooks";
+import { AccountPublicKey } from "../rpc/localRpcDefinition";
+import { TruncatedLine } from "../components/TruncatedLine";
 
 type ContactScreenProps = {
   onAdd(): void;
+  onConversation(accountPublicKey: AccountPublicKey): void;
 };
-export function ContactsScreen({ onAdd }: ContactScreenProps) {
-  const contacts = useAllContacts();
+export function ContactsScreen({ onAdd, onConversation }: ContactScreenProps) {
+  const contacts = useReadRpcCall(
+    "allContacts",
+    React.useMemo(
+      () => ({
+        orderBy: { type: "name-ascending", payload: null },
+      }),
+      []
+    ),
+    []
+  );
   return (
     <React.Fragment>
       <FullScreenNavigationLayout
         top={
-          <AppBar>
+          <AppBar position="static">
             <Toolbar>
-              <div style={{ flexGrow: 1 }}></div>
+              <Box sx={{ flexGrow: 1 }}></Box>
               <IconButton
                 size="large"
                 aria-label="display more actions"
@@ -49,11 +61,11 @@ export function ContactsScreen({ onAdd }: ContactScreenProps) {
                   width={width}
                   height={height}
                   itemSize={72}
-                  itemCount={contacts.data.length}
+                  itemCount={contacts.response.length}
                   overscanCount={5}
                 >
                   {({ index, style }) => {
-                    const contact = contacts.data[index];
+                    const contact = contacts.response[index];
                     return (
                       <ListItem
                         style={style}
@@ -61,13 +73,21 @@ export function ContactsScreen({ onAdd }: ContactScreenProps) {
                         component="div"
                         disablePadding
                       >
-                        <ListItemButton>
+                        <ListItemButton
+                          onClick={() =>
+                            onConversation(contact.accountPublicKey)
+                          }
+                        >
                           <ListItemAvatar>
                             <Avatar>{contact.name[0].toUpperCase()}</Avatar>
                           </ListItemAvatar>
                           <ListItemText
                             primary={contact.name}
-                            secondary={contact.accountPublicKey.toHex()}
+                            secondary={
+                              <TruncatedLine
+                                text={contact.accountPublicKey.toHex()}
+                              />
+                            }
                           />
                         </ListItemButton>
                       </ListItem>

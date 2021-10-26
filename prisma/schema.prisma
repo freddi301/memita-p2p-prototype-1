@@ -12,13 +12,15 @@ generator client {
 }
 
 model Contact {
-  id               String @unique
-  accountPublicKey String
+  accountPublicKey String @unique
   name             String
 }
 
-model Draft {
-  id         String   @unique
-  text       String
-  lastUpdate DateTime @updatedAt
+model Message {
+  sender    String
+  recipient String
+  text      String
+  createdAt DateTime
+
+  @@unique([sender, recipient, text, createdAt])
 }
