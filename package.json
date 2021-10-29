@@ -50,6 +50,7 @@
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.2.1-alpha-fd5e01c2e-20210913",
+    "hyperswarm": "^3.0.0",
     "libsodium-wrappers": "^0.7.9",
     "luxon": "^2.0.2",
     "path-browserify": "^1.0.1",
