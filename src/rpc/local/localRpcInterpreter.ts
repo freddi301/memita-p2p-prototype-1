@@ -1,7 +1,7 @@
 import {
   DescriptionImplementation,
   ensureRpcInterpreter,
-} from "./framework/rpc-framework";
+} from "../framework/rpc-framework";
 import { AccountPublicKey, localRpcDefinition } from "./localRpcDefinition";
 import { PrismaClient, Message, Contact } from "@prisma/client";
 import { DateTime } from "luxon";

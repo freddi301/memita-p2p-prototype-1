@@ -3,5 +3,10 @@ import { localRpcServerAdapter } from "../localRpcServerAdapter";
 import { RCP_ELECTRON_CHANNEL } from "./rpc-electron-common";
 
 ipcMain.on(RCP_ELECTRON_CHANNEL, async (event, arg) => {
-  localRpcServerAdapter(arg, (response) => event.reply(response));
+  try {
+    await localRpcServerAdapter(arg, (response) => event.reply(response));
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
 });

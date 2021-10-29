@@ -1,4 +1,9 @@
-import { definition, interpreter } from "./websocket/rpc-websocket-server";
+import { jsonSerializable } from "../framework/rpc-framwork-json-serializable";
+import { localRpcDefinition } from "./localRpcDefinition";
+import { localRpcInterpreter } from "./localRpcInterpreter";
+
+const interpreter = localRpcInterpreter(jsonSerializable);
+const definition = localRpcDefinition(jsonSerializable);
 
 export async function localRpcServerAdapter(
   request: any,

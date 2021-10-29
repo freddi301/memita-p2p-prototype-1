@@ -1,6 +1,6 @@
 import React from "react";
-import { rpcElectronRenderer } from "./rpc/electron/rpc-electron-renderer";
-import { rpcWebsocketClient } from "./rpc/websocket/rpc-websocket-client";
+import { rpcElectronRenderer } from "./rpc/local/electron/rpc-electron-renderer";
+import { rpcWebsocketClient } from "./rpc/local/websocket/rpc-websocket-client";
 
 const rpc = rpcElectronRenderer ?? rpcWebsocketClient;
 

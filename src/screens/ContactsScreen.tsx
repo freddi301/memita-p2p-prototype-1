@@ -16,7 +16,7 @@ import { FixedSizeList } from "react-window";
 import { AutoSizer } from "react-virtualized";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { useReadRpcCall } from "../data-hooks";
-import { AccountPublicKey } from "../rpc/localRpcDefinition";
+import { AccountPublicKey } from "../rpc/local/localRpcDefinition";
 import { TruncatedLine } from "../components/TruncatedLine";
 
 type ContactScreenProps = {

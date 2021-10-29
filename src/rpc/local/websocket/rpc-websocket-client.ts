@@ -1,5 +1,5 @@
-import { makeRpcClient } from "../framework/rpc-framework";
-import { jsonSerializable } from "../framework/rpc-framwork-json-serializable";
+import { makeRpcClient } from "../../framework/rpc-framework";
+import { jsonSerializable } from "../../framework/rpc-framwork-json-serializable";
 import { localRpcDefinition } from "../localRpcDefinition";
 import { RPC_WEBSOCKET_PORT, RPC_WEBSOCKET_HOST } from "./rpc-websocket-common";
 

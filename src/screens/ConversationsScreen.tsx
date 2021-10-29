@@ -17,7 +17,7 @@ import { AutoSizer } from "react-virtualized";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { Box } from "@mui/system";
 import { Cached } from "@mui/icons-material";
-import { AccountPublicKey } from "../rpc/localRpcDefinition";
+import { AccountPublicKey } from "../rpc/local/localRpcDefinition";
 import { useReadRpcCall } from "../data-hooks";
 import { DateTime } from "luxon";
 import { myAccountPublicKey } from "./ConversationScreen";

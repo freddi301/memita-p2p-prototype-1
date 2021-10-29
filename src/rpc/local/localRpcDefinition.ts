@@ -2,7 +2,7 @@ import libsodium from "libsodium-wrappers";
 import {
   DescriptionImplementation,
   ensureRpcDefinition,
-} from "./framework/rpc-framework";
+} from "../framework/rpc-framework";
 import { DateTime } from "luxon";
 
 export const localRpcDefinition = <Serialized>({
