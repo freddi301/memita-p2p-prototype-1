@@ -3,3 +3,5 @@ dist
 .env
 prisma/migrations
 prisma/dev.db
+tsconfig.tsbuildinfo
+yarn-error.log
