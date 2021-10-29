@@ -1,8 +1,8 @@
 import React from "react";
-import { rpcElectronRenderer } from "./rpc/local/electron/rpc-electron-renderer";
-import { rpcWebsocketClient } from "./rpc/local/websocket/rpc-websocket-client";
+import { localRpcElectronRenderer } from "./rpc/local/electron/client";
+import { localRpcWebsocketClient } from "./rpc/local/websocket/client";
 
-const rpc = rpcElectronRenderer ?? rpcWebsocketClient;
+const rpc = localRpcElectronRenderer ?? localRpcWebsocketClient;
 
 export function useReadRpcCall<Method extends keyof typeof rpc, Initial>(
   method: Method,

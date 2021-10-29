@@ -16,7 +16,7 @@ import { DateTime } from "luxon";
 import React from "react";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { doWriteRpcCall, useReadRpcCall } from "../data-hooks";
-import { AccountPublicKey } from "../rpc/local/localRpcDefinition";
+import { AccountPublicKey } from "../rpc/local/definition";
 
 export const myAccountPublicKey = AccountPublicKey.fromHex(
   "0000000000000000000000000000000000000000000000000000000000000001"

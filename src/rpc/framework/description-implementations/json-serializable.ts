@@ -1,4 +1,4 @@
-import { DescriptionImplementation } from "./rpc-framework";
+import { DescriptionImplementation } from "../rpc-framework";
 
 export const jsonSerializable: DescriptionImplementation<unknown> = {
   empty: {

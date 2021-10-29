@@ -1,11 +1,13 @@
 import { makeRpcClient } from "../../framework/rpc-framework";
-import { jsonSerializable } from "../../framework/rpc-framwork-json-serializable";
-import { localRpcDefinition } from "../localRpcDefinition";
-import { RPC_WEBSOCKET_PORT, RPC_WEBSOCKET_HOST } from "./rpc-websocket-common";
+import { jsonSerializable } from "../../framework/description-implementations/json-serializable";
+import { localRpcDefinition } from "../definition";
+import { LOCAL_RPC_WEBSOCKET_PORT, LOCAL_RPC_WEBSOCKET_HOST } from "./common";
 
 // TODO improve performance using only one message listener
 
-let socket = new WebSocket(`ws://${RPC_WEBSOCKET_HOST}:${RPC_WEBSOCKET_PORT}`);
+let socket = new WebSocket(
+  `ws://${LOCAL_RPC_WEBSOCKET_HOST}:${LOCAL_RPC_WEBSOCKET_PORT}`
+);
 socket.addEventListener("open", (event) => {
   // console.log("websocket opened", event);
 });
@@ -22,7 +24,7 @@ const ready = new Promise<void>((resolve) => {
   });
 });
 
-export const rpcWebsocketClient = makeRpcClient(
+export const localRpcWebsocketClient = makeRpcClient(
   jsonSerializable,
   localRpcDefinition(jsonSerializable),
   async ({ type, payload }) => {

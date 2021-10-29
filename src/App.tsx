@@ -4,7 +4,7 @@ import { ConversationScreen } from "./screens/ConversationScreen";
 import { ConversationsScreen } from "./screens/ConversationsScreen";
 import { AddContactScreen } from "./screens/AddContactScreen";
 import { StyleProvider } from "./components/StyleProvider";
-import { AccountPublicKey } from "./rpc/localRpcDefinition";
+import { AccountPublicKey } from "./rpc/local/definition";
 import {
   List,
   ListItem,

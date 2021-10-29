@@ -1,6 +1,6 @@
-import { jsonSerializable } from "../framework/rpc-framwork-json-serializable";
-import { localRpcDefinition } from "./localRpcDefinition";
-import { localRpcInterpreter } from "./localRpcInterpreter";
+import { jsonSerializable } from "../framework/description-implementations/json-serializable";
+import { localRpcDefinition } from "./definition";
+import { localRpcInterpreter } from "./interpreter";
 
 const interpreter = localRpcInterpreter(jsonSerializable);
 const definition = localRpcDefinition(jsonSerializable);
