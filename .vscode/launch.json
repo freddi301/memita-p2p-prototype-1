@@ -1,0 +1,17 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "SMS Desktop websocket server",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\dist\\rpc\\websocket\\rpc-websocket-server.js",
+      "outFiles": ["${workspaceFolder}/**/*.js"],
+      "preLaunchTask": "npm: build:typescript - sms-desktop"
+    }
+  ]
+}

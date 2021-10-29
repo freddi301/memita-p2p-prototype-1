@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build:typescript",
+      "path": "./",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: build:typescript - sms-desktop",
+      "detail": "tsc && cp public/index.html dist/index.html"
+    }
+  ]
+}
