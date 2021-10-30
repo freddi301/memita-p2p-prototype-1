@@ -3,6 +3,9 @@ import { makeRpcClient } from "../../framework/rpc-framework";
 import { jsonSerializable } from "../../framework/description-implementations/json-serializable";
 import { remoteRpcDefinition } from "../definition";
 
+export type RemoteRpcHyperswarmClient = ReturnType<
+  typeof makeRemoteRpcHyperswarmClient
+>;
 export function makeRemoteRpcHyperswarmClient(connection: Connection) {
   return makeRpcClient(
     jsonSerializable,
