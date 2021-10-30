@@ -17,10 +17,7 @@ import React from "react";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { doWriteRpcCall, useReadRpcCall } from "../data-hooks";
 import { AccountPublicKey } from "../rpc/local/definition";
-
-export const myAccountPublicKey = AccountPublicKey.fromHex(
-  "0000000000000000000000000000000000000000000000000000000000000001"
-);
+import { myAccountPublicKey } from "../myAccountPublicKey";
 
 type ConversationScreenProps = {
   recipient: AccountPublicKey;
@@ -48,6 +45,7 @@ export function ConversationScreen({
   );
   const [text, setText] = React.useState("");
   const listRef = React.useRef<VariableSizeList<any>>();
+  const canSend = text.trim().length > 0;
   return (
     <FullScreenNavigationLayout
       top={
@@ -144,16 +142,19 @@ export function ConversationScreen({
           <IconButton
             aria-label="send"
             color="primary"
+            disabled={!canSend}
             onClick={async () => {
-              setText("");
-              await doWriteRpcCall("sendMessage", {
-                sender: myAccountPublicKey,
-                recipient,
-                text,
-                createdAt: DateTime.now(),
-              });
-              conversation.reload();
-              // listRef.current?.scrollToItem(1000000000000, "start");
+              if (canSend) {
+                setText("");
+                await doWriteRpcCall("sendMessage", {
+                  sender: myAccountPublicKey,
+                  recipient,
+                  text,
+                  createdAt: DateTime.now(),
+                });
+                conversation.reload();
+                // listRef.current?.scrollToItem(1000000000000, "start");
+              }
             }}
           >
             <Send />

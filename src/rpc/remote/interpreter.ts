@@ -1,3 +1,6 @@
+import { myAccountPublicKey } from "../../myAccountPublicKey";
+import { hashMessage } from "../common";
+import { prisma } from "../prisma";
 import {
   DescriptionImplementation,
   ensureRpcInterpreter,
@@ -11,9 +14,26 @@ export const remoteRpcInterpreter = <Serialized>(
     descriptionImplementation,
     remoteRpcDefinition(descriptionImplementation),
     {
-      async replicate(text) {
-        // TODO
+      async replicateMessage({ sender, recipient, text, createdAt }) {
+        const hash = hashMessage({ sender, recipient, text, createdAt });
+        await prisma.message.upsert({
+          where: { hash },
+          update: {},
+          create: {
+            hash,
+            sender: sender.toHex(),
+            recipient: recipient.toHex(),
+            text,
+            createdAt: createdAt.toJSDate(),
+          },
+        });
         return null;
+      },
+      async whoAreYou() {
+        return {
+          accountPublicKey: myAccountPublicKey,
+          device: "1",
+        };
       },
     }
   );

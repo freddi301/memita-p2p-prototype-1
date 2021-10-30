@@ -20,7 +20,7 @@ import { Cached } from "@mui/icons-material";
 import { AccountPublicKey } from "../rpc/local/definition";
 import { useReadRpcCall } from "../data-hooks";
 import { DateTime } from "luxon";
-import { myAccountPublicKey } from "./ConversationScreen";
+import { myAccountPublicKey } from "../myAccountPublicKey";
 import { TruncatedLine } from "../components/TruncatedLine";
 
 type ConversationsScreenProps = {
@@ -88,7 +88,9 @@ export function ConversationsScreen({
                         >
                           <ListItemAvatar>
                             <Avatar>
-                              {conversation.contact.name[0].toUpperCase()}
+                              {conversation.contact.name
+                                .slice(0, 1)
+                                .toUpperCase()}
                             </Avatar>
                           </ListItemAvatar>
                           <ListItemText

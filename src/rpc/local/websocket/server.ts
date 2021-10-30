@@ -2,8 +2,6 @@ import { WebSocketServer } from "ws";
 import { localRpcServerAdapter } from "../adapter";
 import { LOCAL_RPC_WEBSOCKET_PORT } from "./common";
 
-require("source-map-support").install(); // need for node
-
 const wss = new WebSocketServer({ port: LOCAL_RPC_WEBSOCKET_PORT }, () => {
   console.log(`server started on port ${LOCAL_RPC_WEBSOCKET_PORT}`);
 });

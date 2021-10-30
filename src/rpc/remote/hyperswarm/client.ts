@@ -1,12 +1,12 @@
 import { Connection } from "hyperswarm";
 import { makeRpcClient } from "../../framework/rpc-framework";
 import { jsonSerializable } from "../../framework/description-implementations/json-serializable";
-import { localRpcDefinition } from "../../local/definition";
+import { remoteRpcDefinition } from "../definition";
 
-export function makeRpcHyperswarmClient(connection: Connection) {
+export function makeRemoteRpcHyperswarmClient(connection: Connection) {
   return makeRpcClient(
     jsonSerializable,
-    localRpcDefinition(jsonSerializable),
+    remoteRpcDefinition(jsonSerializable),
     async ({ type, payload }) => {
       const requestId = Math.random();
       connection.write(

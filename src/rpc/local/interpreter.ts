@@ -3,15 +3,15 @@ import {
   ensureRpcInterpreter,
 } from "../framework/rpc-framework";
 import { AccountPublicKey, localRpcDefinition } from "./definition";
-import { PrismaClient, Message, Contact } from "@prisma/client";
+import { Message } from "@prisma/client";
 import { DateTime } from "luxon";
-
-const prisma = new PrismaClient();
+import { hashMessage } from "../common";
+import { prisma } from "../prisma";
 
 export const localRpcInterpreter = <Serialized>(
   descriptionImplementation: DescriptionImplementation<Serialized>
-) =>
-  ensureRpcInterpreter(
+) => {
+  return ensureRpcInterpreter(
     descriptionImplementation,
     localRpcDefinition(descriptionImplementation),
     {
@@ -68,14 +68,14 @@ export const localRpcInterpreter = <Serialized>(
         return Promise.all(
           Object.entries(byConversation).map(async ([key, messages]) => {
             const { text, createdAt } = messages[messages.length - 1];
-            const contact = (await prisma.contact.findFirst({
+            const contact = await prisma.contact.findFirst({
               where: {
                 accountPublicKey: key,
               },
-            })) as Contact;
+            });
             return {
               contact: {
-                name: contact.name,
+                name: contact?.name ?? "",
                 accountPublicKey: AccountPublicKey.fromHex(key),
               },
               lastMessage: {
@@ -90,6 +90,7 @@ export const localRpcInterpreter = <Serialized>(
       async sendMessage({ sender, recipient, text, createdAt }) {
         await prisma.message.create({
           data: {
+            hash: hashMessage({ sender, recipient, text, createdAt }),
             sender: sender.toHex(),
             recipient: recipient.toHex(),
             text,
@@ -127,3 +128,4 @@ export const localRpcInterpreter = <Serialized>(
       },
     }
   );
+};
