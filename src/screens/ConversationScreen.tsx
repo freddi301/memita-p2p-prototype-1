@@ -43,6 +43,13 @@ export function ConversationScreen({
     ),
     []
   );
+  const { reload } = conversation;
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      reload();
+    }, 300);
+    return () => clearInterval(intervalId);
+  }, [reload]);
   const [text, setText] = React.useState("");
   const listRef = React.useRef<VariableSizeList<any>>();
   const canSend = text.trim().length > 0;
@@ -65,7 +72,7 @@ export function ConversationScreen({
               {contact.response?.name}
             </Typography>
             <Box sx={{ flexGrow: 1 }}></Box>
-            <IconButton
+            {/* <IconButton
               size="large"
               aria-label="display more actions"
               edge="end"
@@ -73,7 +80,7 @@ export function ConversationScreen({
               onClick={() => conversation.reload()}
             >
               <Cached />
-            </IconButton>
+            </IconButton> */}
           </Toolbar>
         </AppBar>
       }

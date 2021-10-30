@@ -47,9 +47,12 @@ export function App() {
     });
     openContactsScreen();
   };
-  const openConversationScreen = (accountPublicKey: AccountPublicKey) => {
-    setState({ screen: "conversation", recipient: accountPublicKey });
-  };
+  const openConversationScreen = React.useCallback(
+    (accountPublicKey: AccountPublicKey) => {
+      setState({ screen: "conversation", recipient: accountPublicKey });
+    },
+    []
+  );
   React.useLayoutEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
