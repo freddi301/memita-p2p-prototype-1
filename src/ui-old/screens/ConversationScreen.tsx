@@ -16,8 +16,8 @@ import { DateTime } from "luxon";
 import React from "react";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { doWriteRpcCall, useReadRpcCall } from "../data-hooks";
-import { AccountPublicKey } from "../rpc/local/definition";
-import { myAccountPublicKey } from "../myAccountPublicKey";
+import { AccountPublicKey } from "../../rpc/local/definition";
+import { myAccountPublicKey } from "../../myAccountPublicKey";
 
 type ConversationScreenProps = {
   recipient: AccountPublicKey;

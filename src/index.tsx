@@ -4,6 +4,6 @@ import libsodium from "libsodium-wrappers";
 
 (async () => {
   await libsodium.ready;
-  const { App } = await import("./App");
+  const { App } = await import("./ui/App");
   ReactDOM.render(<App />, document.getElementById("root"));
 })();

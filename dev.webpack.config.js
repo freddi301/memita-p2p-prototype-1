@@ -20,12 +20,24 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            plugins: [require("react-refresh/babel")],
-            presets: ["@babel/preset-env"],
+            plugins: [
+              "macros",
+              require("react-refresh/babel"),
+              [
+                "@babel/plugin-transform-runtime",
+                {
+                  regenerator: true,
+                },
+              ],
+            ],
+            presets: ["@babel/preset-env", "@babel/react", "@babel/typescript"],
           },
         },
       },
-      ...config.module.rules,
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
   plugins: [new ReactRefreshWebpackPlugin(), ...config.plugins],

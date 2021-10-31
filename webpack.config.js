@@ -23,9 +23,28 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
         exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            plugins: [
+              "macros",
+              [
+                "@babel/plugin-transform-runtime",
+                {
+                  regenerator: true,
+                },
+              ],
+            ],
+            presets: ["@babel/preset-env", "@babel/react", "@babel/typescript"],
+          },
+        },
       },
+      // {
+      //   test: /\.tsx?$/,
+      //   use: "ts-loader",
+      //   exclude: /node_modules/,
+      // },
       {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],

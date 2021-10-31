@@ -11,7 +11,7 @@ import {
   Fab,
 } from "@mui/material";
 import { Close, Save } from "@mui/icons-material";
-import { AccountPublicKey } from "../rpc/local/definition";
+import { AccountPublicKey } from "../../rpc/local/definition";
 
 type AddContactScreenProps = {
   onCancel(): void;

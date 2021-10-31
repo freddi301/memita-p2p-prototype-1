@@ -17,10 +17,10 @@ import { AutoSizer } from "react-virtualized";
 import { FullScreenNavigationLayout } from "../components/FullScreenNavigationLayout";
 import { Box } from "@mui/system";
 import { Cached } from "@mui/icons-material";
-import { AccountPublicKey } from "../rpc/local/definition";
+import { AccountPublicKey } from "../../rpc/local/definition";
 import { useReadRpcCall } from "../data-hooks";
 import { DateTime } from "luxon";
-import { myAccountPublicKey } from "../myAccountPublicKey";
+import { myAccountPublicKey } from "../../myAccountPublicKey";
 import { TruncatedLine } from "../components/TruncatedLine";
 import { isEqual } from "lodash";
 
