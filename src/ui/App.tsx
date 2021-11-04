@@ -1,24 +1,45 @@
 import React from "react";
-import { useMediaQuery } from "react-responsive";
-import { LargeScreen } from "./large/LargeScreen";
-import { SmallScreen } from "./small/SmallScreen";
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
-import "./index.css";
-import { css } from "styled-components/macro";
+import { StyleProvider } from "./StyleProvider";
+import { WholeScreen } from "./components/WholeScreen";
+import { CreateAccountScreen } from "./screens/CreateAccountScreen";
+import { AccountListScreen } from "./screens/AccountListScreen";
 
 export function App() {
-  const isSmall = useMediaQuery({ query: "(max-width: 600px)" });
+  const [routing, setRouting] = React.useState<Routing>({
+    screen: "create-account",
+  });
+  const openAccountListScreen = React.useCallback(() => {
+    setRouting({ screen: "account-list" });
+  }, []);
+  const openCreateAccountScreen = React.useCallback(() => {
+    setRouting({ screen: "create-account" });
+  }, []);
   return (
-    <div
-      css={css`
-        font-family: Roboto;
-        color: #abb2bf;
-      `}
-    >
-      {isSmall ? <SmallScreen /> : <LargeScreen />}
-    </div>
+    <StyleProvider>
+      <WholeScreen>
+        {(() => {
+          switch (routing.screen) {
+            case "home": {
+              return null;
+            }
+            case "create-account": {
+              return <CreateAccountScreen onCancel={openAccountListScreen} />;
+            }
+            case "account-list": {
+              return <AccountListScreen onCreate={openCreateAccountScreen} />;
+            }
+          }
+        })()}
+      </WholeScreen>
+    </StyleProvider>
   );
 }
+
+type Routing =
+  | { screen: "home" }
+  | {
+      screen: "account-list";
+    }
+  | {
+      screen: "create-account";
+    };

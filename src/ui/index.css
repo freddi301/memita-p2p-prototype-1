@@ -3,12 +3,13 @@ body {
 }
 
 ::-webkit-scrollbar {
-  background-color: #21252b;
+  background-color: hsl(0, 0%, 15%);
   width: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #282c34;
+  background-color: hsl(0, 0%, 10%);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-corner {
-  background-color: #21252b;
+  background-color: hsl(0, 0%, 15%);
 }
