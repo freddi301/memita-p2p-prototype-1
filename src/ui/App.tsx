@@ -5,11 +5,14 @@ import { CreateAccountScreen } from "./screens/CreateAccountScreen";
 import { AccountListScreen } from "./screens/AccountListScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { AccountScreen } from "./screens/AccountScreen";
+import { usePrevious } from "./hooks/usePrevious";
+import { Transitionate } from "./components/Transitionate";
 
 export function App() {
   const [routing, setRouting] = React.useState<Routing>({
-    screen: "create-account",
+    screen: "home",
   });
+  const previous = usePrevious(routing);
   const openHomeScreen = React.useCallback(() => {
     setRouting({ screen: "home" });
   }, []);
@@ -22,31 +25,78 @@ export function App() {
   const openAccountScreen = React.useCallback(() => {
     setRouting({ screen: "account" });
   }, []);
+  const screen = React.useMemo(() => {
+    switch (routing.screen) {
+      case "home": {
+        return <HomeScreen onAccounts={openAccountListScreen} />;
+      }
+      case "create-account": {
+        return <CreateAccountScreen onCancel={openAccountListScreen} />;
+      }
+      case "account-list": {
+        return (
+          <AccountListScreen
+            onCreate={openCreateAccountScreen}
+            onAccount={openAccountScreen}
+            onHome={openHomeScreen}
+          />
+        );
+      }
+      case "account": {
+        return <AccountScreen onCancel={openAccountListScreen} />;
+      }
+    }
+  }, [
+    routing.screen,
+    openAccountListScreen,
+    openAccountScreen,
+    openCreateAccountScreen,
+    openHomeScreen,
+  ]);
+  const enterFrom = (() => {
+    console.log(previous.screen, routing.screen);
+    switch (previous.screen) {
+      case "home": {
+        switch (routing.screen) {
+          case "home":
+            return "right";
+          case "account-list":
+            return "right";
+        }
+        break;
+      }
+      case "account-list": {
+        switch (routing.screen) {
+          case "home":
+            return "left";
+          case "account":
+            return "right";
+          case "create-account":
+            return "right";
+        }
+        break;
+      }
+      case "create-account": {
+        switch (routing.screen) {
+          case "account-list":
+            return "left";
+        }
+        break;
+      }
+      case "account": {
+        switch (routing.screen) {
+          case "account-list":
+            return "left";
+        }
+        break;
+      }
+    }
+    throw new Error();
+  })();
   return (
     <StyleProvider>
       <WholeScreen>
-        {(() => {
-          switch (routing.screen) {
-            case "home": {
-              return <HomeScreen onAccounts={openAccountListScreen} />;
-            }
-            case "create-account": {
-              return <CreateAccountScreen onCancel={openAccountListScreen} />;
-            }
-            case "account-list": {
-              return (
-                <AccountListScreen
-                  onCreate={openCreateAccountScreen}
-                  onAccount={openAccountScreen}
-                  onHome={openHomeScreen}
-                />
-              );
-            }
-            case "account": {
-              return <AccountScreen onCancel={openAccountListScreen} />;
-            }
-          }
-        })()}
+        <Transitionate enterFrom={enterFrom}>{screen}</Transitionate>
       </WholeScreen>
     </StyleProvider>
   );

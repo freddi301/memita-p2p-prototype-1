@@ -2,18 +2,32 @@ import React from "react";
 import { StackLayout } from "../components/StackLayout";
 import { Text } from "../components/Text";
 import { Clickable } from "../components/Clickable";
+import { Icon } from "../components/Icon";
+import { HeaderContentControlsLayout } from "../components/HeaderContentControlsLayout";
+import { Button } from "../components/Button";
 
 type HomeScreenProps = {
   onAccounts(): void;
 };
 export function HomeScreen({ onAccounts }: HomeScreenProps) {
   return (
-    <StackLayout type="vertical" align="start" gap={false} padding={false}>
-      <Clickable onClick={onAccounts}>
-        <StackLayout type="vertical" align="start" gap={true} padding={true}>
-          <Text color="primary" size="normal" weight="normal" text="Accounts" />
+    <HeaderContentControlsLayout
+      header={
+        <StackLayout type="horizontal" align="start" gap={true} padding={true}>
+          <Text text="Home" color="primary" weight="bold" size="big" />
         </StackLayout>
-      </Clickable>
-    </StackLayout>
+      }
+      content={null}
+      controls={
+        <StackLayout type="horizontal" align="end" gap={true} padding={true}>
+          <Button
+            icon={<Icon icon="Account" />}
+            enabled={true}
+            label="Accounts"
+            onClick={onAccounts}
+          />
+        </StackLayout>
+      }
+    />
   );
 }

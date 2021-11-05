@@ -3,9 +3,9 @@ import { Button } from "../components/Button";
 import { HeaderContentControlsLayout } from "../components/HeaderContentControlsLayout";
 import { StackLayout } from "../components/StackLayout";
 import { Text } from "../components/Text";
-import { StyleContext } from "../StyleProvider";
 import { Virtuoso } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
+import { Icon } from "../components/Icon";
 
 type AccountListScreenProps = {
   onCreate(): void;
@@ -17,7 +17,6 @@ export function AccountListScreen({
   onHome,
   onAccount,
 }: AccountListScreenProps) {
-  const { theme } = React.useContext(StyleContext);
   return (
     <HeaderContentControlsLayout
       header={
@@ -58,13 +57,13 @@ export function AccountListScreen({
         <StackLayout type="horizontal" align="end" gap={true} padding={true}>
           <Button
             label="Create Account"
-            icon={theme.icons.CreateAccount}
+            icon={<Icon icon="CreateAccount" />}
             onClick={onCreate}
             enabled={true}
           />
           <Button
             label="Home"
-            icon={theme.icons.Home}
+            icon={<Icon icon="Home" />}
             onClick={onHome}
             enabled={true}
           />

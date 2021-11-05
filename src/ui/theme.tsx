@@ -4,6 +4,7 @@ import {
   faHome,
   faSave,
   faTimes,
+  faUser,
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -59,5 +60,6 @@ export const theme = {
     Cancel: <FontAwesomeIcon icon={faTimes} />,
     Home: <FontAwesomeIcon icon={faHome} />,
     Save: <FontAwesomeIcon icon={faSave} />,
+    Account: <FontAwesomeIcon icon={faUser} />,
   },
 };

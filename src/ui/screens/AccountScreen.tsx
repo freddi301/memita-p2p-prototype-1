@@ -5,7 +5,7 @@ import { Textarea } from "../components/Textarea";
 import { HeaderContentControlsLayout } from "../components/HeaderContentControlsLayout";
 import { StackLayout } from "../components/StackLayout";
 import { Text } from "../components/Text";
-import { StyleContext } from "../StyleProvider";
+import { Icon } from "../components/Icon";
 
 type AccountScreenProps = {
   onCancel(): void;
@@ -14,7 +14,6 @@ type AccountScreenProps = {
 export function AccountScreen({ onCancel }: AccountScreenProps) {
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
-  const { theme } = React.useContext(StyleContext);
   return (
     <HeaderContentControlsLayout
       header={
@@ -51,13 +50,13 @@ export function AccountScreen({ onCancel }: AccountScreenProps) {
         <StackLayout type="horizontal" align="end" gap={true} padding={true}>
           <Button
             label="Save"
-            icon={theme.icons.Save}
+            icon={<Icon icon="Save" />}
             onClick={() => {}}
             enabled={false}
           />
           <Button
             label="Back"
-            icon={theme.icons.Cancel}
+            icon={<Icon icon="Cancel" />}
             onClick={onCancel}
             enabled={true}
           />

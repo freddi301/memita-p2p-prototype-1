@@ -47,6 +47,7 @@ export function StackLayout({
             grid-auto-columns: max-content;
             grid-template-rows: auto;
             grid-column-gap: ${gap ? theme.spacing.gap : ""};
+            align-items: center;
             padding-top: ${padding ? theme.spacing.text.vertical : ""};
             padding-bottom: ${padding ? theme.spacing.text.vertical : ""};
             padding-left: ${padding ? theme.spacing.text.horizontal : ""};
