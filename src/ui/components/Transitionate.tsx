@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 type TransitionateProps = {
-  enterFrom: "left" | "right";
+  enterFrom: "left" | "right" | "stay";
   children: React.ReactNode;
 };
 export function Transitionate({ children, enterFrom }: TransitionateProps) {
@@ -63,5 +63,9 @@ const transformMap = {
   right: {
     leaving: "translate(-100%, 0%)",
     entering: "translate(100%, 0%)",
+  },
+  stay: {
+    leaving: "translate(0%, 0%)",
+    entering: "translate(0%, 0%)",
   },
 } as const;

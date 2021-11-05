@@ -58,8 +58,6 @@ export function App() {
     switch (previous.screen) {
       case "home": {
         switch (routing.screen) {
-          case "home":
-            return "right";
           case "account-list":
             return "right";
         }
@@ -91,7 +89,7 @@ export function App() {
         break;
       }
     }
-    throw new Error();
+    return "stay";
   })();
   return (
     <StyleProvider>

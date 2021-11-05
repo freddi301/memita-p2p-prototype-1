@@ -35,15 +35,15 @@ export function CreateAccountScreen({ onCancel }: CreateAccountScreenProps) {
       controls={
         <StackLayout type="horizontal" align="end" gap={true} padding={true}>
           <Button
-            label="Create Account"
-            icon={<Icon icon="CreateAccount" />}
-            onClick={() => {}}
-            enabled={true}
-          />
-          <Button
             label="Cancel"
             icon={<Icon icon="Cancel" />}
             onClick={onCancel}
+            enabled={true}
+          />
+          <Button
+            label="Create Account"
+            icon={<Icon icon="CreateAccount" />}
+            onClick={() => {}}
             enabled={true}
           />
         </StackLayout>

@@ -16,7 +16,10 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
   return (
     <button
       ref={ref}
-      onClick={onClick}
+      onClick={() => {
+        console.log("pops");
+        onClick();
+      }}
       css={css`
         display: flex;
         justify-content: center;
@@ -47,11 +50,6 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
         padding-right: ${showButtonLabel ? theme.spacing.text.horizontal : ""};
         transition: ${theme.transitions.input.duration};
       `}
-      onKeyDown={(event) => {
-        if (event.key === "Enter") {
-          onClick();
-        }
-      }}
       onMouseEnter={() => {
         ref.current?.focus();
       }}

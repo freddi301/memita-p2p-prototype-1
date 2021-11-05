@@ -1,23 +1,29 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faFileExport,
+  faFileImport,
   faHome,
   faSave,
+  faShareAlt,
   faTimes,
   faUser,
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
+const hue = 240;
+const saturation = 10;
+
 export const theme = {
   colors: {
     text: {
-      primary: "hsl(0, 0%, 80%)",
-      secondary: "hsl(0, 0%, 55%)",
+      primary: `hsl(${hue}, ${saturation}%, 90%)`,
+      secondary: `hsl(${hue}, ${saturation}%, 55%)`,
     },
     background: {
-      passive: "hsl(0, 0%, 15%)",
-      active: "hsl(0, 0%, 10%)",
-      focus: "hsl(0, 0%, 20%)",
+      passive: `hsl(${hue}, ${saturation}%, 15%)`,
+      active: `hsl(${hue}, ${saturation}%, 10%)`,
+      focus: `hsl(${hue}, ${saturation}%, 20%)`,
     },
   },
   spacing: {
@@ -61,5 +67,8 @@ export const theme = {
     Home: <FontAwesomeIcon icon={faHome} />,
     Save: <FontAwesomeIcon icon={faSave} />,
     Account: <FontAwesomeIcon icon={faUser} />,
+    Share: <FontAwesomeIcon icon={faShareAlt} />,
+    Export: <FontAwesomeIcon icon={faFileExport} />,
+    Import: <FontAwesomeIcon icon={faFileImport} />,
   },
 };

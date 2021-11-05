@@ -49,16 +49,29 @@ export function AccountScreen({ onCancel }: AccountScreenProps) {
       controls={
         <StackLayout type="horizontal" align="end" gap={true} padding={true}>
           <Button
-            label="Save"
-            icon={<Icon icon="Save" />}
+            label="Share"
+            icon={<Icon icon="Share" />}
             onClick={() => {}}
-            enabled={false}
+            enabled={true}
           />
+          <Button
+            label="Export"
+            icon={<Icon icon="Export" />}
+            onClick={() => {}}
+            enabled={true}
+          />
+
           <Button
             label="Back"
             icon={<Icon icon="Cancel" />}
             onClick={onCancel}
             enabled={true}
+          />
+          <Button
+            label="Save"
+            icon={<Icon icon="Save" />}
+            onClick={() => {}}
+            enabled={false}
           />
         </StackLayout>
       }

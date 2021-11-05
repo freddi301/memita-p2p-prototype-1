@@ -40,13 +40,13 @@ export function AccountListScreen({
                   color="primary"
                   size="normal"
                   weight="bold"
-                  text={`User${index}`}
+                  text={`Account Name ${index}`}
                 />
                 <Text
                   color="secondary"
                   size="normal"
                   weight="normal"
-                  text={`Utente${index}`}
+                  text={`xxxx ${index}`}
                 />
               </StackLayout>
             </Clickable>
@@ -56,15 +56,21 @@ export function AccountListScreen({
       controls={
         <StackLayout type="horizontal" align="end" gap={true} padding={true}>
           <Button
-            label="Create Account"
-            icon={<Icon icon="CreateAccount" />}
-            onClick={onCreate}
-            enabled={true}
-          />
-          <Button
             label="Home"
             icon={<Icon icon="Home" />}
             onClick={onHome}
+            enabled={true}
+          />
+          <Button
+            label="Import"
+            icon={<Icon icon="Import" />}
+            onClick={() => {}}
+            enabled={true}
+          />
+          <Button
+            label="Create"
+            icon={<Icon icon="CreateAccount" />}
+            onClick={onCreate}
             enabled={true}
           />
         </StackLayout>
