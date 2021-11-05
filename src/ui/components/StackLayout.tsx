@@ -6,9 +6,16 @@ type StackLayoutProps = {
   type: "vertical" | "horizontal";
   align: "start" | "end";
   gap: boolean;
+  padding: boolean;
   children: React.ReactNode;
 };
-export function StackLayout({ type, children, align, gap }: StackLayoutProps) {
+export function StackLayout({
+  type,
+  children,
+  align,
+  gap,
+  padding,
+}: StackLayoutProps) {
   const { theme } = React.useContext(StyleContext);
   switch (type) {
     case "vertical": {
@@ -20,10 +27,10 @@ export function StackLayout({ type, children, align, gap }: StackLayoutProps) {
             grid-auto-rows: auto;
             grid-template-columns: auto;
             grid-row-gap: ${gap ? theme.spacing.gap : ""};
-            padding-top: ${theme.spacing.text.vertical};
-            padding-bottom: ${theme.spacing.text.vertical};
-            padding-left: ${theme.spacing.text.horizontal};
-            padding-right: ${theme.spacing.text.horizontal};
+            padding-top: ${padding ? theme.spacing.text.vertical : ""};
+            padding-bottom: ${padding ? theme.spacing.text.vertical : ""};
+            padding-left: ${padding ? theme.spacing.text.horizontal : ""};
+            padding-right: ${padding ? theme.spacing.text.horizontal : ""};
           `}
         >
           {children}
@@ -40,10 +47,10 @@ export function StackLayout({ type, children, align, gap }: StackLayoutProps) {
             grid-auto-columns: max-content;
             grid-template-rows: auto;
             grid-column-gap: ${gap ? theme.spacing.gap : ""};
-            padding-top: ${theme.spacing.text.vertical};
-            padding-bottom: ${theme.spacing.text.vertical};
-            padding-left: ${theme.spacing.text.horizontal};
-            padding-right: ${theme.spacing.text.horizontal};
+            padding-top: ${padding ? theme.spacing.text.vertical : ""};
+            padding-bottom: ${padding ? theme.spacing.text.vertical : ""};
+            padding-left: ${padding ? theme.spacing.text.horizontal : ""};
+            padding-right: ${padding ? theme.spacing.text.horizontal : ""};
           `}
         >
           {align === "end" && <div></div>}

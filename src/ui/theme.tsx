@@ -1,6 +1,11 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faTimes, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHome,
+  faSave,
+  faTimes,
+  faUserPlus,
+} from "@fortawesome/free-solid-svg-icons";
 
 export const theme = {
   colors: {
@@ -44,9 +49,15 @@ export const theme = {
       height: "40px",
     },
   },
+  transitions: {
+    input: {
+      duration: "0.25s",
+    },
+  },
   icons: {
     CreateAccount: <FontAwesomeIcon icon={faUserPlus} />,
     Cancel: <FontAwesomeIcon icon={faTimes} />,
     Home: <FontAwesomeIcon icon={faHome} />,
+    Save: <FontAwesomeIcon icon={faSave} />,
   },
 };

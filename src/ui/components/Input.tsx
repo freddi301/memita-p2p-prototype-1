@@ -33,6 +33,7 @@ function Input({ value, label, onChange }: InputProps) {
           border: ${theme.spacing.border.size} solid
             ${theme.colors.background.focus};
         }
+        transition: ${theme.transitions.input.duration};
       `}
     >
       {label && (

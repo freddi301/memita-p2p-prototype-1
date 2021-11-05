@@ -5,14 +5,17 @@ import { StyleContext } from "../StyleProvider";
 type ButtonProps = {
   label: string;
   icon: React.ReactNode;
+  enabled: boolean;
   onClick(): void;
 };
 
-function Button({ label, icon, onClick }: ButtonProps) {
+function Button({ label, icon, onClick, enabled }: ButtonProps) {
   const { theme, showButtonIcon, showButtonLabel } =
     React.useContext(StyleContext);
+  const ref = React.useRef<HTMLButtonElement | null>(null);
   return (
     <button
+      ref={ref}
       onClick={onClick}
       css={css`
         display: flex;
@@ -20,7 +23,9 @@ function Button({ label, icon, onClick }: ButtonProps) {
         align-items: center;
         min-width: ${theme.sizes.row.height};
         height: ${theme.sizes.row.height};
-        color: ${theme.colors.text.primary};
+        color: ${enabled
+          ? theme.colors.text.primary
+          : theme.colors.text.secondary};
         background-color: ${theme.colors.background.active};
         font-family: ${theme.font.family};
         font-size: ${theme.font.size.normal};
@@ -31,12 +36,8 @@ function Button({ label, icon, onClick }: ButtonProps) {
         box-sizing: border-box;
         border: ${theme.spacing.border.size} solid
           ${theme.colors.background.active};
-        :hover {
+        :focus {
           background-color: ${theme.colors.background.focus};
-          border: ${theme.spacing.border.size} solid
-            ${theme.colors.background.focus};
-        }
-        :focus-within {
           border: ${theme.spacing.border.size} solid
             ${theme.colors.background.focus};
         }
@@ -44,7 +45,16 @@ function Button({ label, icon, onClick }: ButtonProps) {
         padding-bottom: ${theme.spacing.text.vertical};
         padding-left: ${showButtonLabel ? theme.spacing.text.horizontal : ""};
         padding-right: ${showButtonLabel ? theme.spacing.text.horizontal : ""};
+        transition: ${theme.transitions.input.duration};
       `}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          onClick();
+        }
+      }}
+      onMouseEnter={() => {
+        ref.current?.focus();
+      }}
     >
       {showButtonIcon && icon}
       {showButtonIcon && showButtonLabel && (

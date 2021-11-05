@@ -15,15 +15,14 @@ function Text({ text, color, weight, size }: TextProps) {
     <div
       css={css`
         color: ${theme.colors.text[color]};
-        background-color: ${theme.colors.background.passive};
         font-family: ${theme.font.family};
         font-size: ${theme.font.size[size]};
         font-weight: ${theme.font.weight[weight]};
         box-sizing: border-box;
-        border: ${theme.spacing.border.size} solid
-          ${theme.colors.background.passive};
+        border: ${theme.spacing.border.size} solid transparent;
         white-space: pre-line;
         word-break: break-word;
+        transition: ${theme.transitions.input.duration};
       `}
     >
       {text}
