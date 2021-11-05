@@ -7,9 +7,10 @@ type TextareaProps = {
   label?: string;
   rows: number;
   onChange(value: string): void;
+  actions?: React.ReactNode;
 };
 
-function Textarea({ value, label, rows, onChange }: TextareaProps) {
+function Textarea({ value, label, rows, onChange, actions }: TextareaProps) {
   const { theme } = React.useContext(StyleContext);
   return (
     <div
@@ -20,19 +21,16 @@ function Textarea({ value, label, rows, onChange }: TextareaProps) {
         font-family: ${theme.font.family};
         font-size: ${theme.font.size.normal};
         border-radius: ${theme.spacing.border.radius};
-        border: ${theme.spacing.border.size} solid
-          ${theme.colors.background.active};
+        border: ${theme.spacing.border.size} solid ${theme.colors.background.active};
         padding-top: ${theme.spacing.text.vertical};
         padding-bottom: ${theme.spacing.text.vertical};
         padding-left: ${theme.spacing.text.horizontal};
         padding-right: ${theme.spacing.text.horizontal};
         :hover {
-          border: ${theme.spacing.border.size} solid
-            ${theme.colors.background.focus};
+          border: ${theme.spacing.border.size} solid ${theme.colors.background.focus};
         }
         :focus-within {
-          border: ${theme.spacing.border.size} solid
-            ${theme.colors.background.focus};
+          border: ${theme.spacing.border.size} solid ${theme.colors.background.focus};
         }
         transition: ${theme.transitions.input.duration};
       `}
@@ -47,22 +45,39 @@ function Textarea({ value, label, rows, onChange }: TextareaProps) {
           {label}
         </div>
       )}
-      <textarea
-        value={value}
-        onChange={(event) => onChange(event.currentTarget.value)}
-        rows={rows}
+      <div
         css={css`
-          color: ${theme.colors.text.primary};
-          border: none;
-          outline: none;
-          resize: none;
-          background-color: inherit;
-          font-family: inherit;
-          font-size: inherit;
-          padding: 0px;
-          margin: 0px;
+          display: flex;
+          align-items: end;
         `}
-      />
+      >
+        <textarea
+          value={value}
+          onChange={(event) => onChange(event.currentTarget.value)}
+          rows={rows}
+          css={css`
+            flex-grow: 1;
+            color: ${theme.colors.text.primary};
+            border: none;
+            outline: none;
+            resize: none;
+            background-color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0px;
+            margin: 0px;
+          `}
+        />
+        <div
+          css={css`
+            margin-top: calc(${theme.spacing.text.vertical} * -1 - ${theme.spacing.border.size});
+            margin-bottom: calc(${theme.spacing.text.vertical} * -1 - ${theme.spacing.border.size});
+            margin-right: calc(${theme.spacing.text.horizontal} * -1 - ${theme.spacing.border.size});
+          `}
+        >
+          {actions}
+        </div>
+      </div>
     </div>
   );
 }

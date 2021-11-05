@@ -10,6 +10,7 @@ import { Transitionate } from "./components/Transitionate";
 import { CreateContactScreen } from "./screens/CreateContactScreen";
 import { ContactListScreen } from "./screens/ContactListScreen";
 import { ContactScreen } from "./screens/ContactScreen";
+import { ConversationScreen } from "./screens/ConversationScreen";
 
 export function App() {
   const [routing, setRouting] = React.useState<Routing>({
@@ -37,23 +38,17 @@ export function App() {
   const openContactScreen = React.useCallback(() => {
     setRouting({ screen: "contact" });
   }, []);
+  const openConversationScreen = React.useCallback(() => {
+    setRouting({ screen: "conversation" });
+  }, []);
   const screen = React.useMemo(() => {
     switch (routing.screen) {
       case "home": {
-        return (
-          <HomeScreen
-            onAccounts={openAccountListScreen}
-            onContacts={openContactListScreen}
-          />
-        );
+        return <HomeScreen onAccounts={openAccountListScreen} onContacts={openContactListScreen} />;
       }
       case "account-list": {
         return (
-          <AccountListScreen
-            onCreate={openCreateAccountScreen}
-            onAccount={openAccountScreen}
-            onHome={openHomeScreen}
-          />
+          <AccountListScreen onCreate={openCreateAccountScreen} onAccount={openAccountScreen} onHome={openHomeScreen} />
         );
       }
       case "create-account": {
@@ -64,29 +59,29 @@ export function App() {
       }
       case "contact-list": {
         return (
-          <ContactListScreen
-            onCreate={openCreateContactScreen}
-            onContact={openContactScreen}
-            onHome={openHomeScreen}
-          />
+          <ContactListScreen onCreate={openCreateContactScreen} onContact={openContactScreen} onHome={openHomeScreen} />
         );
       }
       case "create-contact": {
         return <CreateContactScreen onCancel={openContactListScreen} />;
       }
       case "contact": {
-        return <ContactScreen onCancel={openContactListScreen} />;
+        return <ContactScreen onCancel={openContactListScreen} onConversation={openConversationScreen} />;
+      }
+      case "conversation": {
+        return <ConversationScreen onHome={openHomeScreen} onContact={openContactScreen} onSend={() => {}} />;
       }
     }
   }, [
     routing.screen,
     openAccountListScreen,
+    openContactListScreen,
     openCreateAccountScreen,
     openAccountScreen,
     openHomeScreen,
     openCreateContactScreen,
     openContactScreen,
-    openContactListScreen,
+    openConversationScreen,
   ]);
   const enterFrom = (() => {
     switch (previous.screen) {
@@ -146,6 +141,17 @@ export function App() {
         switch (routing.screen) {
           case "contact-list":
             return "left";
+          case "conversation":
+            return "right";
+        }
+        break;
+      }
+      case "conversation": {
+        switch (routing.screen) {
+          case "contact":
+            return "left";
+          case "home":
+            return "left";
         }
         break;
       }
@@ -180,4 +186,7 @@ type Routing =
     }
   | {
       screen: "contact";
+    }
+  | {
+      screen: "conversation";
     };

@@ -9,13 +9,7 @@ type StackLayoutProps = {
   padding: boolean;
   children: React.ReactNode;
 };
-export function StackLayout({
-  type,
-  children,
-  align,
-  gap,
-  padding,
-}: StackLayoutProps) {
+export function StackLayout({ type, children, align, gap, padding }: StackLayoutProps) {
   const { theme } = React.useContext(StyleContext);
   switch (type) {
     case "vertical": {
@@ -43,18 +37,17 @@ export function StackLayout({
           css={css`
             display: grid;
             grid-auto-flow: column;
-            grid-template-columns: ${align === "end" ? "1fr" : ""};
             grid-auto-columns: max-content;
             grid-template-rows: auto;
             grid-column-gap: ${gap ? theme.spacing.gap : ""};
             align-items: center;
+            justify-content: ${align};
             padding-top: ${padding ? theme.spacing.text.vertical : ""};
             padding-bottom: ${padding ? theme.spacing.text.vertical : ""};
             padding-left: ${padding ? theme.spacing.text.horizontal : ""};
             padding-right: ${padding ? theme.spacing.text.horizontal : ""};
           `}
         >
-          {align === "end" && <div></div>}
           {children}
         </div>
       );

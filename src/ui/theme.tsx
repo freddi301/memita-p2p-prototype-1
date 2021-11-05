@@ -2,9 +2,11 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAddressBook,
+  faEnvelope,
   faFileExport,
   faFileImport,
   faHome,
+  faPaperPlane,
   faSave,
   faShareAlt,
   faTimes,
@@ -73,5 +75,7 @@ export const theme = {
     Import: <FontAwesomeIcon icon={faFileImport} />,
     Contacts: <FontAwesomeIcon icon={faAddressBook} />,
     CreateContact: <FontAwesomeIcon icon={faUserPlus} />,
+    Send: <FontAwesomeIcon icon={faPaperPlane} />,
+    Conversation: <FontAwesomeIcon icon={faEnvelope} />,
   },
 };

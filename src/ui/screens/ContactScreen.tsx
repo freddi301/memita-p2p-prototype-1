@@ -9,9 +9,13 @@ import { Icon } from "../components/Icon";
 
 type ContactScreenProps = {
   onCancel(): void;
+  onConversation(): void;
 };
 
-export function ContactScreen({ onCancel }: ContactScreenProps) {
+export function ContactScreen({
+  onCancel,
+  onConversation,
+}: ContactScreenProps) {
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
   return (
@@ -65,6 +69,12 @@ export function ContactScreen({ onCancel }: ContactScreenProps) {
             icon={<Icon icon="Save" />}
             onClick={() => {}}
             enabled={false}
+          />
+          <Button
+            label="Conversation"
+            icon={<Icon icon="Conversation" />}
+            onClick={onConversation}
+            enabled={true}
           />
         </StackLayout>
       }
