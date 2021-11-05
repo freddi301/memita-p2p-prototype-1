@@ -7,71 +7,51 @@ import { StackLayout } from "../components/StackLayout";
 import { Text } from "../components/Text";
 import { Icon } from "../components/Icon";
 
-type AccountScreenProps = {
+type CreateContactScreenProps = {
   onCancel(): void;
 };
 
-export function AccountScreen({ onCancel }: AccountScreenProps) {
+export function CreateContactScreen({ onCancel }: CreateContactScreenProps) {
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
+  const [publicKey, setPublicKey] = React.useState("");
   return (
     <HeaderContentControlsLayout
       header={
         <StackLayout type="horizontal" align="start" gap={true} padding={true}>
-          <Text text="Account" color="primary" weight="bold" size="big" />
+          <Text
+            text="Create Contact"
+            color="primary"
+            weight="bold"
+            size="big"
+          />
         </StackLayout>
       }
       content={
         <StackLayout type="vertical" align="start" gap={true} padding={true}>
           <Input label="Name" value={name} onChange={setName} />
-          <StackLayout
-            type="horizontal"
-            align="start"
-            gap={true}
-            padding={false}
-          >
-            <Text
-              color="secondary"
-              size="normal"
-              weight="normal"
-              text="Public Key"
-            />
-            <Text
-              color="primary"
-              size="normal"
-              weight="normal"
-              text="xxxxxxxxxx"
-            />
-          </StackLayout>
           <Textarea label="Notes" value={notes} onChange={setNotes} rows={5} />
+          <Textarea
+            label="Public Key"
+            value={publicKey}
+            onChange={setPublicKey}
+            rows={5}
+          />
         </StackLayout>
       }
       controls={
         <StackLayout type="horizontal" align="end" gap={true} padding={true}>
           <Button
-            label="Share"
-            icon={<Icon icon="Share" />}
-            onClick={() => {}}
-            enabled={true}
-          />
-          <Button
-            label="Export"
-            icon={<Icon icon="Export" />}
-            onClick={() => {}}
-            enabled={true}
-          />
-
-          <Button
-            label="Back"
+            label="Cancel"
             icon={<Icon icon="Cancel" />}
             onClick={onCancel}
             enabled={true}
           />
           <Button
-            label="Save"
-            icon={<Icon icon="Save" />}
+            label="Create Account"
+            icon={<Icon icon="CreateAccount" />}
             onClick={() => {}}
-            enabled={false}
+            enabled={true}
           />
         </StackLayout>
       }

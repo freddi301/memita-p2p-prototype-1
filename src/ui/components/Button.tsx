@@ -17,7 +17,6 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
     <button
       ref={ref}
       onClick={() => {
-        console.log("pops");
         onClick();
       }}
       css={css`

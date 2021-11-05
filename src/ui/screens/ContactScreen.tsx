@@ -7,18 +7,18 @@ import { StackLayout } from "../components/StackLayout";
 import { Text } from "../components/Text";
 import { Icon } from "../components/Icon";
 
-type AccountScreenProps = {
+type ContactScreenProps = {
   onCancel(): void;
 };
 
-export function AccountScreen({ onCancel }: AccountScreenProps) {
+export function ContactScreen({ onCancel }: ContactScreenProps) {
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
   return (
     <HeaderContentControlsLayout
       header={
         <StackLayout type="horizontal" align="start" gap={true} padding={true}>
-          <Text text="Account" color="primary" weight="bold" size="big" />
+          <Text text="Contact" color="primary" weight="bold" size="big" />
         </StackLayout>
       }
       content={
@@ -54,13 +54,6 @@ export function AccountScreen({ onCancel }: AccountScreenProps) {
             onClick={() => {}}
             enabled={true}
           />
-          <Button
-            label="Export"
-            icon={<Icon icon="Export" />}
-            onClick={() => {}}
-            enabled={true}
-          />
-
           <Button
             label="Back"
             icon={<Icon icon="Cancel" />}

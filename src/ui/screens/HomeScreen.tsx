@@ -8,8 +8,9 @@ import { Button } from "../components/Button";
 
 type HomeScreenProps = {
   onAccounts(): void;
+  onContacts(): void;
 };
-export function HomeScreen({ onAccounts }: HomeScreenProps) {
+export function HomeScreen({ onAccounts, onContacts }: HomeScreenProps) {
   return (
     <HeaderContentControlsLayout
       header={
@@ -25,6 +26,12 @@ export function HomeScreen({ onAccounts }: HomeScreenProps) {
             enabled={true}
             label="Accounts"
             onClick={onAccounts}
+          />
+          <Button
+            icon={<Icon icon="Contacts" />}
+            enabled={true}
+            label="Contacts"
+            onClick={onContacts}
           />
         </StackLayout>
       }
