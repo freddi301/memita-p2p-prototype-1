@@ -17,20 +17,15 @@ function Textarea({ value, label, rows, onChange, actions }: TextareaProps) {
       css={css`
         display: flex;
         flex-direction: column;
+        min-height: ${theme.sizes.vertical};
+        justify-content: center;
+        box-sizing: border-box;
         background-color: ${theme.colors.background.active};
         font-family: ${theme.font.family};
         font-size: ${theme.font.size.normal};
         border-radius: ${theme.spacing.border.radius};
-        border: ${theme.spacing.border.size} solid ${theme.colors.background.active};
-        padding-top: ${theme.spacing.text.vertical};
-        padding-bottom: ${theme.spacing.text.vertical};
-        padding-left: ${theme.spacing.text.horizontal};
-        padding-right: ${theme.spacing.text.horizontal};
-        :hover {
-          border: ${theme.spacing.border.size} solid ${theme.colors.background.focus};
-        }
         :focus-within {
-          border: ${theme.spacing.border.size} solid ${theme.colors.background.focus};
+          background-color: ${theme.colors.background.focus};
         }
         transition: ${theme.transitions.input.duration};
       `}
@@ -40,6 +35,9 @@ function Textarea({ value, label, rows, onChange, actions }: TextareaProps) {
           css={css`
             color: ${theme.colors.text.secondary};
             font-weight: ${theme.font.weight.bold};
+            margin-top: ${theme.spacing.text.vertical};
+            margin-left: ${theme.spacing.text.horizontal};
+            margin-right: ${theme.spacing.text.horizontal};
           `}
         >
           {label}
@@ -55,6 +53,8 @@ function Textarea({ value, label, rows, onChange, actions }: TextareaProps) {
           value={value}
           onChange={(event) => onChange(event.currentTarget.value)}
           rows={rows}
+          autoComplete="off"
+          spellCheck={false}
           css={css`
             flex-grow: 1;
             color: ${theme.colors.text.primary};
@@ -65,18 +65,13 @@ function Textarea({ value, label, rows, onChange, actions }: TextareaProps) {
             font-family: inherit;
             font-size: inherit;
             padding: 0px;
-            margin: 0px;
+            margin-top: ${theme.spacing.text.vertical};
+            margin-bottom: ${theme.spacing.text.vertical};
+            margin-left: ${theme.spacing.text.horizontal};
+            margin-right: ${theme.spacing.text.horizontal};
           `}
         />
-        <div
-          css={css`
-            margin-top: calc(${theme.spacing.text.vertical} * -1 - ${theme.spacing.border.size});
-            margin-bottom: calc(${theme.spacing.text.vertical} * -1 - ${theme.spacing.border.size});
-            margin-right: calc(${theme.spacing.text.horizontal} * -1 - ${theme.spacing.border.size});
-          `}
-        >
-          {actions}
-        </div>
+        <div>{actions}</div>
       </div>
     </div>
   );

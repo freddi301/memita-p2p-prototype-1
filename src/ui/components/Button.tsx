@@ -10,8 +10,7 @@ type ButtonProps = {
 };
 
 function Button({ label, icon, onClick, enabled }: ButtonProps) {
-  const { theme, showButtonIcon, showButtonLabel } =
-    React.useContext(StyleContext);
+  const { theme, showButtonIcon, showButtonLabel } = React.useContext(StyleContext);
   const ref = React.useRef<HTMLButtonElement | null>(null);
   return (
     <button
@@ -23,11 +22,9 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
         display: flex;
         justify-content: center;
         align-items: center;
-        min-width: ${theme.sizes.row.height};
-        height: ${theme.sizes.row.height};
-        color: ${enabled
-          ? theme.colors.text.primary
-          : theme.colors.text.secondary};
+        min-width: ${theme.sizes.vertical};
+        height: ${theme.sizes.vertical};
+        color: ${enabled ? theme.colors.text.primary : theme.colors.text.secondary};
         background-color: ${theme.colors.background.active};
         font-family: ${theme.font.family};
         font-size: ${theme.font.size.normal};
@@ -36,12 +33,8 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
         outline: none;
         cursor: pointer;
         box-sizing: border-box;
-        border: ${theme.spacing.border.size} solid
-          ${theme.colors.background.active};
         :focus {
           background-color: ${theme.colors.background.focus};
-          border: ${theme.spacing.border.size} solid
-            ${theme.colors.background.focus};
         }
         padding-top: ${theme.spacing.text.vertical};
         padding-bottom: ${theme.spacing.text.vertical};
@@ -57,7 +50,7 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
       {showButtonIcon && showButtonLabel && (
         <div
           css={css`
-            width: ${theme.spacing.input.horizontal};
+            width: ${theme.spacing.text.horizontal};
           `}
         ></div>
       )}

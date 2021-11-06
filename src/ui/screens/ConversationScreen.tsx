@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "../components/Button";
 import { HeaderContentControlsLayout } from "../components/HeaderContentControlsLayout";
-import { StackLayout } from "../components/StackLayout";
 import { Text } from "../components/Text";
 import { Virtuoso } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
@@ -9,6 +8,7 @@ import { Icon } from "../components/Icon";
 import { Textarea } from "../components/Textarea";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
+import { ButtonGroup } from "../components/ButtonGroup";
 
 type ConversationScreenProps = {
   onSend(): void;
@@ -20,11 +20,7 @@ export function ConversationScreen({ onSend, onHome, onContact }: ConversationSc
   const [text, setText] = React.useState("");
   return (
     <HeaderContentControlsLayout
-      header={
-        <StackLayout type="vertical" align="start" gap={true} padding={true}>
-          <Text text="Conversation" color="primary" weight="bold" size="big" />
-        </StackLayout>
-      }
+      header={<Text text="Conversation" color="primary" weight="bold" size="big" />}
       content={
         <div
           css={css`
@@ -37,18 +33,44 @@ export function ConversationScreen({ onSend, onHome, onContact }: ConversationSc
             totalCount={200}
             itemContent={(index) => (
               <Clickable onClick={onContact}>
-                <StackLayout type="vertical" align="start" gap={false} padding={true}>
-                  <StackLayout type="horizontal" align="start" gap={false} padding={false}>
+                <div
+                  css={css`
+                    display: grid;
+                    grid-template-columns: 1fr auto;
+                    grid-template-rows: auto auto;
+                    padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+                  `}
+                >
+                  <div
+                    css={css`
+                      grid-row: 1;
+                      grid-column: 1;
+                    `}
+                  >
                     <Text color="primary" size="normal" weight="bold" text={`Contact Name`} />
+                  </div>
+                  <div
+                    css={css`
+                      grid-row: 1;
+                      grid-column: 2;
+                    `}
+                  >
                     <Text color="secondary" size="normal" weight="normal" text={`2021`} />
-                  </StackLayout>
-                  <Text
-                    color="primary"
-                    size="normal"
-                    weight="normal"
-                    text={`Message content ${index}\nMessage content ${index}\nMessage content ${index}`}
-                  />
-                </StackLayout>
+                  </div>
+                  <div
+                    css={css`
+                      grid-row: 2;
+                      grid-column: 1 / span 2;
+                    `}
+                  >
+                    <Text
+                      color="primary"
+                      size="normal"
+                      weight="normal"
+                      text={`Message content ${index}\nMessage content ${index}\nMessage content ${index}`}
+                    />
+                  </div>
+                </div>
               </Clickable>
             )}
           />
@@ -74,9 +96,9 @@ export function ConversationScreen({ onSend, onHome, onContact }: ConversationSc
         </div>
       }
       controls={
-        <StackLayout type="horizontal" align="end" gap={true} padding={true}>
+        <ButtonGroup>
           <Button label="Home" icon={<Icon icon="Home" />} onClick={onHome} enabled={true} />
-        </StackLayout>
+        </ButtonGroup>
       }
     />
   );

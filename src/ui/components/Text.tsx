@@ -18,11 +18,8 @@ function Text({ text, color, weight, size }: TextProps) {
         font-family: ${theme.font.family};
         font-size: ${theme.font.size[size]};
         font-weight: ${theme.font.weight[weight]};
-        box-sizing: border-box;
-        border: ${theme.spacing.border.size} solid transparent;
         white-space: pre-line;
         word-break: break-word;
-        transition: ${theme.transitions.input.duration};
       `}
     >
       {text}

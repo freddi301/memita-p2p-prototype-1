@@ -8,11 +8,7 @@ type HeaderContentControlsLayoutProps = {
   controls: React.ReactNode;
 };
 
-export function HeaderContentControlsLayout({
-  header,
-  content,
-  controls,
-}: HeaderContentControlsLayoutProps) {
+export function HeaderContentControlsLayout({ header, content, controls }: HeaderContentControlsLayoutProps) {
   const { theme, controlsPosition } = React.useContext(StyleContext);
   switch (controlsPosition) {
     case "bottom": {
@@ -22,13 +18,18 @@ export function HeaderContentControlsLayout({
             height: 100%;
             display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: min-content 1fr min-content;
+            grid-template-rows:
+              calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2)
+              1fr
+              calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
           `}
         >
           <div
             css={css`
               grid-column: 1;
               grid-row: 1;
+              align-self: center;
+              padding-left: ${theme.spacing.text.horizontal};
             `}
           >
             {header}
@@ -62,13 +63,17 @@ export function HeaderContentControlsLayout({
             height: 100%;
             display: grid;
             grid-template-columns: auto 1fr;
-            grid-template-rows: min-content 1fr;
+            grid-template-rows:
+              calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2)
+              1fr;
           `}
         >
           <div
             css={css`
               grid-column: 1;
               grid-row: 1;
+              align-self: center;
+              padding-left: ${theme.spacing.text.horizontal};
             `}
           >
             {header}

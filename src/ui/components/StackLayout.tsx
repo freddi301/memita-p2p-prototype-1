@@ -9,7 +9,7 @@ type StackLayoutProps = {
   padding: boolean;
   children: React.ReactNode;
 };
-export function StackLayout({ type, children, align, gap, padding }: StackLayoutProps) {
+function StackLayout({ type, children, align, gap, padding }: StackLayoutProps) {
   const { theme } = React.useContext(StyleContext);
   switch (type) {
     case "vertical": {

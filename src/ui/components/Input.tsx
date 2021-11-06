@@ -14,24 +14,19 @@ function Input({ value, label, onChange }: InputProps) {
     <div
       css={css`
         display: flex;
+        height: ${theme.sizes.vertical};
+        box-sizing: border-box;
+        align-items: center;
         background-color: ${theme.colors.background.active};
         font-family: ${theme.font.family};
         font-size: ${theme.font.size.normal};
         border-radius: ${theme.spacing.border.radius};
-        box-sizing: border-box;
-        border: ${theme.spacing.border.size} solid
-          ${theme.colors.background.active};
         padding-top: ${theme.spacing.text.vertical};
         padding-bottom: ${theme.spacing.text.vertical};
         padding-left: ${theme.spacing.text.horizontal};
         padding-right: ${theme.spacing.text.horizontal};
-        :hover {
-          border: ${theme.spacing.border.size} solid
-            ${theme.colors.background.focus};
-        }
         :focus-within {
-          border: ${theme.spacing.border.size} solid
-            ${theme.colors.background.focus};
+          background-color: ${theme.colors.background.focus};
         }
         transition: ${theme.transitions.input.duration};
       `}
@@ -40,7 +35,7 @@ function Input({ value, label, onChange }: InputProps) {
         <label
           css={css`
             color: ${theme.colors.text.secondary};
-            margin-right: ${theme.spacing.input.horizontal};
+            margin-right: ${theme.spacing.text.horizontal};
             font-weight: ${theme.font.weight.bold};
           `}
         >
@@ -50,6 +45,8 @@ function Input({ value, label, onChange }: InputProps) {
       <input
         value={value}
         onChange={(event) => onChange(event.currentTarget.value)}
+        autoComplete="off"
+        spellCheck={false}
         css={css`
           flex-grow: 1;
           color: ${theme.colors.text.primary};

@@ -14,19 +14,16 @@ import {
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
-const hue = 240;
-const saturation = 10;
-
 export const theme = {
   colors: {
     text: {
-      primary: `hsl(${hue}, ${saturation}%, 90%)`,
-      secondary: `hsl(${hue}, ${saturation}%, 55%)`,
+      primary: `hsl(0, 0%, 80%)`,
+      secondary: `hsl(0, 0%, 55%)`,
     },
     background: {
-      passive: `hsl(${hue}, ${saturation}%, 15%)`,
-      active: `hsl(${hue}, ${saturation}%, 10%)`,
-      focus: `hsl(${hue}, ${saturation}%, 20%)`,
+      passive: `hsl(0, 0%, 10%)`,
+      active: `hsl(0, 0%, 5%)`,
+      focus: `hsl(0, 0%, 15%)`,
     },
   },
   spacing: {
@@ -34,12 +31,8 @@ export const theme = {
       horizontal: "16px",
       vertical: "8px",
     },
-    input: {
-      horizontal: "8px",
-    },
     gap: "8px",
     border: {
-      size: "2.5px",
       radius: "20px",
     },
   },
@@ -54,15 +47,13 @@ export const theme = {
       bold: "500",
     },
   },
-  sizes: {
-    row: {
-      height: "40px",
-    },
-  },
   transitions: {
     input: {
       duration: "0.25s",
     },
+  },
+  sizes: {
+    vertical: "40px",
   },
   icons: {
     CreateAccount: <FontAwesomeIcon icon={faUserPlus} />,
