@@ -7,9 +7,9 @@ type TransitionateProps = {
 };
 export function Transitionate({ children, enterFrom }: TransitionateProps) {
   const duration = 0.3;
-  const [queue, setQueue] = React.useState<Array<React.ReactPortal>>([]);
+  const [queue, setQueue] = React.useState<Array<{ element: HTMLDivElement; portal: React.ReactPortal }>>([]);
   const lastItemRef = React.useRef<HTMLDivElement | null>(null);
-  const continerRef = React.useRef<HTMLDivElement | null>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
   React.useLayoutEffect(() => {
     const key = Math.random().toString();
     const entering = document.createElement("div");
@@ -27,23 +27,29 @@ export function Transitionate({ children, enterFrom }: TransitionateProps) {
       entering.style.pointerEvents = "auto";
       entering.style.userSelect = "auto";
     }, duration * 1000);
-    continerRef.current?.appendChild(entering);
+    containerRef.current?.appendChild(entering);
     const portal = ReactDOM.createPortal(children, entering, key);
-    setQueue((queue) => queue.concat(portal));
+    setQueue((queue) => queue.concat({ element: entering, portal }));
     if (lastItemRef.current) {
       lastItemRef.current.style.pointerEvents = "none";
       lastItemRef.current.style.userSelect = "none";
       lastItemRef.current.style.transition = `transform ${duration}s ease-in-out`;
       lastItemRef.current.style.transform = transformMap[enterFrom].leaving;
       setTimeout(() => {
-        setQueue((queue) => queue.slice(1));
+        setQueue((queue) => {
+          const [removed, ...rest] = queue;
+          setTimeout(() => {
+            containerRef.current?.removeChild(removed.element);
+          }, 0);
+          return rest;
+        });
       }, duration * 1000);
     }
     lastItemRef.current = entering;
   }, [children, duration, enterFrom]);
   return (
     <div
-      ref={continerRef}
+      ref={containerRef}
       style={{
         position: "relative",
         width: "100%",
@@ -51,7 +57,7 @@ export function Transitionate({ children, enterFrom }: TransitionateProps) {
         overflow: "hidden",
       }}
     >
-      {queue}
+      {queue.map(({ portal }) => portal)}
     </div>
   );
 }

@@ -43,7 +43,7 @@ export const theme = {
       big: "24px",
     },
     weight: {
-      normal: "400",
+      normal: "300",
       bold: "500",
     },
   },
