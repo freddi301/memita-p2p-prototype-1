@@ -1,15 +1,17 @@
 import React from "react";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
+import { Icon } from "./Icon";
 
 type InputProps = {
   value: string;
   label?: string;
-  onChange(value: string): void;
+  onChange?(value: string): void;
 };
 
 function Input({ value, label, onChange }: InputProps) {
   const { theme } = React.useContext(StyleContext);
+  const readOnly = onChange === undefined;
   return (
     <div
       css={css`
@@ -44,7 +46,8 @@ function Input({ value, label, onChange }: InputProps) {
       )}
       <input
         value={value}
-        onChange={(event) => onChange(event.currentTarget.value)}
+        onChange={(event) => onChange?.(event.currentTarget.value)}
+        readOnly={readOnly}
         autoComplete="off"
         spellCheck={false}
         css={css`
@@ -59,6 +62,15 @@ function Input({ value, label, onChange }: InputProps) {
           margin: 0px;
         `}
       />
+      {readOnly && (
+        <div
+          css={css`
+            color: ${theme.colors.text.secondary};
+          `}
+        >
+          <Icon icon="ReadOnly" />
+        </div>
+      )}
     </div>
   );
 }

@@ -8,36 +8,23 @@ import { Icon } from "../components/Icon";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
+import { FrontendFacade } from "../../FrontendFacade";
 
 type ContactListScreenProps = {
   onCreate(): void;
   onHome(): void;
-  onContact(): void;
+  onContact(publicKey: string): void;
 };
 export function ContactListScreen({ onCreate, onHome, onContact }: ContactListScreenProps) {
-  const { theme } = React.useContext(StyleContext);
+  const contactCount = FrontendFacade.useContactListSize() ?? 0;
   return (
     <HeaderContentControlsLayout
       header={<Text text="Contacts" color="primary" weight="bold" size="big" />}
       content={
         <Virtuoso
           style={{ height: "100%" }}
-          totalCount={200}
-          itemContent={(index) => (
-            <Clickable onClick={onContact}>
-              <div
-                css={css`
-                  display: grid;
-                  grid-auto-flow: row;
-                  grid-auto-columns: auto;
-                  padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
-                `}
-              >
-                <Text color="primary" size="normal" weight="bold" text={`Contact Name ${index}`} />
-                <Text color="secondary" size="normal" weight="normal" text={`xxxx ${index}`} />
-              </div>
-            </Clickable>
-          )}
+          totalCount={contactCount}
+          itemContent={(index) => <ContactItem index={index} onContact={onContact} />}
         />
       }
       controls={
@@ -47,5 +34,31 @@ export function ContactListScreen({ onCreate, onHome, onContact }: ContactListSc
         </ButtonGroup>
       }
     />
+  );
+}
+
+type ContactItemProps = {
+  index: number;
+  onContact(publicKey: string): void;
+};
+function ContactItem({ index, onContact }: ContactItemProps) {
+  const { theme } = React.useContext(StyleContext);
+  const contact = FrontendFacade.useContactListAtIndex(index);
+  if (!contact) return null;
+  const { publicKey, name } = contact;
+  return (
+    <Clickable onClick={() => onContact(publicKey)}>
+      <div
+        css={css`
+          display: grid;
+          grid-auto-flow: row;
+          grid-auto-columns: auto;
+          padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+        `}
+      >
+        <Text color="primary" size="normal" weight="bold" text={name} />
+        <Text color="secondary" size="normal" weight="normal" text={publicKey} />
+      </div>
+    </Clickable>
   );
 }

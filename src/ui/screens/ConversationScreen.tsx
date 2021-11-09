@@ -13,7 +13,7 @@ import { ButtonGroup } from "../components/ButtonGroup";
 type ConversationScreenProps = {
   onSend(): void;
   onHome(): void;
-  onContact(): void;
+  onContact(publicKey: string): void;
 };
 export function ConversationScreen({ onSend, onHome, onContact }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
@@ -32,7 +32,7 @@ export function ConversationScreen({ onSend, onHome, onContact }: ConversationSc
             style={{ height: "100%" }}
             totalCount={200}
             itemContent={(index) => (
-              <Clickable onClick={onContact}>
+              <Clickable onClick={() => {}}>
                 <div
                   css={css`
                     display: grid;

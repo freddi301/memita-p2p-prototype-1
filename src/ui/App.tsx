@@ -35,8 +35,8 @@ export function App() {
   const openCreateContactScreen = React.useCallback(() => {
     setRouting({ screen: "create-contact" });
   }, []);
-  const openContactScreen = React.useCallback(() => {
-    setRouting({ screen: "contact" });
+  const openContactScreen = React.useCallback((publicKey: string) => {
+    setRouting({ screen: "contact", publicKey });
   }, []);
   const openConversationScreen = React.useCallback(() => {
     setRouting({ screen: "conversation" });
@@ -63,17 +63,23 @@ export function App() {
         );
       }
       case "create-contact": {
-        return <CreateContactScreen onCancel={openContactListScreen} />;
+        return <CreateContactScreen onCancel={openContactListScreen} onContact={openContactScreen} />;
       }
       case "contact": {
-        return <ContactScreen onCancel={openContactListScreen} onConversation={openConversationScreen} />;
+        return (
+          <ContactScreen
+            publicKey={routing.publicKey}
+            onCancel={openContactListScreen}
+            onConversation={openConversationScreen}
+          />
+        );
       }
       case "conversation": {
         return <ConversationScreen onHome={openHomeScreen} onContact={openContactScreen} onSend={() => {}} />;
       }
     }
   }, [
-    routing.screen,
+    routing,
     openAccountListScreen,
     openContactListScreen,
     openCreateAccountScreen,
@@ -134,6 +140,8 @@ export function App() {
         switch (routing.screen) {
           case "contact-list":
             return "left";
+          case "contact":
+            return "bottom";
         }
         break;
       }
@@ -186,6 +194,7 @@ type Routing =
     }
   | {
       screen: "contact";
+      publicKey: string;
     }
   | {
       screen: "conversation";

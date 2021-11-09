@@ -22,6 +22,9 @@ export function Clickable({ children, onClick }: ClickableProps) {
       onMouseEnter={() => {
         ref.current?.focus();
       }}
+      onMouseLeave={() => {
+        ref.current?.blur();
+      }}
       css={css`
         outline: none;
         cursor: pointer;

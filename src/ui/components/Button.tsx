@@ -45,6 +45,9 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
       onMouseEnter={() => {
         ref.current?.focus();
       }}
+      onMouseLeave={() => {
+        ref.current?.blur();
+      }}
     >
       {showButtonIcon && icon}
       {showButtonIcon && showButtonLabel && (

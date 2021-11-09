@@ -6,11 +6,13 @@ import {
   faFileExport,
   faFileImport,
   faHome,
+  faLock,
   faPaperPlane,
   faSave,
   faShareAlt,
   faTimes,
   faUser,
+  faUserMinus,
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -68,5 +70,7 @@ export const theme = {
     CreateContact: <FontAwesomeIcon icon={faUserPlus} />,
     Send: <FontAwesomeIcon icon={faPaperPlane} />,
     Conversation: <FontAwesomeIcon icon={faEnvelope} />,
+    ReadOnly: <FontAwesomeIcon icon={faLock} />,
+    DeleteContact: <FontAwesomeIcon icon={faUserMinus} />,
   },
 };

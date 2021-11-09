@@ -8,16 +8,22 @@ import { Icon } from "../components/Icon";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
+import { FrontendFacade } from "../../FrontendFacade";
 
 type CreateContactScreenProps = {
   onCancel(): void;
+  onContact(publickKey: string): void;
 };
 
-export function CreateContactScreen({ onCancel }: CreateContactScreenProps) {
+export function CreateContactScreen({ onCancel, onContact }: CreateContactScreenProps) {
   const { theme } = React.useContext(StyleContext);
+  const [publicKey, setPublicKey] = React.useState("");
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
-  const [publicKey, setPublicKey] = React.useState("");
+  const onCreate = React.useCallback(() => {
+    FrontendFacade.doUpdateContact(publicKey, name, notes);
+    onContact(publicKey);
+  }, [publicKey, name, notes, onContact]);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Create Contact" color="primary" weight="bold" size="big" />}
@@ -39,7 +45,7 @@ export function CreateContactScreen({ onCancel }: CreateContactScreenProps) {
       controls={
         <ButtonGroup>
           <Button label="Cancel" icon={<Icon icon="Cancel" />} onClick={onCancel} enabled={true} />
-          <Button label="Create Account" icon={<Icon icon="CreateAccount" />} onClick={() => {}} enabled={true} />
+          <Button label="Create" icon={<Icon icon="CreateAccount" />} onClick={onCreate} enabled={true} />
         </ButtonGroup>
       }
     />
