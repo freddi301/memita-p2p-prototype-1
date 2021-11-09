@@ -33,9 +33,9 @@ export function ContactScreen({ publicKey, onCancel, onConversation }: ContactSc
     FrontendFacade.doUpdateContact(publicKey, name, notes);
   }, [name, notes, publicKey]);
   const onDelete = React.useCallback(() => {
-    FrontendFacade.doDeleteContact(publicKey, name, notes);
+    FrontendFacade.doDeleteContact(publicKey);
     onCancel();
-  }, [name, notes, onCancel, publicKey]);
+  }, [onCancel, publicKey]);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Contact" color="primary" weight="bold" size="big" />}

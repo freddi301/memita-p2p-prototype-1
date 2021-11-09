@@ -4,43 +4,83 @@ import React from "react";
 
 type Commands = {
   UpdateContact(publicKey: string, name: string, notes: string): void;
-  DeleteContact(publickKey: string, name: string, notes: string): void;
+  DeleteContact(publickKey: string): void;
+  CreateAccount(name: string, notes: string): void;
+  UpdateAccount(publicKey: string, name: string, notes: string): void;
+  DeleteAccount(publickKey: string): void;
 };
 
 type Queries = {
   ContactListSize(): number;
   ContactListAtIndex(index: number): { publicKey: string; name: string; notes: string } | null;
   ContactByPublicKey(publicKey: string): { name: string; notes: string } | null;
+  AccountListSize(): number;
+  AccountListAtIndex(index: number): { publicKey: string; name: string; notes: string } | null;
+  AccountByPublicKey(publicKey: string): { name: string; notes: string } | null;
 };
 
 const store = makeStore(
   {
     contactMap(contactMap: Record<string, { name: string; notes: string }>) {
       return {
+        UpdateContact(publicKey, name, notes) {
+          return { ...contactMap, [publicKey]: { name, notes } };
+        },
         DeleteContact(publicKey) {
           const { [publicKey]: deleted, ...rest } = contactMap;
           return rest;
         },
-        UpdateContact(publicKey, name, notes) {
-          return { ...contactMap, [publicKey]: { name, notes } };
+      };
+    },
+    accountMap(accountMap: Record<string, { privateKey: string; name: string; notes: string }>) {
+      return {
+        CreateAccount(name, notes) {
+          const publicKey = Math.random().toString(16);
+          const privateKey = Math.random().toString(16);
+          return { ...accountMap, [publicKey]: { name, notes, privateKey } };
+        },
+        UpdateAccount(publicKey, name, notes) {
+          const existing = accountMap[publicKey];
+          if (!existing) return accountMap;
+          const { privateKey } = existing;
+          return { ...accountMap, [publicKey]: { name, notes, privateKey } };
+        },
+        DeleteAccount(publicKey) {
+          const { [publicKey]: deleted, ...rest } = accountMap;
+          return rest;
         },
       };
     },
   },
-  { contactMap: {} },
-  ({ contactMap }) => {
+  { contactMap: {}, accountMap: {} },
+  ({ contactMap, accountMap }) => {
     const contactList = Object.entries(contactMap)
+      .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    const accountList = Object.entries(accountMap)
       .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
       .sort((a, b) => a.name.localeCompare(b.name));
     return {
       ContactListSize() {
-        return Object.keys(contactMap).length;
+        return contactList.length;
       },
       ContactListAtIndex(index) {
         return contactList[index] ?? null;
       },
       ContactByPublicKey(publicKey) {
         const existing = contactMap[publicKey];
+        if (!existing) return null;
+        const { name, notes } = existing;
+        return { name, notes };
+      },
+      AccountListSize() {
+        return accountList.length;
+      },
+      AccountListAtIndex(index) {
+        return accountList[index] ?? null;
+      },
+      AccountByPublicKey(publicKey) {
+        const existing = accountMap[publicKey];
         if (!existing) return null;
         const { name, notes } = existing;
         return { name, notes };
@@ -108,7 +148,7 @@ function makeSingletonByKey<Key, Value>(factory: (key: Key) => Value) {
 
 // machinery
 
-type CommandInterpreter<Return> = { [Key in keyof Commands]: (...args: Parameters<Commands[Key]>) => Return };
+type CommandInterpreter<Return> = { [Key in keyof Commands]?: (...args: Parameters<Commands[Key]>) => Return };
 type CommandInterpreterReducer<State> = (state: State) => CommandInterpreter<State>;
 type QueryInterpreter = { [Key in keyof Queries]: (...args: Parameters<Queries[Key]>) => ReturnType<Queries[Key]> };
 
@@ -128,7 +168,8 @@ function makeStore<Reducers extends Record<string, CommandInterpreterReducer<any
         return <CommandName extends keyof Commands>(...args: Parameters<Commands[CommandName]>) => {
           const newState = Object.fromEntries(
             Object.entries(reducers).map(([reducerName, reducer]) => {
-              return [reducerName, (reducer(currentState[reducerName])[commandName] as any)(...args)];
+              const handler = reducer(currentState[reducerName])[commandName] as any;
+              return [reducerName, handler ? handler(...args) : currentState[reducerName]];
             })
           ) as typeof initialState;
           currentState = newState;
@@ -143,10 +184,10 @@ function makeStore<Reducers extends Record<string, CommandInterpreterReducer<any
     {},
     {
       get(target, property) {
-        return (...args: any[]) =>
-          <Key extends keyof Queries>(listener: (value: ReturnType<Queries[Key]>) => void) => {
+        return <Key extends keyof Queries>(...args: Parameters<Queries[Key]>) =>
+          (listener: (value: ReturnType<Queries[Key]>) => void) => {
             const subscription: Subscription = {
-              query: (states) => queries(states)[property as keyof Queries](...args),
+              query: (states) => (queries(states)[property as keyof Queries] as any)(...args),
               listener,
             };
             subscriptions.add(subscription);
@@ -160,5 +201,8 @@ function makeStore<Reducers extends Record<string, CommandInterpreterReducer<any
       ...args: Parameters<Queries[Key]>
     ) => (listener: (value: ReturnType<Queries[Key]>) => void) => () => void;
   };
+  // setInterval(() => {
+  //   console.log(currentState);
+  // }, 1000);
   return { command, query };
 }

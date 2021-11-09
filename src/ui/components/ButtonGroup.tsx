@@ -6,7 +6,7 @@ type ButtonGroupProps = {
   children: React.ReactNode;
 };
 export function ButtonGroup({ children }: ButtonGroupProps) {
-  const { theme } = React.useContext(StyleContext);
+  const { theme, controlsPosition } = React.useContext(StyleContext);
   return (
     <div
       css={css`
@@ -16,7 +16,7 @@ export function ButtonGroup({ children }: ButtonGroupProps) {
         grid-template-rows: auto;
         grid-column-gap: ${theme.spacing.gap};
         align-items: center;
-        justify-content: end;
+        justify-content: ${controlsPosition === "bottom" ? "end" : "start"};
         padding-top: ${theme.spacing.text.vertical};
         padding-bottom: ${theme.spacing.text.vertical};
         padding-left: ${theme.spacing.text.horizontal};

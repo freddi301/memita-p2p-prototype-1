@@ -26,8 +26,8 @@ export function App() {
   const openCreateAccountScreen = React.useCallback(() => {
     setRouting({ screen: "create-account" });
   }, []);
-  const openAccountScreen = React.useCallback(() => {
-    setRouting({ screen: "account" });
+  const openAccountScreen = React.useCallback((publicKey: string) => {
+    setRouting({ screen: "account", publicKey });
   }, []);
   const openContactListScreen = React.useCallback(() => {
     setRouting({ screen: "contact-list" });
@@ -55,7 +55,7 @@ export function App() {
         return <CreateAccountScreen onCancel={openAccountListScreen} />;
       }
       case "account": {
-        return <AccountScreen onCancel={openAccountListScreen} />;
+        return <AccountScreen publicKey={routing.publicKey} onCancel={openAccountListScreen} />;
       }
       case "contact-list": {
         return (
@@ -185,6 +185,7 @@ type Routing =
     }
   | {
       screen: "account";
+      publicKey: string;
     }
   | {
       screen: "contact-list";

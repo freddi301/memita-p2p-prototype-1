@@ -8,6 +8,7 @@ import { Icon } from "../components/Icon";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
+import { FrontendFacade } from "../../logic/FrontendFacade";
 
 type CreateAccountScreenProps = {
   onCancel(): void;
@@ -17,6 +18,10 @@ export function CreateAccountScreen({ onCancel }: CreateAccountScreenProps) {
   const { theme } = React.useContext(StyleContext);
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
+  const onCreate = React.useCallback(() => {
+    FrontendFacade.doCreateAccount(name, notes);
+    onCancel();
+  }, [name, notes, onCancel]);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Create Account" color="primary" weight="bold" size="big" />}
@@ -37,7 +42,7 @@ export function CreateAccountScreen({ onCancel }: CreateAccountScreenProps) {
       controls={
         <ButtonGroup>
           <Button label="Cancel" icon={<Icon icon="Cancel" />} onClick={onCancel} enabled={true} />
-          <Button label="Create Account" icon={<Icon icon="CreateAccount" />} onClick={() => {}} enabled={true} />
+          <Button label="Create" icon={<Icon icon="CreateAccount" />} onClick={onCreate} enabled={true} />
         </ButtonGroup>
       }
     />
