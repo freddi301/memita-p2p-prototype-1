@@ -6,8 +6,8 @@ require("source-map-support").install(); // need for node
 
 (async () => {
   await libsodium.ready;
-  await import("./rpc/local/electron/server");
-  await import("./rpc/remote/hyperswarm/server");
+  await import("./legacy/rpc/local/electron/server");
+  await import("./legacy/rpc/remote/hyperswarm/server");
 })();
 
 function createWindow() {

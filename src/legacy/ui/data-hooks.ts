@@ -9,9 +9,7 @@ export function useReadRpcCall<Method extends keyof typeof rpc, Initial>(
   request: Parameters<typeof rpc[Method]>[0],
   initialValue: Initial
 ) {
-  const [response, setResponse] = React.useState<
-    Initial | Awaited<ReturnType<typeof rpc[Method]>>
-  >(initialValue);
+  const [response, setResponse] = React.useState<Initial | Awaited<ReturnType<typeof rpc[Method]>>>(initialValue);
   const [forceReload, setForceReload] = React.useState(0);
   const reload = React.useCallback(() => {
     setForceReload((n) => n + 1);

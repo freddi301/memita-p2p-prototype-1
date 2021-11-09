@@ -27,9 +27,7 @@ import { isEqual } from "lodash";
 type ConversationsScreenProps = {
   onConversation(accountPublicKey: AccountPublicKey): void;
 };
-export function ConversationsScreen({
-  onConversation,
-}: ConversationsScreenProps) {
+export function ConversationsScreen({ onConversation }: ConversationsScreenProps) {
   const conversations = useReadRpcCall(
     "allConversations",
     React.useMemo(
@@ -107,17 +105,11 @@ type ConversationItemProps = {
   style: React.CSSProperties;
 };
 const ConversationItemMemo = React.memo(ConversationItem, isEqual);
-function ConversationItem({
-  index,
-  style,
-  data: { conversations, onConversation },
-}: ConversationItemProps) {
+function ConversationItem({ index, style, data: { conversations, onConversation } }: ConversationItemProps) {
   const conversation = conversations[index];
   return (
     <ListItem style={style} key={index} component="div" disablePadding>
-      <ListItemButton
-        onClick={() => onConversation(conversation.contact.accountPublicKey)}
-      >
+      <ListItemButton onClick={() => onConversation(conversation.contact.accountPublicKey)}>
         <ListItemAvatar>
           <Avatar>{conversation.contact.name.slice(0, 1).toUpperCase()}</Avatar>
         </ListItemAvatar>
@@ -135,9 +127,7 @@ function ConversationItem({
                   fontSize: "0.875rem",
                 }}
               >
-                {conversation.lastMessage.createdAt.toLocaleString(
-                  DateTime.DATE_SHORT
-                )}
+                {conversation.lastMessage.createdAt.toLocaleString(DateTime.DATE_SHORT)}
               </Typography>
               <Typography
                 sx={{
@@ -146,9 +136,7 @@ function ConversationItem({
                   fontSize: "0.875rem",
                 }}
               >
-                {conversation.lastMessage.createdAt.toLocaleString(
-                  DateTime.TIME_WITH_SECONDS
-                )}
+                {conversation.lastMessage.createdAt.toLocaleString(DateTime.TIME_WITH_SECONDS)}
               </Typography>
             </Stack>
           </Badge>

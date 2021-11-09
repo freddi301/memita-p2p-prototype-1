@@ -1,15 +1,5 @@
 import React from "react";
-import {
-  Box,
-  TextField,
-  List,
-  ListItem,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Fab,
-} from "@mui/material";
+import { Box, TextField, List, ListItem, AppBar, Toolbar, IconButton, Typography, Fab } from "@mui/material";
 import { Close, Save } from "@mui/icons-material";
 import { AccountPublicKey } from "../../rpc/local/definition";
 
@@ -19,8 +9,7 @@ type AddContactScreenProps = {
 };
 export function AddContactScreen({ onCancel, onSave }: AddContactScreenProps) {
   const [name, setName] = React.useState("");
-  const [accountPublicKeyString, setAccountPublicKeyString] =
-    React.useState("");
+  const [accountPublicKeyString, setAccountPublicKeyString] = React.useState("");
   const accountPublicKey = React.useMemo(() => {
     try {
       return AccountPublicKey.fromHex(accountPublicKeyString);
@@ -33,14 +22,7 @@ export function AddContactScreen({ onCancel, onSave }: AddContactScreenProps) {
     <React.Fragment>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={onCancel}
-          >
+          <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }} onClick={onCancel}>
             <Close />
           </IconButton>
           <Typography variant="h6" component="div">
@@ -68,9 +50,7 @@ export function AddContactScreen({ onCancel, onSave }: AddContactScreenProps) {
               multiline
               fullWidth={true}
               value={accountPublicKeyString}
-              onChange={(event) =>
-                setAccountPublicKeyString(event.currentTarget.value)
-              }
+              onChange={(event) => setAccountPublicKeyString(event.currentTarget.value)}
             />
           </ListItem>
         </List>

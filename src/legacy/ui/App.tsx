@@ -5,13 +5,7 @@ import { ConversationsScreen } from "./screens/ConversationsScreen";
 import { AddContactScreen } from "./screens/AddContactScreen";
 import { StyleProvider } from "./components/StyleProvider";
 import { AccountPublicKey } from "../rpc/local/definition";
-import {
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  SwipeableDrawer,
-} from "@mui/material";
+import { List, ListItem, ListItemIcon, ListItemText, SwipeableDrawer } from "@mui/material";
 import { Contacts, Chat } from "@mui/icons-material";
 import { Box } from "@mui/system";
 import { doWriteRpcCall } from "./data-hooks";
@@ -47,12 +41,9 @@ export function App() {
     });
     openContactsScreen();
   };
-  const openConversationScreen = React.useCallback(
-    (accountPublicKey: AccountPublicKey) => {
-      setState({ screen: "conversation", recipient: accountPublicKey });
-    },
-    []
-  );
+  const openConversationScreen = React.useCallback((accountPublicKey: AccountPublicKey) => {
+    setState({ screen: "conversation", recipient: accountPublicKey });
+  }, []);
   React.useLayoutEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -104,33 +95,16 @@ export function App() {
       {(() => {
         switch (state.screen) {
           case "contacts": {
-            return (
-              <ContactsScreen
-                onAdd={openAddContactScreen}
-                onConversation={openConversationScreen}
-              />
-            );
+            return <ContactsScreen onAdd={openAddContactScreen} onConversation={openConversationScreen} />;
           }
           case "add-contact": {
-            return (
-              <AddContactScreen
-                onCancel={openContactsScreen}
-                onSave={saveContact}
-              />
-            );
+            return <AddContactScreen onCancel={openContactsScreen} onSave={saveContact} />;
           }
           case "conversations": {
-            return (
-              <ConversationsScreen onConversation={openConversationScreen} />
-            );
+            return <ConversationsScreen onConversation={openConversationScreen} />;
           }
           case "conversation": {
-            return (
-              <ConversationScreen
-                recipient={state.recipient}
-                onCancel={openConversationsScreen}
-              />
-            );
+            return <ConversationScreen recipient={state.recipient} onCancel={openConversationsScreen} />;
           }
           default:
             throw new Error();

@@ -4,9 +4,7 @@ import { prisma } from "../../prisma";
 import { AccountPublicKey } from "../../local/definition";
 import { RemoteRpcHyperswarmClient } from "./client";
 
-export async function replicate(
-  remoteRpcHyperswarmClient: RemoteRpcHyperswarmClient
-) {
+export async function replicate(remoteRpcHyperswarmClient: RemoteRpcHyperswarmClient) {
   const other = await remoteRpcHyperswarmClient.whoAreYou(null);
   while (true) {
     const messageToSend = await prisma.message.findFirst({

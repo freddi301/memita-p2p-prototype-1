@@ -67,27 +67,14 @@ export function ContactsScreen({ onAdd, onConversation }: ContactScreenProps) {
                   {({ index, style }) => {
                     const contact = contacts.response[index];
                     return (
-                      <ListItem
-                        style={style}
-                        key={index}
-                        component="div"
-                        disablePadding
-                      >
-                        <ListItemButton
-                          onClick={() =>
-                            onConversation(contact.accountPublicKey)
-                          }
-                        >
+                      <ListItem style={style} key={index} component="div" disablePadding>
+                        <ListItemButton onClick={() => onConversation(contact.accountPublicKey)}>
                           <ListItemAvatar>
                             <Avatar>{contact.name[0].toUpperCase()}</Avatar>
                           </ListItemAvatar>
                           <ListItemText
                             primary={contact.name}
-                            secondary={
-                              <TruncatedLine
-                                text={contact.accountPublicKey.toHex()}
-                              />
-                            }
+                            secondary={<TruncatedLine text={contact.accountPublicKey.toHex()} />}
                           />
                         </ListItemButton>
                       </ListItem>

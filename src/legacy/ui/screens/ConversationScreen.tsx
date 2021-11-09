@@ -1,14 +1,5 @@
 import { Close, Send } from "@mui/icons-material";
-import {
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Box,
-} from "@mui/material";
+import { Paper, Stack, TextField, Typography, AppBar, Toolbar, IconButton, Box } from "@mui/material";
 import { Cached } from "@mui/icons-material";
 import { VariableSizeList } from "react-window";
 import { AutoSizer } from "react-virtualized";
@@ -23,10 +14,7 @@ type ConversationScreenProps = {
   recipient: AccountPublicKey;
   onCancel(): void;
 };
-export function ConversationScreen({
-  recipient,
-  onCancel,
-}: ConversationScreenProps) {
+export function ConversationScreen({ recipient, onCancel }: ConversationScreenProps) {
   const contact = useReadRpcCall(
     "contactByAccountPublicKey",
     React.useMemo(() => ({ accountPublicKey: recipient }), [recipient]),
@@ -58,14 +46,7 @@ export function ConversationScreen({
       top={
         <AppBar position="static">
           <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-              onClick={onCancel}
-            >
+            <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }} onClick={onCancel}>
               <Close />
             </IconButton>
             <Typography variant="h6" component="div">
@@ -104,22 +85,14 @@ export function ConversationScreen({
                   if (message.recipient.equals(myAccountPublicKey)) {
                     return (
                       <Box key={index} style={style}>
-                        <Message
-                          type="received"
-                          text={message.text}
-                          createdAt={message.createdAt}
-                        />
+                        <Message type="received" text={message.text} createdAt={message.createdAt} />
                       </Box>
                     );
                   }
                   if (message.sender.equals(myAccountPublicKey)) {
                     return (
                       <Box key={index} style={style}>
-                        <Message
-                          type="sent"
-                          text={message.text}
-                          createdAt={message.createdAt}
-                        />
+                        <Message type="sent" text={message.text} createdAt={message.createdAt} />
                       </Box>
                     );
                   }
@@ -131,12 +104,7 @@ export function ConversationScreen({
         </AutoSizer>
       }
       bottom={
-        <Stack
-          direction="row"
-          spacing={1}
-          alignItems="flex-end"
-          sx={{ padding: "8px" }}
-        >
+        <Stack direction="row" spacing={1} alignItems="flex-end" sx={{ padding: "8px" }}>
           <TextField
             id="text"
             multiline
