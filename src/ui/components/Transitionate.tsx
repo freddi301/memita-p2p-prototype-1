@@ -79,3 +79,22 @@ const transformMap = {
     entering: "translate(0%, 0%)",
   },
 } as const;
+
+const transformMap3d = {
+  left: {
+    leaving: "perspective(100px) translate3d(150%, 0%, -50px)",
+    entering: "perspective(100px) translate3d(-150%, 0%, -50px)",
+  },
+  right: {
+    leaving: "perspective(100px) translate3d(-150%, 0%, -50px)",
+    entering: "perspective(100px) translate3d(150%, 0%, -50px)",
+  },
+  bottom: {
+    leaving: "perspective(100px) translate3d(0%, -150%, -50px)",
+    entering: "perspective(100px) translate3d(0%, 150%, -50px)",
+  },
+  stay: {
+    leaving: "perspective(100px) translate3d(0%, 0%, 0px)",
+    entering: "perspective(100px) translate3d(0%, 0%, 0px)",
+  },
+} as const;

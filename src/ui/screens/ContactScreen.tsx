@@ -8,7 +8,7 @@ import { Icon } from "../components/Icon";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
-import { FrontendFacade } from "../../FrontendFacade";
+import { FrontendFacade } from "../../logic/FrontendFacade";
 
 type ContactScreenProps = {
   publicKey: string;
