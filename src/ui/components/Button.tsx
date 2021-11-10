@@ -32,6 +32,7 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
         border: none;
         outline: none;
         cursor: pointer;
+        user-select: none;
         box-sizing: border-box;
         :focus {
           background-color: ${theme.colors.background.focus};

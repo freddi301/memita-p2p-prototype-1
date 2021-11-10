@@ -28,10 +28,6 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
-    "@mui/icons-material": "^5.0.4",
-    "@mui/material": "^5.0.4",
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest",
-    "@mui/styled-engine-sc": "^5.0.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
     "@prisma/client": "^3.2.1",
     "@types/electron": "^1.6.10",
@@ -87,8 +83,5 @@
     "webpack-dev-server": "^4.3.1",
     "ws": "^8.2.3"
   },
-  "dependencies": {},
-  "resolutions": {
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
-  }
+  "dependencies": {}
 }

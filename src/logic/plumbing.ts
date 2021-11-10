@@ -18,6 +18,7 @@ export function makeStore<Reducers extends Record<string, CommandInterpreterRedu
 ): {
   command: RemoteCommands;
   query: RemoteQueries;
+  currentState: typeof initialState;
 } {
   let currentState = initialState;
   type Subscription = { query: (states: typeof initialState) => any; listener: (value: any) => void };
@@ -59,8 +60,14 @@ export function makeStore<Reducers extends Record<string, CommandInterpreterRedu
       },
     }
   ) as RemoteQueries;
-  // setInterval(() => {
-  //   console.log(currentState);
-  // }, 1000);
-  return { command, query };
+  return {
+    command,
+    query,
+    get currentState() {
+      return currentState;
+    },
+    set currentState(newState: typeof initialState) {
+      currentState = newState;
+    },
+  };
 }

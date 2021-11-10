@@ -1,3 +1,4 @@
+const webpack = require("webpack");
 const path = require("path");
 
 module.exports = {
@@ -55,5 +56,5 @@ module.exports = {
     filename: "index.js",
     path: path.resolve(__dirname, "dist"),
   },
-  plugins: [],
+  plugins: [new webpack.EnvironmentPlugin(["PORT"])],
 };

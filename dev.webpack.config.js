@@ -1,6 +1,8 @@
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const config = require("./webpack.config");
 
+if (!process.env.PORT) throw new Error("PORT not specified");
+
 module.exports = {
   ...config,
   mode: "development",
@@ -10,6 +12,7 @@ module.exports = {
       overlay: { errors: true, warnings: false },
     },
     hot: true,
+    port: Number(process.env.PORT),
   },
   module: {
     ...config.module,
