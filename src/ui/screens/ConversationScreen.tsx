@@ -78,6 +78,13 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
               onChange={setText}
               rows={text.split("\n").length}
               actions={<Button label="Send" icon={<Icon icon="Send" />} onClick={onSend} enabled={false} />}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  onSend();
+                  event.currentTarget.focus();
+                }
+              }}
             />
           </div>
         </div>

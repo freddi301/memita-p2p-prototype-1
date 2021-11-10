@@ -18,7 +18,6 @@ export function App() {
   });
   const previous = usePrevious(routing);
   const preferences = FrontendFacade.usePreferences();
-  console.log(preferences);
   const openHomeScreen = React.useCallback(() => {
     setRouting({ screen: "home" });
   }, []);

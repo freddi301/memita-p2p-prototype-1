@@ -8,9 +8,10 @@ type TextareaProps = {
   rows: number;
   onChange(value: string): void;
   actions?: React.ReactNode;
+  onKeyDown?: React.HTMLProps<HTMLTextAreaElement>["onKeyDown"];
 };
 
-function Textarea({ value, label, rows, onChange, actions }: TextareaProps) {
+function Textarea({ value, label, rows, onChange, actions, onKeyDown }: TextareaProps) {
   const { theme } = React.useContext(StyleContext);
   return (
     <div
@@ -55,6 +56,7 @@ function Textarea({ value, label, rows, onChange, actions }: TextareaProps) {
           rows={rows}
           autoComplete="off"
           spellCheck={false}
+          onKeyDown={onKeyDown}
           css={css`
             flex-grow: 1;
             color: ${theme.colors.text.primary};
