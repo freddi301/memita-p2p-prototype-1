@@ -14,12 +14,15 @@ socket.addEventListener("close", (event) => {
 socket.addEventListener("error", (event) => {
   // console.log("websocket error", event);
 });
-// const ready = new Promise<void>((resolve) => {
-//   socket.addEventListener("open", function listener(event) {
-//     resolve();
-//     socket.removeEventListener("open", listener);
-//   });
-// });
+
+let isReady = false;
+const ready = new Promise<void>((resolve) => {
+  socket.addEventListener("open", function listener(event) {
+    isReady = true;
+    resolve();
+    socket.removeEventListener("open", listener);
+  });
+});
 
 export const localRpcWebsocketClient: {
   command: RemoteCommands;
@@ -32,14 +35,16 @@ export const localRpcWebsocketClient: {
         return <Key extends keyof Commands>(...args: Parameters<Commands[Key]>) => {
           const name = property as Key;
           const id = Math.random().toString();
-          socket.send(
-            JSON.stringify({
-              id,
-              type: "command",
-              name,
-              args,
-            })
-          );
+          if (isReady) {
+            socket.send(
+              JSON.stringify({
+                id,
+                type: "command",
+                name,
+                args,
+              })
+            );
+          }
         };
       },
     }
@@ -52,14 +57,16 @@ export const localRpcWebsocketClient: {
           (listener: (value: ReturnType<Queries[Key]>) => void) => {
             const name = property as Key;
             const id = Math.random().toString();
-            socket.send(
-              JSON.stringify({
-                id,
-                type: "query",
-                name,
-                args,
-              })
-            );
+            if (isReady) {
+              socket.send(
+                JSON.stringify({
+                  id,
+                  type: "query",
+                  name,
+                  args,
+                })
+              );
+            }
             const onMessage = (event: MessageEvent<any>) => {
               const parsed = JSON.parse(event.data);
               if (parsed.id === id) {
