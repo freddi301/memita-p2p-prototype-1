@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "../components/Button";
 import { HeaderContentControlsLayout } from "../components/HeaderContentControlsLayout";
 import { Text } from "../components/Text";
-import { Virtuoso } from "react-virtuoso";
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
 import { Icon } from "../components/Icon";
 import { Textarea } from "../components/Textarea";
@@ -19,6 +19,11 @@ type ConversationScreenProps = {
 };
 export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onContact }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
+  const virtuosoRef = React.useRef<VirtuosoHandle | null>(null);
+  const scrollTo = React.useCallback((index: number) => {
+    virtuosoRef.current?.scrollToIndex({ index, behavior: "smooth" });
+  }, []);
+  const [isAtBottom, setIsAtBottom] = React.useState(false);
   const [text, setText] = React.useState("");
   const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
   const onSend = React.useCallback(() => {
@@ -27,6 +32,14 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
   }, [myPublicKey, otherPublicKey, text]);
   const me = FrontendFacade.useAccountByPublicKey(myPublicKey);
   const other = FrontendFacade.useContactByPublicKey(otherPublicKey);
+  React.useLayoutEffect(() => {
+    if (isAtBottom) {
+      setTimeout(() => {
+        scrollTo(conversationCount);
+      }, 0);
+    }
+  }, [conversationCount, isAtBottom, scrollTo]);
+  console.log(isAtBottom);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Conversation" color="primary" weight="bold" size="big" />}
@@ -38,6 +51,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
           `}
         >
           <Virtuoso
+            ref={virtuosoRef}
             style={{ height: "100%" }}
             totalCount={conversationCount}
             itemContent={(index) => (
@@ -49,6 +63,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
                 otherName={other?.name ?? ""}
               />
             )}
+            atBottomStateChange={setIsAtBottom}
             components={{
               Footer() {
                 return (
