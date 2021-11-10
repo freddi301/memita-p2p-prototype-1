@@ -1,130 +1,13 @@
 import React from "react";
+import { localRpcWebsocketClient } from "../rpc/local/websocket/client";
+import { Commands, Queries } from "./domain";
 
-// logic
-
-type Commands = {
-  UpdateContact(publicKey: string, name: string, notes: string): void;
-  DeleteContact(publickKey: string): void;
-  CreateAccount(name: string, notes: string): void;
-  UpdateAccount(publicKey: string, name: string, notes: string): void;
-  DeleteAccount(publickKey: string): void;
-  Message(senderPublicKey: string, recipientPublicKey: string, text: string, createdAtEpoch: number): void;
-};
-
-type Queries = {
-  ContactListSize(): number;
-  ContactListAtIndex(index: number): { publicKey: string; name: string; notes: string } | null;
-  ContactByPublicKey(publicKey: string): { name: string; notes: string } | null;
-  AccountListSize(): number;
-  AccountListAtIndex(index: number): { publicKey: string; name: string; notes: string } | null;
-  AccountByPublicKey(publicKey: string): { name: string; notes: string } | null;
-  ConversationListSize(myPublicKey: string, otherPublicKey: string): number;
-  ConversationListAtIndex(
-    myPublicKey: string,
-    otherPublicKey: string,
-    index: number
-  ): { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number };
-};
-
-const store = makeStore(
-  {
-    contactMap(contactMap: Record<string, { name: string; notes: string }>) {
-      return {
-        UpdateContact(publicKey, name, notes) {
-          return { ...contactMap, [publicKey]: { name, notes } };
-        },
-        DeleteContact(publicKey) {
-          const { [publicKey]: deleted, ...rest } = contactMap;
-          return rest;
-        },
-      };
-    },
-    accountMap(accountMap: Record<string, { privateKey: string; name: string; notes: string }>) {
-      return {
-        CreateAccount(name, notes) {
-          const publicKey = Math.random().toString(16);
-          const privateKey = Math.random().toString(16);
-          return { ...accountMap, [publicKey]: { name, notes, privateKey } };
-        },
-        UpdateAccount(publicKey, name, notes) {
-          const existing = accountMap[publicKey];
-          if (!existing) return accountMap;
-          const { privateKey } = existing;
-          return { ...accountMap, [publicKey]: { name, notes, privateKey } };
-        },
-        DeleteAccount(publicKey) {
-          const { [publicKey]: deleted, ...rest } = accountMap;
-          return rest;
-        },
-      };
-    },
-    messageArray(
-      messageArray: Array<{ senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number }>
-    ) {
-      return {
-        Message(senderPublicKey, recipientPublicKey, text, createdAtEpoch) {
-          return [...messageArray, { senderPublicKey, recipientPublicKey, text, createdAtEpoch }];
-        },
-      };
-    },
-  },
-  { contactMap: {}, accountMap: {}, messageArray: [] },
-  ({ contactMap, accountMap, messageArray }) => {
-    const contactList = Object.entries(contactMap)
-      .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-    const accountList = Object.entries(accountMap)
-      .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-    const getConversation = (myPublicKey: string, otherPublicKey: string) =>
-      messageArray
-        .filter(
-          (message) =>
-            (message.senderPublicKey === myPublicKey && message.recipientPublicKey === otherPublicKey) ||
-            (message.senderPublicKey === otherPublicKey && message.recipientPublicKey === myPublicKey)
-        )
-        .sort((a, b) => a.createdAtEpoch - b.createdAtEpoch);
-    return {
-      ContactListSize() {
-        return contactList.length;
-      },
-      ContactListAtIndex(index) {
-        return contactList[index] ?? null;
-      },
-      ContactByPublicKey(publicKey) {
-        const existing = contactMap[publicKey];
-        if (!existing) return null;
-        const { name, notes } = existing;
-        return { name, notes };
-      },
-      AccountListSize() {
-        return accountList.length;
-      },
-      AccountListAtIndex(index) {
-        return accountList[index] ?? null;
-      },
-      AccountByPublicKey(publicKey) {
-        const existing = accountMap[publicKey];
-        if (!existing) return null;
-        const { name, notes } = existing;
-        return { name, notes };
-      },
-      ConversationListSize(myPublicKey, otherPublicKey) {
-        return getConversation(myPublicKey, otherPublicKey).length;
-      },
-      ConversationListAtIndex(myPublicKey, otherPublicKey, index) {
-        return getConversation(myPublicKey, otherPublicKey)[index];
-      },
-    };
-  }
-);
+const store = localRpcWebsocketClient;
 
 // frontend machinery
-
 type CommandFacade = {
   [Key in keyof Commands as `do${Key}`]: (...args: Parameters<Commands[Key]>) => Promise<ReturnType<Commands[Key]>>;
 };
-
 type QueryFacade = {
   [Key in keyof Queries as `use${Key}`]: (...args: Parameters<Queries[Key]>) => ReturnType<Queries[Key]> | null;
 };
@@ -145,14 +28,12 @@ export const FrontendFacade: CommandFacade & QueryFacade = new Proxy(
     },
   }
 ) as any;
-
 const dispatchSingletonsByKey = makeSingletonByKey(
   <Key extends keyof Commands>(name: Key) =>
     (...args: Parameters<Commands[Key]>) => {
       (store.command[name] as any)(...args);
     }
 );
-
 const subscribeSingletonByKey = makeSingletonByKey(
   <Key extends keyof Queries>(key: Key) =>
     (...args: Parameters<Queries[Key]>): ReturnType<Queries[Key]> | null => {
@@ -164,7 +45,6 @@ const subscribeSingletonByKey = makeSingletonByKey(
       return state;
     }
 );
-
 function makeSingletonByKey<Key, Value>(factory: (key: Key) => Value) {
   const cache = new Map<Key, Value>();
   return (key: Key) => {
@@ -174,65 +54,4 @@ function makeSingletonByKey<Key, Value>(factory: (key: Key) => Value) {
     cache.set(key, created);
     return created;
   };
-}
-
-// machinery
-
-type CommandInterpreter<Return> = { [Key in keyof Commands]?: (...args: Parameters<Commands[Key]>) => Return };
-type CommandInterpreterReducer<State> = (state: State) => CommandInterpreter<State>;
-type QueryInterpreter = { [Key in keyof Queries]: (...args: Parameters<Queries[Key]>) => ReturnType<Queries[Key]> };
-
-function makeStore<Reducers extends Record<string, CommandInterpreterReducer<any>>>(
-  reducers: Reducers,
-  initialState: { [Key in keyof Reducers]: Parameters<Reducers[Key]>[0] },
-  queries: (states: typeof initialState) => QueryInterpreter
-) {
-  let currentState = initialState;
-  type Subscription = { query: (states: typeof initialState) => any; listener: (value: any) => void };
-  const subscriptions = new Set<Subscription>();
-  const command = new Proxy(
-    {},
-    {
-      get(target, property) {
-        const commandName = property as keyof Commands;
-        return <CommandName extends keyof Commands>(...args: Parameters<Commands[CommandName]>) => {
-          const newState = Object.fromEntries(
-            Object.entries(reducers).map(([reducerName, reducer]) => {
-              const handler = reducer(currentState[reducerName])[commandName] as any;
-              return [reducerName, handler ? handler(...args) : currentState[reducerName]];
-            })
-          ) as typeof initialState;
-          currentState = newState;
-          for (const { query, listener } of Array.from(subscriptions)) {
-            listener(query(newState));
-          }
-        };
-      },
-    }
-  ) as Commands;
-  const query = new Proxy(
-    {},
-    {
-      get(target, property) {
-        return <Key extends keyof Queries>(...args: Parameters<Queries[Key]>) =>
-          (listener: (value: ReturnType<Queries[Key]>) => void) => {
-            const subscription: Subscription = {
-              query: (states) => (queries(states)[property as keyof Queries] as any)(...args),
-              listener,
-            };
-            subscriptions.add(subscription);
-            listener(subscription.query(currentState));
-            return () => subscriptions.delete(subscription);
-          };
-      },
-    }
-  ) as {
-    [Key in keyof Queries]: (
-      ...args: Parameters<Queries[Key]>
-    ) => (listener: (value: ReturnType<Queries[Key]>) => void) => () => void;
-  };
-  // setInterval(() => {
-  //   console.log(currentState);
-  // }, 1000);
-  return { command, query };
 }
