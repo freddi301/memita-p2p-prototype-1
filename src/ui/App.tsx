@@ -10,13 +10,15 @@ import { CreateContactScreen } from "./screens/CreateContactScreen";
 import { ContactListScreen } from "./screens/ContactListScreen";
 import { ContactScreen } from "./screens/ContactScreen";
 import { ConversationScreen } from "./screens/ConversationScreen";
+import { FrontendFacade } from "../logic/FrontendFacade";
 
 export function App() {
   const [routing, setRouting] = React.useState<Routing>({
     screen: "home",
   });
-  const [preferences, setPreferences] = React.useState<Preferences>({});
   const previous = usePrevious(routing);
+  const preferences = FrontendFacade.usePreferences();
+  console.log(preferences);
   const openHomeScreen = React.useCallback(() => {
     setRouting({ screen: "home" });
   }, []);
@@ -41,9 +43,12 @@ export function App() {
   const openConversationScreen = React.useCallback((otherPublicKey: string) => {
     setRouting({ screen: "conversation", otherPublicKey });
   }, []);
-  const setCurrentAccount = React.useCallback((accountPublickKey: string) => {
-    setPreferences((preferences) => ({ ...preferences, currentAccountPublicKey: accountPublickKey }));
-  }, []);
+  const setCurrentAccount = React.useCallback(
+    (accountPublickKey: string) => {
+      FrontendFacade.doUpdatePreferences({ ...preferences, currentAccountPublicKey: accountPublickKey });
+    },
+    [preferences]
+  );
   const screen = React.useMemo(() => {
     switch (routing.screen) {
       case "home": {
@@ -80,7 +85,7 @@ export function App() {
         );
       }
       case "conversation": {
-        if (preferences.currentAccountPublicKey) {
+        if (preferences?.currentAccountPublicKey) {
           return (
             <ConversationScreen
               myPublicKey={preferences.currentAccountPublicKey}
@@ -103,7 +108,7 @@ export function App() {
     }
   }, [
     routing,
-    preferences.currentAccountPublicKey,
+    preferences?.currentAccountPublicKey,
     openAccountListScreen,
     openContactListScreen,
     openCreateAccountScreen,
@@ -227,7 +232,7 @@ type Routing =
       otherPublicKey: string;
     };
 
-type Preferences = {
+export type Preferences = {
   currentAccountPublicKey?: string;
 };
 

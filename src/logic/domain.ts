@@ -1,5 +1,6 @@
 import { makeStore } from "./plumbing";
 import libsodium from "libsodium-wrappers";
+import { Preferences } from "../ui/App";
 
 export type Commands = {
   UpdateContact(publicKey: string, name: string, notes: string): void;
@@ -8,6 +9,7 @@ export type Commands = {
   UpdateAccount(publicKey: string, name: string, notes: string): void;
   DeleteAccount(publickKey: string): void;
   Message(senderPublicKey: string, recipientPublicKey: string, createdAtEpoch: number, text: string): void;
+  UpdatePreferences(preferences: Preferences): void;
 };
 export type Queries = {
   ContactListSize(): number;
@@ -22,7 +24,9 @@ export type Queries = {
     otherPublicKey: string,
     index: number
   ): { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number };
+  Preferences(): Preferences;
 };
+
 export const store = makeStore(
   {
     contactMap(contactMap: Record<string, { name: string; notes: string }>) {
@@ -68,9 +72,16 @@ export const store = makeStore(
         },
       };
     },
+    preferences(preferences: Preferences) {
+      return {
+        UpdatePreferences(preferences) {
+          return preferences;
+        },
+      };
+    },
   },
-  { contactMap: {}, accountMap: {}, messageMap: {} },
-  ({ contactMap, accountMap, messageMap }) => {
+  { contactMap: {}, accountMap: {}, messageMap: {}, preferences: {} },
+  ({ contactMap, accountMap, messageMap, preferences }) => {
     const contactList = Object.entries(contactMap)
       .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -115,6 +126,9 @@ export const store = makeStore(
       },
       ConversationListAtIndex(myPublicKey, otherPublicKey, index) {
         return getConversation(myPublicKey, otherPublicKey)[index];
+      },
+      Preferences() {
+        return preferences;
       },
     };
   }
