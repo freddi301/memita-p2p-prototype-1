@@ -5,7 +5,6 @@ import { CreateAccountScreen } from "./screens/CreateAccountScreen";
 import { AccountListScreen } from "./screens/AccountListScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { AccountScreen } from "./screens/AccountScreen";
-import { usePrevious } from "./hooks/usePrevious";
 import { Transitionate } from "./components/Transitionate";
 import { CreateContactScreen } from "./screens/CreateContactScreen";
 import { ContactListScreen } from "./screens/ContactListScreen";
@@ -231,3 +230,11 @@ type Routing =
 type Preferences = {
   currentAccountPublicKey?: string;
 };
+
+function usePrevious<Value>(value: Value) {
+  const ref = React.useRef<Value>(value);
+  React.useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}

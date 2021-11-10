@@ -44,10 +44,14 @@ type ContactItemProps = {
 function ContactItem({ index, onContact }: ContactItemProps) {
   const { theme } = React.useContext(StyleContext);
   const contact = FrontendFacade.useContactListAtIndex(index);
-  if (!contact) return null;
-  const { publicKey, name } = contact;
   return (
-    <Clickable onClick={() => onContact(publicKey)}>
+    <Clickable
+      onClick={() => {
+        if (contact) {
+          onContact(contact.publicKey);
+        }
+      }}
+    >
       <div
         css={css`
           display: grid;
@@ -56,8 +60,8 @@ function ContactItem({ index, onContact }: ContactItemProps) {
           padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
         `}
       >
-        <Text color="primary" size="normal" weight="bold" text={name} />
-        <Text color="secondary" size="normal" weight="normal" text={publicKey} />
+        <Text color="primary" size="normal" weight="bold" text={contact?.name ?? "..."} />
+        <Text color="secondary" size="normal" weight="normal" text={contact?.publicKey ?? "..."} />
       </div>
     </Clickable>
   );

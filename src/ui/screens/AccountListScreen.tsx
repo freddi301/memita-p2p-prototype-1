@@ -45,10 +45,14 @@ type AccountItemProps = {
 function AccountItem({ index, onAccount }: AccountItemProps) {
   const { theme } = React.useContext(StyleContext);
   const account = FrontendFacade.useAccountListAtIndex(index);
-  if (!account) return null;
-  const { publicKey, name } = account;
   return (
-    <Clickable onClick={() => onAccount(publicKey)}>
+    <Clickable
+      onClick={() => {
+        if (account) {
+          onAccount(account.publicKey);
+        }
+      }}
+    >
       <div
         css={css`
           display: grid;
@@ -57,8 +61,8 @@ function AccountItem({ index, onAccount }: AccountItemProps) {
           padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
         `}
       >
-        <Text color="primary" size="normal" weight="bold" text={name} />
-        <Text color="secondary" size="normal" weight="normal" text={publicKey} />
+        <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
+        <Text color="secondary" size="normal" weight="normal" text={account?.publicKey ?? "..."} />
       </div>
     </Clickable>
   );
