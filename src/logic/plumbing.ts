@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { Commands, Queries } from "./domain";
 
 export type RemoteCommands = { [Key in keyof Commands]: (...args: Parameters<Commands[Key]>) => void };
@@ -21,7 +22,7 @@ export function makeStore<Reducers extends Record<string, CommandInterpreterRedu
   currentState: typeof initialState;
 } {
   let currentState = initialState;
-  type Subscription = { query: (states: typeof initialState) => any; listener: (value: any) => void };
+  type Subscription = { query: (states: typeof initialState) => any; listener: (value: any) => void; lastValue: any };
   const subscriptions = new Set<Subscription>();
   const command = new Proxy(
     {},
@@ -36,8 +37,12 @@ export function makeStore<Reducers extends Record<string, CommandInterpreterRedu
             })
           ) as typeof initialState;
           currentState = newState;
-          for (const { query, listener } of Array.from(subscriptions)) {
-            listener(query(newState));
+          for (const subscription of Array.from(subscriptions)) {
+            const newValue = subscription.query(newState);
+            if (!_.isEqual(newValue, subscription.lastValue)) {
+              subscription.listener(newValue);
+              subscription.lastValue = newValue;
+            }
           }
         };
       },
@@ -49,12 +54,15 @@ export function makeStore<Reducers extends Record<string, CommandInterpreterRedu
       get(target, property) {
         return <Key extends keyof Queries>(...args: Parameters<Queries[Key]>) =>
           (listener: (value: ReturnType<Queries[Key]>) => void) => {
+            const query = (states: typeof initialState) => (queries(states)[property as keyof Queries] as any)(...args);
+            const lastValue = query(currentState);
             const subscription: Subscription = {
-              query: (states) => (queries(states)[property as keyof Queries] as any)(...args),
+              query,
               listener,
+              lastValue,
             };
             subscriptions.add(subscription);
-            listener(subscription.query(currentState));
+            listener(lastValue);
             return () => subscriptions.delete(subscription);
           };
       },
