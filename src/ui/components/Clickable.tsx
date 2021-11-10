@@ -19,17 +19,14 @@ export function Clickable({ children, onClick }: ClickableProps) {
           onClick();
         }
       }}
-      onMouseEnter={() => {
-        ref.current?.focus();
-      }}
-      onMouseLeave={() => {
-        ref.current?.blur();
-      }}
       css={css`
         outline: none;
         cursor: pointer;
         user-select: none;
         :focus {
+          background-color: ${theme.colors.background.focus};
+        }
+        :hover {
           background-color: ${theme.colors.background.focus};
         }
         transition: ${theme.transitions.input.duration};
