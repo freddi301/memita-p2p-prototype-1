@@ -22,7 +22,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
   const [text, setText] = React.useState("");
   const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
   const onSend = React.useCallback(() => {
-    FrontendFacade.doMessage(myPublicKey, otherPublicKey, text, new Date().getTime());
+    FrontendFacade.doMessage(myPublicKey, otherPublicKey, new Date().getTime(), text);
     setText("");
   }, [myPublicKey, otherPublicKey, text]);
   const me = FrontendFacade.useAccountByPublicKey(myPublicKey);
@@ -90,9 +90,7 @@ type ConversationItemProps = {
 function ConversationItem({ index, myPublicKey, otherPublicKey, myName, otherName }: ConversationItemProps) {
   const { theme } = React.useContext(StyleContext);
   const message = FrontendFacade.useConversationListAtIndex(myPublicKey, otherPublicKey, index);
-  if (!message) return null;
-  const { senderPublicKey, text, createdAtEpoch } = message;
-  const name = senderPublicKey === myPublicKey ? myName : otherName;
+  const name = message ? (message.senderPublicKey === myPublicKey ? myName : otherName) : "";
   return (
     <Clickable onClick={() => {}}>
       <div
@@ -123,7 +121,7 @@ function ConversationItem({ index, myPublicKey, otherPublicKey, myName, otherNam
             color="secondary"
             size="small"
             weight="normal"
-            text={dateTimeFormatter.format(createdAtEpoch)}
+            text={message ? dateTimeFormatter.format(message.createdAtEpoch) : "..."}
             textAlign="right"
           />
         </div>
@@ -133,7 +131,7 @@ function ConversationItem({ index, myPublicKey, otherPublicKey, myName, otherNam
             grid-column: 1 / span 2;
           `}
         >
-          <Text color="primary" size="normal" weight="normal" text={text} />
+          <Text color="primary" size="normal" weight="normal" text={message ? message.text : "..."} />
         </div>
       </div>
     </Clickable>

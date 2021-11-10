@@ -1,4 +1,5 @@
 import { makeStore } from "./plumbing";
+import libsodium from "libsodium-wrappers";
 
 export type Commands = {
   UpdateContact(publicKey: string, name: string, notes: string): void;
@@ -6,7 +7,7 @@ export type Commands = {
   CreateAccount(name: string, notes: string): void;
   UpdateAccount(publicKey: string, name: string, notes: string): void;
   DeleteAccount(publickKey: string): void;
-  Message(senderPublicKey: string, recipientPublicKey: string, text: string, createdAtEpoch: number): void;
+  Message(senderPublicKey: string, recipientPublicKey: string, createdAtEpoch: number, text: string): void;
 };
 export type Queries = {
   ContactListSize(): number;
@@ -54,18 +55,22 @@ export const store = makeStore(
         },
       };
     },
-    messageArray(
-      messageArray: Array<{ senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number }>
+    messageMap(
+      messageMap: Record<
+        string,
+        { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number }
+      >
     ) {
       return {
-        Message(senderPublicKey, recipientPublicKey, text, createdAtEpoch) {
-          return [...messageArray, { senderPublicKey, recipientPublicKey, text, createdAtEpoch }];
+        Message(senderPublicKey, recipientPublicKey, createdAtEpoch, text) {
+          const messageHash = calculateMessageHash({ senderPublicKey, recipientPublicKey, createdAtEpoch, text });
+          return { ...messageMap, [messageHash]: { senderPublicKey, recipientPublicKey, text, createdAtEpoch } };
         },
       };
     },
   },
-  { contactMap: {}, accountMap: {}, messageArray: [] },
-  ({ contactMap, accountMap, messageArray }) => {
+  { contactMap: {}, accountMap: {}, messageMap: {} },
+  ({ contactMap, accountMap, messageMap }) => {
     const contactList = Object.entries(contactMap)
       .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -73,7 +78,7 @@ export const store = makeStore(
       .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
       .sort((a, b) => a.name.localeCompare(b.name));
     const getConversation = (myPublicKey: string, otherPublicKey: string) =>
-      messageArray
+      Object.values(messageMap)
         .filter(
           (message) =>
             (message.senderPublicKey === myPublicKey && message.recipientPublicKey === otherPublicKey) ||
@@ -114,3 +119,22 @@ export const store = makeStore(
     };
   }
 );
+
+function calculateMessageHash({
+  senderPublicKey,
+  recipientPublicKey,
+  text,
+  createdAtEpoch,
+}: {
+  senderPublicKey: string;
+  recipientPublicKey: string;
+  text: string;
+  createdAtEpoch: number;
+}) {
+  const state = libsodium.crypto_generichash_init(null, libsodium.crypto_generichash_KEYBYTES);
+  libsodium.crypto_generichash_update(state, senderPublicKey);
+  libsodium.crypto_generichash_update(state, recipientPublicKey);
+  libsodium.crypto_generichash_update(state, createdAtEpoch.toString());
+  libsodium.crypto_generichash_update(state, text);
+  return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES, "hex");
+}
