@@ -2,6 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAddressBook,
+  faCheck,
   faEnvelope,
   faFileExport,
   faFileImport,
@@ -41,12 +42,13 @@ export const theme = {
   font: {
     family: "Roboto",
     size: {
+      small: "14px",
       normal: "16px",
       big: "24px",
     },
     weight: {
-      normal: "300",
-      bold: "500",
+      normal: "400",
+      bold: "700",
     },
   },
   transitions: {
@@ -72,5 +74,6 @@ export const theme = {
     Conversation: <FontAwesomeIcon icon={faEnvelope} />,
     ReadOnly: <FontAwesomeIcon icon={faLock} />,
     DeleteContact: <FontAwesomeIcon icon={faUserMinus} />,
+    UseAccount: <FontAwesomeIcon icon={faCheck} />,
   },
 };

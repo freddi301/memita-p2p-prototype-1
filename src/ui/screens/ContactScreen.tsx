@@ -13,7 +13,7 @@ import { FrontendFacade } from "../../logic/FrontendFacade";
 type ContactScreenProps = {
   publicKey: string;
   onCancel(): void;
-  onConversation(): void;
+  onConversation(otherPublicKey: string): void;
 };
 
 export function ContactScreen({ publicKey, onCancel, onConversation }: ContactScreenProps) {
@@ -36,6 +36,9 @@ export function ContactScreen({ publicKey, onCancel, onConversation }: ContactSc
     FrontendFacade.doDeleteContact(publicKey);
     onCancel();
   }, [onCancel, publicKey]);
+  const onOpenConversation = React.useCallback(() => {
+    onConversation(publicKey);
+  }, [onConversation, publicKey]);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Contact" color="primary" weight="bold" size="big" />}
@@ -60,7 +63,12 @@ export function ContactScreen({ publicKey, onCancel, onConversation }: ContactSc
           <Button label="Share" icon={<Icon icon="Share" />} onClick={() => {}} enabled={true} />
           <Button label="Back" icon={<Icon icon="Cancel" />} onClick={onCancel} enabled={true} />
           <Button label="Save" icon={<Icon icon="Save" />} onClick={onSave} enabled={isLoaded} />
-          <Button label="Conversation" icon={<Icon icon="Conversation" />} onClick={onConversation} enabled={true} />
+          <Button
+            label="Conversation"
+            icon={<Icon icon="Conversation" />}
+            onClick={onOpenConversation}
+            enabled={true}
+          />
         </ButtonGroup>
       }
     />

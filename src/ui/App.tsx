@@ -16,6 +16,7 @@ export function App() {
   const [routing, setRouting] = React.useState<Routing>({
     screen: "home",
   });
+  const [preferences, setPreferences] = React.useState<Preferences>({});
   const previous = usePrevious(routing);
   const openHomeScreen = React.useCallback(() => {
     setRouting({ screen: "home" });
@@ -38,8 +39,11 @@ export function App() {
   const openContactScreen = React.useCallback((publicKey: string) => {
     setRouting({ screen: "contact", publicKey });
   }, []);
-  const openConversationScreen = React.useCallback(() => {
-    setRouting({ screen: "conversation" });
+  const openConversationScreen = React.useCallback((otherPublicKey: string) => {
+    setRouting({ screen: "conversation", otherPublicKey });
+  }, []);
+  const setCurrentAccount = React.useCallback((accountPublickKey: string) => {
+    setPreferences((preferences) => ({ ...preferences, currentAccountPublicKey: accountPublickKey }));
   }, []);
   const screen = React.useMemo(() => {
     switch (routing.screen) {
@@ -55,7 +59,9 @@ export function App() {
         return <CreateAccountScreen onCancel={openAccountListScreen} />;
       }
       case "account": {
-        return <AccountScreen publicKey={routing.publicKey} onCancel={openAccountListScreen} />;
+        return (
+          <AccountScreen publicKey={routing.publicKey} onUse={setCurrentAccount} onCancel={openAccountListScreen} />
+        );
       }
       case "contact-list": {
         return (
@@ -75,16 +81,36 @@ export function App() {
         );
       }
       case "conversation": {
-        return <ConversationScreen onHome={openHomeScreen} onContact={openContactScreen} onSend={() => {}} />;
+        if (preferences.currentAccountPublicKey) {
+          return (
+            <ConversationScreen
+              myPublicKey={preferences.currentAccountPublicKey}
+              otherPublicKey={routing.otherPublicKey}
+              onHome={openHomeScreen}
+              onContact={openContactScreen}
+            />
+          );
+        } else {
+          // TODO better
+          return (
+            <AccountListScreen
+              onCreate={openCreateAccountScreen}
+              onAccount={openAccountScreen}
+              onHome={openHomeScreen}
+            />
+          );
+        }
       }
     }
   }, [
     routing,
+    preferences.currentAccountPublicKey,
     openAccountListScreen,
     openContactListScreen,
     openCreateAccountScreen,
     openAccountScreen,
     openHomeScreen,
+    setCurrentAccount,
     openCreateContactScreen,
     openContactScreen,
     openConversationScreen,
@@ -199,4 +225,9 @@ type Routing =
     }
   | {
       screen: "conversation";
+      otherPublicKey: string;
     };
+
+type Preferences = {
+  currentAccountPublicKey?: string;
+};

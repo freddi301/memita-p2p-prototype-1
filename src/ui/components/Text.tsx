@@ -5,11 +5,12 @@ import { StyleContext } from "../StyleProvider";
 type TextProps = {
   color: "primary" | "secondary";
   weight: "normal" | "bold";
-  size: "normal" | "big";
+  size: "small" | "normal" | "big";
   text: string;
+  textAlign?: "left" | "right";
 };
 
-function Text({ text, color, weight, size }: TextProps) {
+function Text({ text, color, weight, size, textAlign }: TextProps) {
   const { theme } = React.useContext(StyleContext);
   return (
     <div
@@ -20,6 +21,7 @@ function Text({ text, color, weight, size }: TextProps) {
         font-weight: ${theme.font.weight[weight]};
         white-space: pre-line;
         word-break: break-word;
+        text-align: ${textAlign};
       `}
     >
       {text}

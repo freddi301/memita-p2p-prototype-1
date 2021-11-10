@@ -9,15 +9,24 @@ import { Textarea } from "../components/Textarea";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { ButtonGroup } from "../components/ButtonGroup";
+import { FrontendFacade } from "../../logic/FrontendFacade";
 
 type ConversationScreenProps = {
-  onSend(): void;
+  myPublicKey: string;
+  otherPublicKey: string;
   onHome(): void;
   onContact(publicKey: string): void;
 };
-export function ConversationScreen({ onSend, onHome, onContact }: ConversationScreenProps) {
+export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onContact }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
   const [text, setText] = React.useState("");
+  const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
+  const onSend = React.useCallback(() => {
+    FrontendFacade.doMessage(myPublicKey, otherPublicKey, text, new Date().getTime());
+    setText("");
+  }, [myPublicKey, otherPublicKey, text]);
+  const me = FrontendFacade.useAccountByPublicKey(myPublicKey);
+  const other = FrontendFacade.useContactByPublicKey(otherPublicKey);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Conversation" color="primary" weight="bold" size="big" />}
@@ -30,48 +39,15 @@ export function ConversationScreen({ onSend, onHome, onContact }: ConversationSc
         >
           <Virtuoso
             style={{ height: "100%" }}
-            totalCount={200}
+            totalCount={conversationCount}
             itemContent={(index) => (
-              <Clickable onClick={() => {}}>
-                <div
-                  css={css`
-                    display: grid;
-                    grid-template-columns: 1fr auto;
-                    grid-template-rows: auto auto;
-                    padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
-                  `}
-                >
-                  <div
-                    css={css`
-                      grid-row: 1;
-                      grid-column: 1;
-                    `}
-                  >
-                    <Text color="primary" size="normal" weight="bold" text={`Contact Name`} />
-                  </div>
-                  <div
-                    css={css`
-                      grid-row: 1;
-                      grid-column: 2;
-                    `}
-                  >
-                    <Text color="secondary" size="normal" weight="normal" text={`2021`} />
-                  </div>
-                  <div
-                    css={css`
-                      grid-row: 2;
-                      grid-column: 1 / span 2;
-                    `}
-                  >
-                    <Text
-                      color="primary"
-                      size="normal"
-                      weight="normal"
-                      text={`Message content ${index}\nMessage content ${index}\nMessage content ${index}`}
-                    />
-                  </div>
-                </div>
-              </Clickable>
+              <ConversationItem
+                index={index}
+                myPublicKey={myPublicKey}
+                myName={me?.name ?? ""}
+                otherPublicKey={otherPublicKey}
+                otherName={other?.name ?? ""}
+              />
             )}
           />
           <div
@@ -103,3 +79,65 @@ export function ConversationScreen({ onSend, onHome, onContact }: ConversationSc
     />
   );
 }
+
+type ConversationItemProps = {
+  index: number;
+  myPublicKey: string;
+  myName: string;
+  otherPublicKey: string;
+  otherName: string;
+};
+function ConversationItem({ index, myPublicKey, otherPublicKey, myName, otherName }: ConversationItemProps) {
+  const { theme } = React.useContext(StyleContext);
+  const message = FrontendFacade.useConversationListAtIndex(myPublicKey, otherPublicKey, index);
+  if (!message) return null;
+  const { senderPublicKey, text, createdAtEpoch } = message;
+  const name = senderPublicKey === myPublicKey ? myName : otherName;
+  return (
+    <Clickable onClick={() => {}}>
+      <div
+        css={css`
+          display: grid;
+          grid-template-columns: 1fr auto;
+          grid-template-rows: auto auto;
+          padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+        `}
+      >
+        <div
+          css={css`
+            grid-row: 1;
+            grid-column: 1;
+          `}
+        >
+          <Text color="primary" size="normal" weight="bold" text={name} />
+        </div>
+        <div
+          css={css`
+            grid-row: 1;
+            grid-column: 2;
+            display: flex;
+            align-items: flex-end;
+          `}
+        >
+          <Text
+            color="secondary"
+            size="small"
+            weight="normal"
+            text={dateTimeFormatter.format(createdAtEpoch)}
+            textAlign="right"
+          />
+        </div>
+        <div
+          css={css`
+            grid-row: 2;
+            grid-column: 1 / span 2;
+          `}
+        >
+          <Text color="primary" size="normal" weight="normal" text={text} />
+        </div>
+      </div>
+    </Clickable>
+  );
+}
+
+const dateTimeFormatter = Intl.DateTimeFormat([], { dateStyle: "short", timeStyle: "medium" });

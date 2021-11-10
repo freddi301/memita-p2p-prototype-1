@@ -8,6 +8,7 @@ type Commands = {
   CreateAccount(name: string, notes: string): void;
   UpdateAccount(publicKey: string, name: string, notes: string): void;
   DeleteAccount(publickKey: string): void;
+  Message(senderPublicKey: string, recipientPublicKey: string, text: string, createdAtEpoch: number): void;
 };
 
 type Queries = {
@@ -17,6 +18,12 @@ type Queries = {
   AccountListSize(): number;
   AccountListAtIndex(index: number): { publicKey: string; name: string; notes: string } | null;
   AccountByPublicKey(publicKey: string): { name: string; notes: string } | null;
+  ConversationListSize(myPublicKey: string, otherPublicKey: string): number;
+  ConversationListAtIndex(
+    myPublicKey: string,
+    otherPublicKey: string,
+    index: number
+  ): { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number };
 };
 
 const store = makeStore(
@@ -51,15 +58,32 @@ const store = makeStore(
         },
       };
     },
+    messageArray(
+      messageArray: Array<{ senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number }>
+    ) {
+      return {
+        Message(senderPublicKey, recipientPublicKey, text, createdAtEpoch) {
+          return [...messageArray, { senderPublicKey, recipientPublicKey, text, createdAtEpoch }];
+        },
+      };
+    },
   },
-  { contactMap: {}, accountMap: {} },
-  ({ contactMap, accountMap }) => {
+  { contactMap: {}, accountMap: {}, messageArray: [] },
+  ({ contactMap, accountMap, messageArray }) => {
     const contactList = Object.entries(contactMap)
       .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
       .sort((a, b) => a.name.localeCompare(b.name));
     const accountList = Object.entries(accountMap)
       .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
       .sort((a, b) => a.name.localeCompare(b.name));
+    const getConversation = (myPublicKey: string, otherPublicKey: string) =>
+      messageArray
+        .filter(
+          (message) =>
+            (message.senderPublicKey === myPublicKey && message.recipientPublicKey === otherPublicKey) ||
+            (message.senderPublicKey === otherPublicKey && message.recipientPublicKey === myPublicKey)
+        )
+        .sort((a, b) => a.createdAtEpoch - b.createdAtEpoch);
     return {
       ContactListSize() {
         return contactList.length;
@@ -84,6 +108,12 @@ const store = makeStore(
         if (!existing) return null;
         const { name, notes } = existing;
         return { name, notes };
+      },
+      ConversationListSize(myPublicKey, otherPublicKey) {
+        return getConversation(myPublicKey, otherPublicKey).length;
+      },
+      ConversationListAtIndex(myPublicKey, otherPublicKey, index) {
+        return getConversation(myPublicKey, otherPublicKey)[index];
       },
     };
   }

@@ -1,6 +1,7 @@
 import React from "react";
 import { useMediaQuery } from "react-responsive";
 import { theme } from "./theme";
+import "@fontsource/roboto/100.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -20,9 +21,7 @@ export function StyleProvider({ children }: StyleProviderProps) {
       controlsPosition: isSmall ? "bottom" : "top",
     };
   }, [isSmall]);
-  return (
-    <StyleContext.Provider value={value}>{children}</StyleContext.Provider>
-  );
+  return <StyleContext.Provider value={value}>{children}</StyleContext.Provider>;
 }
 
 type StyleContextValue = {

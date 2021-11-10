@@ -13,9 +13,10 @@ import { FrontendFacade } from "../../logic/FrontendFacade";
 type AccountScreenProps = {
   publicKey: string;
   onCancel(): void;
+  onUse(accountPublicKey: string): void;
 };
 
-export function AccountScreen({ onCancel, publicKey }: AccountScreenProps) {
+export function AccountScreen({ onCancel, publicKey, onUse }: AccountScreenProps) {
   const { theme } = React.useContext(StyleContext);
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
@@ -31,6 +32,9 @@ export function AccountScreen({ onCancel, publicKey }: AccountScreenProps) {
   const onSave = React.useCallback(() => {
     FrontendFacade.doUpdateAccount(publicKey, name, notes);
   }, [name, notes, publicKey]);
+  const setCurrentAccount = React.useCallback(() => {
+    onUse(publicKey);
+  }, [onUse, publicKey]);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Account" color="primary" weight="bold" size="big" />}
@@ -45,7 +49,7 @@ export function AccountScreen({ onCancel, publicKey }: AccountScreenProps) {
           `}
         >
           <Input label="Name" value={name} onChange={setName} />
-          <Input label="Public Key" value={"xxx"} />
+          <Input label="Public Key" value={publicKey} />
           <Textarea label="Notes" value={notes} onChange={setNotes} rows={5} />
         </div>
       }
@@ -55,6 +59,7 @@ export function AccountScreen({ onCancel, publicKey }: AccountScreenProps) {
           <Button label="Export" icon={<Icon icon="Export" />} onClick={() => {}} enabled={false} />
           <Button label="Back" icon={<Icon icon="Cancel" />} onClick={onCancel} enabled={true} />
           <Button label="Save" icon={<Icon icon="Save" />} onClick={onSave} enabled={true} />
+          <Button label="Use" icon={<Icon icon="UseAccount" />} onClick={setCurrentAccount} enabled={true} />
         </ButtonGroup>
       }
     />
