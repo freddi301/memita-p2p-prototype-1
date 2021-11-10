@@ -49,12 +49,23 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
                 otherName={other?.name ?? ""}
               />
             )}
+            components={{
+              Footer() {
+                return (
+                  <div
+                    css={css`
+                      height: calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
+                    `}
+                  />
+                );
+              },
+            }}
           />
           <div
             css={css`
-              position: absolute;
-              width: 100%;
-              bottom: 0px;
+              /* position: absolute; */
+              /* width: 100%; */
+              /* bottom: 0px; */
               padding-top: ${theme.spacing.text.vertical};
               padding-bottom: ${theme.spacing.text.vertical};
               padding-left: ${theme.spacing.text.horizontal};
