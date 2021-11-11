@@ -23,7 +23,15 @@ export type Queries = {
     myPublicKey: string,
     otherPublicKey: string,
     index: number
-  ): { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number };
+  ): { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number } | null;
+  ConversationsListSize(myPublicKey: string): number;
+  ConversationsListAtIndex(
+    myPublicKey: string,
+    index: number
+  ): {
+    otherPublicKey: string;
+    lastMessage: { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number };
+  } | null;
   Preferences(): Preferences;
 };
 
@@ -96,6 +104,34 @@ export const store = makeStore(
             (message.senderPublicKey === otherPublicKey && message.recipientPublicKey === myPublicKey)
         )
         .sort((a, b) => a.createdAtEpoch - b.createdAtEpoch);
+    const getConversations = (myPublickKey: string) => {
+      type Message = { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number };
+      const lastMessageByConversationKey = Object.values(messageMap).reduce(
+        (lastMessageByKey: Record<string, Message>, message) => {
+          const replace = (otherPublicKey: string) => {
+            const existing = lastMessageByKey[otherPublicKey];
+            if (!existing) return { ...lastMessageByKey, [otherPublicKey]: message };
+            if (message.createdAtEpoch > existing.createdAtEpoch)
+              return { ...lastMessageByKey, [otherPublicKey]: message };
+            return lastMessageByKey;
+          };
+          if (message.senderPublicKey === myPublickKey) {
+            const otherPublicKey = message.recipientPublicKey;
+            return replace(otherPublicKey);
+          } else if (message.recipientPublicKey === myPublickKey) {
+            const otherPublicKey = message.senderPublicKey;
+            return replace(otherPublicKey);
+          } else {
+            return lastMessageByKey;
+          }
+        },
+        {}
+      );
+      return Object.entries(lastMessageByConversationKey).map(([otherPublicKey, lastMessage]) => ({
+        otherPublicKey,
+        lastMessage,
+      }));
+    };
     return {
       ContactListSize() {
         return contactList.length;
@@ -129,6 +165,12 @@ export const store = makeStore(
       },
       Preferences() {
         return preferences;
+      },
+      ConversationsListSize(myPublicKey) {
+        return getConversations(myPublicKey).length;
+      },
+      ConversationsListAtIndex(myPublicKey, index) {
+        return getConversations(myPublicKey)[index] ?? null;
       },
     };
   }

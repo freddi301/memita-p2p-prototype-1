@@ -11,6 +11,7 @@ import { ContactListScreen } from "./screens/ContactListScreen";
 import { ContactScreen } from "./screens/ContactScreen";
 import { ConversationScreen } from "./screens/ConversationScreen";
 import { FrontendFacade } from "../logic/FrontendFacade";
+import { ConversationListScreen } from "./screens/ConversationListScreen";
 
 export function App() {
   const [routing, setRouting] = React.useState<Routing>({
@@ -39,8 +40,11 @@ export function App() {
   const openContactScreen = React.useCallback((publicKey: string) => {
     setRouting({ screen: "contact", publicKey });
   }, []);
-  const openConversationScreen = React.useCallback((otherPublicKey: string) => {
-    setRouting({ screen: "conversation", otherPublicKey });
+  const openConversationScreen = React.useCallback((myPublicKey: string, otherPublicKey: string) => {
+    setRouting({ screen: "conversation", myPublicKey, otherPublicKey });
+  }, []);
+  const openConversationsScreen = React.useCallback((myPublicKey: string) => {
+    setRouting({ screen: "conversation-list", myPublicKey });
   }, []);
   const setCurrentAccount = React.useCallback(
     (accountPublickKey: string) => {
@@ -51,7 +55,17 @@ export function App() {
   const screen = React.useMemo(() => {
     switch (routing.screen) {
       case "home": {
-        return <HomeScreen onAccounts={openAccountListScreen} onContacts={openContactListScreen} />;
+        return (
+          <HomeScreen
+            onAccounts={openAccountListScreen}
+            onContacts={openContactListScreen}
+            onConversations={() => {
+              if (preferences?.currentAccountPublicKey) {
+                openConversationsScreen(preferences.currentAccountPublicKey);
+              }
+            }}
+          />
+        );
       }
       case "account-list": {
         return (
@@ -79,30 +93,38 @@ export function App() {
           <ContactScreen
             publicKey={routing.publicKey}
             onCancel={openContactListScreen}
-            onConversation={openConversationScreen}
+            onConversation={(otherPublickKey) => {
+              // TODO better
+              if (preferences?.currentAccountPublicKey) {
+                openConversationScreen(preferences.currentAccountPublicKey, otherPublickKey);
+              }
+            }}
           />
         );
       }
       case "conversation": {
-        if (preferences?.currentAccountPublicKey) {
-          return (
-            <ConversationScreen
-              myPublicKey={preferences.currentAccountPublicKey}
-              otherPublicKey={routing.otherPublicKey}
-              onHome={openHomeScreen}
-              onContact={openContactScreen}
-            />
-          );
-        } else {
-          // TODO better
-          return (
-            <AccountListScreen
-              onCreate={openCreateAccountScreen}
-              onAccount={openAccountScreen}
-              onHome={openHomeScreen}
-            />
-          );
-        }
+        return (
+          <ConversationScreen
+            myPublicKey={routing.myPublicKey}
+            otherPublicKey={routing.otherPublicKey}
+            onHome={openHomeScreen}
+            onContact={openContactScreen}
+            onConversations={() => {
+              if (preferences?.currentAccountPublicKey) {
+                openConversationsScreen(preferences.currentAccountPublicKey);
+              }
+            }}
+          />
+        );
+      }
+      case "conversation-list": {
+        return (
+          <ConversationListScreen
+            myPublicKey={routing.myPublicKey}
+            onConversation={openConversationScreen}
+            onHome={openHomeScreen}
+          />
+        );
       }
     }
   }, [
@@ -117,6 +139,7 @@ export function App() {
     openCreateContactScreen,
     openContactScreen,
     openConversationScreen,
+    openConversationsScreen,
   ]);
   const enterFrom = (() => {
     switch (previous.screen) {
@@ -125,6 +148,8 @@ export function App() {
           case "account-list":
             return "right";
           case "contact-list":
+            return "right";
+          case "conversation-list":
             return "right";
         }
         break;
@@ -189,6 +214,17 @@ export function App() {
             return "left";
           case "home":
             return "left";
+          case "conversation-list":
+            return "left";
+        }
+        break;
+      }
+      case "conversation-list": {
+        switch (routing.screen) {
+          case "home":
+            return "left";
+          case "conversation":
+            return "right";
         }
         break;
       }
@@ -228,7 +264,12 @@ type Routing =
     }
   | {
       screen: "conversation";
+      myPublicKey: string;
       otherPublicKey: string;
+    }
+  | {
+      screen: "conversation-list";
+      myPublicKey: string;
     };
 
 export type Preferences = {

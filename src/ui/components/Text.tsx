@@ -8,9 +8,10 @@ type TextProps = {
   size: "small" | "normal" | "big";
   text: string;
   textAlign?: "left" | "right";
+  truncatedLine?: boolean;
 };
 
-function Text({ text, color, weight, size, textAlign }: TextProps) {
+function Text({ text, color, weight, size, textAlign, truncatedLine }: TextProps) {
   const { theme } = React.useContext(StyleContext);
   return (
     <div
@@ -22,9 +23,36 @@ function Text({ text, color, weight, size, textAlign }: TextProps) {
         white-space: pre-line;
         word-break: break-word;
         text-align: ${textAlign};
+        position: relative;
       `}
     >
-      {text}
+      {truncatedLine ? (
+        <>
+          <div
+            css={css`
+              color: transparent;
+              user-select: none;
+            `}
+          >
+            X
+          </div>
+          <div
+            css={css`
+              display: block;
+              position: absolute;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              width: 100%;
+              top: 0;
+            `}
+          >
+            {text}
+          </div>
+        </>
+      ) : (
+        text
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import {
   faAddressBook,
   faAngleDoubleDown,
   faCheck,
+  faCommentAlt,
   faEnvelope,
   faFileExport,
   faFileImport,
@@ -77,5 +78,6 @@ export const theme = {
     DeleteContact: <FontAwesomeIcon icon={faUserMinus} />,
     UseAccount: <FontAwesomeIcon icon={faCheck} />,
     ScrollToBottom: <FontAwesomeIcon icon={faAngleDoubleDown} />,
+    Conversations: <FontAwesomeIcon icon={faCommentAlt} />,
   },
 };

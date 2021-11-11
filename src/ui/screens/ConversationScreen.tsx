@@ -16,8 +16,15 @@ type ConversationScreenProps = {
   otherPublicKey: string;
   onHome(): void;
   onContact(publicKey: string): void;
+  onConversations(): void;
 };
-export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onContact }: ConversationScreenProps) {
+export function ConversationScreen({
+  myPublicKey,
+  otherPublicKey,
+  onHome,
+  onContact,
+  onConversations,
+}: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
   const [text, setText] = React.useState("");
   const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
@@ -65,6 +72,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
               rangeChanged={(range) => {
                 setScrollPosition(range.startIndex);
               }}
+              overscan={10}
             />
           )}
           <div
@@ -77,22 +85,22 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
               position: relative;
             `}
           >
-            {!isAtBottom && (
-              <div
-                css={css`
-                  position: absolute;
-                  right: ${theme.spacing.text.horizontal};
-                  top: -${theme.sizes.vertical};
-                `}
-              >
-                <Button
-                  icon={theme.icons.ScrollToBottom}
-                  label="Scroll to end"
-                  enabled={true}
-                  onClick={() => scrollTo(conversationCount + 1)}
-                />
-              </div>
-            )}
+            <div
+              css={css`
+                position: absolute;
+                right: ${theme.spacing.text.horizontal};
+                top: -${theme.sizes.vertical};
+                transition: 1s;
+                opacity: ${isAtBottom ? 0 : 1};
+              `}
+            >
+              <Button
+                icon={theme.icons.ScrollToBottom}
+                label="Scroll to end"
+                enabled={!isAtBottom}
+                onClick={() => scrollTo(conversationCount + 1)}
+              />
+            </div>
             <Textarea
               value={text}
               onChange={setText}
@@ -112,6 +120,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
       controls={
         <ButtonGroup>
           <Button label="Home" icon={<Icon icon="Home" />} onClick={onHome} enabled={true} />
+          <Button label="Conversations" icon={<Icon icon="Conversations" />} onClick={onConversations} enabled={true} />
         </ButtonGroup>
       }
     />
