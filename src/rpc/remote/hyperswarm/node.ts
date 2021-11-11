@@ -14,7 +14,7 @@ swarm.on("connection", (connection, info) => {
   const pushIntervalId = setInterval(() => {
     const serialized = JSON.stringify(store.currentState.messageMap);
     connection.write(Buffer.from(serialized));
-  }, 100);
+  }, 1000);
   connection.on("data", (data) => {
     for (const message of Object.values(JSON.parse(data.toString())) as any) {
       store.command.Message(message.senderPublicKey, message.recipientPublicKey, message.createdAtEpoch, message.text);

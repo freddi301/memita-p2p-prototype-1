@@ -2,6 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAddressBook,
+  faAngleDoubleDown,
   faCheck,
   faEnvelope,
   faFileExport,
@@ -75,5 +76,6 @@ export const theme = {
     ReadOnly: <FontAwesomeIcon icon={faLock} />,
     DeleteContact: <FontAwesomeIcon icon={faUserMinus} />,
     UseAccount: <FontAwesomeIcon icon={faCheck} />,
+    ScrollToBottom: <FontAwesomeIcon icon={faAngleDoubleDown} />,
   },
 };

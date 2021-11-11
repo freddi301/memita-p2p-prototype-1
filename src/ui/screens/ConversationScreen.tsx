@@ -19,11 +19,6 @@ type ConversationScreenProps = {
 };
 export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onContact }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
-  const virtuosoRef = React.useRef<VirtuosoHandle | null>(null);
-  const scrollTo = React.useCallback((index: number) => {
-    virtuosoRef.current?.scrollToIndex({ index, behavior: "smooth" });
-  }, []);
-  const [isAtBottom, setIsAtBottom] = React.useState(false);
   const [text, setText] = React.useState("");
   const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
   const onSend = React.useCallback(() => {
@@ -32,6 +27,12 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
   }, [myPublicKey, otherPublicKey, text]);
   const me = FrontendFacade.useAccountByPublicKey(myPublicKey);
   const other = FrontendFacade.useContactByPublicKey(otherPublicKey);
+  const [isAtBottom, setIsAtBottom] = React.useState(false);
+  const virtuosoRef = React.useRef<VirtuosoHandle | null>(null);
+  const scrollTo = React.useCallback((index: number) => {
+    virtuosoRef.current?.scrollToIndex({ index, behavior: "smooth" });
+  }, []);
+  // this keeps scrolling on new messages
   React.useLayoutEffect(() => {
     if (isAtBottom) {
       setTimeout(() => {
@@ -39,7 +40,6 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
       }, 0);
     }
   }, [conversationCount, isAtBottom, scrollTo]);
-  console.log(isAtBottom);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Conversation" color="primary" weight="bold" size="big" />}
@@ -47,12 +47,13 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
         <div
           css={css`
             height: 100%;
-            position: relative;
+            display: flex;
+            flex-direction: column;
           `}
         >
           <Virtuoso
             ref={virtuosoRef}
-            style={{ height: "100%" }}
+            style={{ flexGrow: 1 }}
             totalCount={conversationCount}
             itemContent={(index) => (
               <ConversationItem
@@ -64,30 +65,33 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
               />
             )}
             atBottomStateChange={setIsAtBottom}
-            components={{
-              Footer() {
-                return (
-                  <div
-                    css={css`
-                      height: calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
-                    `}
-                  />
-                );
-              },
-            }}
           />
           <div
             css={css`
-              position: absolute;
-              width: 100%;
-              bottom: 0px;
               padding-top: ${theme.spacing.text.vertical};
               padding-bottom: ${theme.spacing.text.vertical};
               padding-left: ${theme.spacing.text.horizontal};
               padding-right: ${theme.spacing.text.horizontal};
               box-sizing: border-box;
+              position: relative;
             `}
           >
+            {!isAtBottom && (
+              <div
+                css={css`
+                  position: absolute;
+                  right: ${theme.spacing.text.horizontal};
+                  top: -${theme.sizes.vertical};
+                `}
+              >
+                <Button
+                  icon={theme.icons.ScrollToBottom}
+                  label="Scroll to end"
+                  enabled={true}
+                  onClick={() => scrollTo(conversationCount + 1)}
+                />
+              </div>
+            )}
             <Textarea
               value={text}
               onChange={setText}

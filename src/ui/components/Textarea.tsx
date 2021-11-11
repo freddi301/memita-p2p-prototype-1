@@ -13,8 +13,10 @@ type TextareaProps = {
 
 function Textarea({ value, label, rows, onChange, actions, onKeyDown }: TextareaProps) {
   const { theme } = React.useContext(StyleContext);
+  const ref = React.useRef<HTMLDivElement | null>(null);
   return (
     <div
+      ref={ref}
       css={css`
         display: flex;
         flex-direction: column;
@@ -82,3 +84,25 @@ function Textarea({ value, label, rows, onChange, actions, onKeyDown }: Textarea
 const TextareaMemo = React.memo(Textarea);
 
 export { TextareaMemo as Textarea };
+
+function useResizeObserver(
+  ref: React.MutableRefObject<any>,
+  onSizeChange: (size: { width: number; height: number }) => void
+) {
+  React.useLayoutEffect(() => {
+    if (ref.current) {
+      const element = ref.current;
+      onSizeChange?.({ width: element.clientWidth, height: element.clientHeight });
+      const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          onSizeChange?.({ width, height });
+        }
+      });
+      observer.observe(element);
+      return () => {
+        observer.unobserve(element);
+      };
+    }
+  }, [onSizeChange, ref]);
+}

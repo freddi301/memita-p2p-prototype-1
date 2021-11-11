@@ -37,7 +37,11 @@ mkdir(userFolderPath, { recursive: true }, (err) => {
   if (err) throw err;
 });
 readFile(userFilePath, (error, data) => {
-  if (!error) store.currentState = JSON.parse(data.toString());
+  if (!error) {
+    try {
+      store.currentState = JSON.parse(data.toString());
+    } catch (error) {}
+  }
   persist();
 });
 function persist() {
