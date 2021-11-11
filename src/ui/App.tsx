@@ -233,6 +233,7 @@ type Routing =
 
 export type Preferences = {
   currentAccountPublicKey?: string;
+  conversationScrollPosition?: Record<string, number>;
 };
 
 function usePrevious<Value>(value: Value) {

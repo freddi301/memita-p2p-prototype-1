@@ -32,14 +32,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
   const scrollTo = React.useCallback((index: number) => {
     virtuosoRef.current?.scrollToIndex({ index, behavior: "smooth" });
   }, []);
-  // this keeps scrolling on new messages
-  React.useLayoutEffect(() => {
-    if (isAtBottom) {
-      setTimeout(() => {
-        scrollTo(conversationCount);
-      }, 0);
-    }
-  }, [conversationCount, isAtBottom, scrollTo]);
+  const [scrollPosition, setScrollPosition] = useConversationScrollPosition(myPublicKey, otherPublicKey);
   return (
     <HeaderContentControlsLayout
       header={<Text text="Conversation" color="primary" weight="bold" size="big" />}
@@ -51,21 +44,29 @@ export function ConversationScreen({ myPublicKey, otherPublicKey, onHome, onCont
             flex-direction: column;
           `}
         >
-          <Virtuoso
-            ref={virtuosoRef}
-            style={{ flexGrow: 1 }}
-            totalCount={conversationCount}
-            itemContent={(index) => (
-              <ConversationItem
-                index={index}
-                myPublicKey={myPublicKey}
-                myName={me?.name ?? ""}
-                otherPublicKey={otherPublicKey}
-                otherName={other?.name ?? ""}
-              />
-            )}
-            atBottomStateChange={setIsAtBottom}
-          />
+          {scrollPosition !== null && (
+            <Virtuoso
+              ref={virtuosoRef}
+              style={{ flexGrow: 1 }}
+              totalCount={conversationCount}
+              itemContent={(index) => (
+                <ConversationItem
+                  index={index}
+                  myPublicKey={myPublicKey}
+                  myName={me?.name ?? ""}
+                  otherPublicKey={otherPublicKey}
+                  otherName={other?.name ?? ""}
+                />
+              )}
+              alignToBottom={true}
+              followOutput="smooth"
+              atBottomStateChange={setIsAtBottom}
+              initialTopMostItemIndex={scrollPosition}
+              rangeChanged={(range) => {
+                setScrollPosition(range.startIndex);
+              }}
+            />
+          )}
           <div
             css={css`
               padding-top: ${theme.spacing.text.vertical};
@@ -176,3 +177,27 @@ function ConversationItem({ index, myPublicKey, otherPublicKey, myName, otherNam
 }
 
 const dateTimeFormatter = Intl.DateTimeFormat([], { dateStyle: "short", timeStyle: "medium" });
+
+function useConversationScrollPosition(myPublicKey: string, otherPublicKey: string) {
+  const preferences = FrontendFacade.usePreferences();
+  const rangeRef = React.useRef(0);
+  const conversationKey = myPublicKey + otherPublicKey;
+  React.useEffect(() => {
+    return () => {
+      if (preferences) {
+        FrontendFacade.doUpdatePreferences({
+          ...preferences,
+          conversationScrollPosition: {
+            ...(preferences.conversationScrollPosition ?? {}),
+            [conversationKey]: rangeRef.current,
+          },
+        });
+      }
+    };
+  }, [conversationKey, preferences]);
+  const scrollPosition = preferences ? preferences.conversationScrollPosition?.[conversationKey] ?? 0 : null;
+  const setScrollPosition = React.useCallback((index: number) => {
+    rangeRef.current = index;
+  }, []);
+  return [scrollPosition, setScrollPosition] as const;
+}
