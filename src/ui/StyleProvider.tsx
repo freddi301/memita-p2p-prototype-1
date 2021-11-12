@@ -8,31 +8,23 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import "./index.css";
 
-type StyleProviderProps = {
-  children: React.ReactNode;
-};
-export function StyleProvider({ children }: StyleProviderProps) {
-  const isSmall = useMediaQuery({ query: "(max-width: 600px)" });
-  const value = React.useMemo((): StyleContextValue => {
-    return {
-      theme,
-      showButtonIcon: true,
-      showButtonLabel: !isSmall,
-      controlsPosition: isSmall ? "bottom" : "top",
-    };
-  }, [isSmall]);
-  return <StyleContext.Provider value={value}>{children}</StyleContext.Provider>;
-}
-
 type StyleContextValue = {
   theme: typeof theme;
-  showButtonIcon: boolean;
-  showButtonLabel: boolean;
-  controlsPosition: "top" | "bottom";
+  showLeftPanel: boolean;
 };
 export const StyleContext = React.createContext<StyleContextValue>({
   theme: theme,
-  showButtonIcon: true,
-  showButtonLabel: true,
-  controlsPosition: "top",
+  showLeftPanel: true,
 });
+
+export function useStyleProvider() {
+  const isSmall = useMediaQuery({ query: "(max-width: 600px)" });
+  const showLeftPanel = useMediaQuery({ query: "(min-width: 900px)" });
+  const value = React.useMemo((): StyleContextValue => {
+    return {
+      theme,
+      showLeftPanel,
+    };
+  }, [showLeftPanel]);
+  return value;
+}

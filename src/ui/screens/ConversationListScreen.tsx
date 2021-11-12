@@ -43,7 +43,7 @@ type ConversationItemProps = {
   myPublicKey: string;
   onConversation(myPublicKey: string, otherPublicKey: string): void;
 };
-function ConversationItem({ index, onConversation, myPublicKey }: ConversationItemProps) {
+export function ConversationItem({ index, onConversation, myPublicKey }: ConversationItemProps) {
   const { theme } = React.useContext(StyleContext);
   const conversation = FrontendFacade.useConversationsListAtIndex(myPublicKey, index);
   const contact = FrontendFacade.useContactByPublicKey(conversation?.otherPublicKey ?? "");

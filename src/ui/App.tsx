@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleProvider } from "./StyleProvider";
+import { StyleContext, useStyleProvider } from "./StyleProvider";
 import { WholeScreen } from "./components/WholeScreen";
 import { CreateAccountScreen } from "./screens/CreateAccountScreen";
 import { AccountListScreen } from "./screens/AccountListScreen";
@@ -11,7 +11,9 @@ import { ContactListScreen } from "./screens/ContactListScreen";
 import { ContactScreen } from "./screens/ContactScreen";
 import { ConversationScreen } from "./screens/ConversationScreen";
 import { FrontendFacade } from "../logic/FrontendFacade";
-import { ConversationListScreen } from "./screens/ConversationListScreen";
+import { ConversationItem, ConversationListScreen } from "./screens/ConversationListScreen";
+import { css } from "styled-components/macro";
+import { Virtuoso } from "react-virtuoso";
 
 export function App() {
   const [routing, setRouting] = React.useState<Routing>({
@@ -19,6 +21,7 @@ export function App() {
   });
   const previous = usePrevious(routing);
   const preferences = FrontendFacade.usePreferences();
+  const styleProviderValue = useStyleProvider();
   const openHomeScreen = React.useCallback(() => {
     setRouting({ screen: "home" });
   }, []);
@@ -231,13 +234,60 @@ export function App() {
     }
     return "stay";
   })();
-  return (
-    <StyleProvider>
-      <WholeScreen>
-        <Transitionate enterFrom={enterFrom}>{screen}</Transitionate>
-      </WholeScreen>
-    </StyleProvider>
-  );
+  const conversationsCount = FrontendFacade.useConversationsListSize(preferences?.currentAccountPublicKey ?? "") ?? 0;
+  if (styleProviderValue.showLeftPanel && routing.screen !== "conversation-list") {
+    return (
+      <StyleContext.Provider value={styleProviderValue}>
+        <WholeScreen>
+          <div
+            css={css`
+              display: grid;
+              grid-template-columns: 350px 1fr;
+              grid-template-rows: 100%;
+              height: 100%;
+            `}
+          >
+            <div
+              css={css`
+                grid-column: 1;
+                grid-row: 1;
+                border-right: 1px solid ${styleProviderValue.theme.colors.background.active};
+              `}
+            >
+              <Virtuoso
+                style={{ height: "100%" }}
+                totalCount={conversationsCount}
+                itemContent={(index) => (
+                  <ConversationItem
+                    index={index}
+                    myPublicKey={preferences?.currentAccountPublicKey ?? ""}
+                    onConversation={openConversationScreen}
+                  />
+                )}
+              />
+            </div>
+
+            <div
+              css={css`
+                grid-column: 2;
+                grid-row: 1;
+              `}
+            >
+              <Transitionate enterFrom={enterFrom}>{screen}</Transitionate>
+            </div>
+          </div>
+        </WholeScreen>
+      </StyleContext.Provider>
+    );
+  } else {
+    return (
+      <StyleContext.Provider value={styleProviderValue}>
+        <WholeScreen>
+          <Transitionate enterFrom={enterFrom}>{screen}</Transitionate>
+        </WholeScreen>
+      </StyleContext.Provider>
+    );
+  }
 }
 
 type Routing =
