@@ -1,0 +1,19 @@
+{
+  "contactMap": {
+    "0.4ba8ab1a67651": {
+      "name": "Frederik",
+      "notes": ""
+    }
+  },
+  "accountMap": {
+    "0.7737c99c26fd9": {
+      "name": "Alice",
+      "notes": "",
+      "privateKey": "0.dd59c20567677"
+    }
+  },
+  "messageMap": {},
+  "preferences": {
+    "currentAccountPublicKey": "0.7737c99c26fd9"
+  }
+}
