@@ -1,4 +1,3 @@
-- add button delete account
 - first open app -> login/signup (create accounts) [use that account]
   - until at least one account is not created go to welcome screen
 - if no contatcs go to contac screen (after account screen)
@@ -36,10 +35,7 @@
 - i18n
 - validation for user created structures
 - validation for received structures
-
-# Now
-# Later
-
-# Maybe
-
-# Nice
+- confirm screen for important deletions (account) (type in name to confirm)
+- instructions for key conservation
+- export account to password encrypted file
+- import account

@@ -30,8 +30,8 @@ wss.on("connection", (ws) => {
   });
 });
 
-if (!process.env.USER_FOLDER) throw new Error(`USER_FOLDER not specified`);
-const userFolderPath = `user-data/${process.env.USER_FOLDER}`;
+if (!process.env["USER_FOLDER"]) throw new Error(`USER_FOLDER not specified`);
+const userFolderPath = `user-data/${process.env["USER_FOLDER"]}`;
 const userFilePath = `${userFolderPath}/dump.json`;
 mkdir(userFolderPath, { recursive: true }, (err) => {
   if (err) throw err;

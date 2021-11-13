@@ -53,7 +53,7 @@ export const jsonSerializable: DescriptionImplementation<unknown> = {
       serialize(value) {
         return Object.fromEntries(
           Object.entries(value).map(([key, value]) => {
-            return [key, entriesDescription[key].serialize(value)];
+            return [key, entriesDescription[key]?.serialize(value)];
           })
         );
       },
@@ -61,7 +61,7 @@ export const jsonSerializable: DescriptionImplementation<unknown> = {
         if (!(data instanceof Object)) throw new Error();
         return Object.fromEntries(
           Object.entries(data).map(([key, value]) => {
-            return [key, entriesDescription[key].deserialize(value)];
+            return [key, entriesDescription[key]?.deserialize(value)];
           })
         ) as any;
       },
@@ -72,7 +72,7 @@ export const jsonSerializable: DescriptionImplementation<unknown> = {
       serialize(value) {
         return {
           type: value.type,
-          payload: entriesDescription[value.type].serialize(value.payload),
+          payload: entriesDescription[value.type]?.serialize(value.payload),
         };
       },
       deserialize(data) {
@@ -82,9 +82,7 @@ export const jsonSerializable: DescriptionImplementation<unknown> = {
         if (!((data as any).type in entriesDescription)) throw new Error();
         return {
           type: (data as any).type,
-          payload: entriesDescription[(data as any).type].deserialize(
-            (data as any).payload
-          ),
+          payload: entriesDescription[(data as any).type]?.deserialize((data as any).payload),
         } as any;
       },
     };
@@ -95,9 +93,7 @@ export const jsonSerializable: DescriptionImplementation<unknown> = {
         return description.intermediate.serialize(description.serialize(value));
       },
       deserialize(data) {
-        return description.deserialize(
-          description.intermediate.deserialize(data)
-        );
+        return description.deserialize(description.intermediate.deserialize(data));
       },
     };
   },

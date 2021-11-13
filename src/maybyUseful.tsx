@@ -20,6 +20,7 @@ function useResizeObserver(
         observer.unobserve(element);
       };
     }
+    return;
   }, [onSizeChange, ref]);
 }
 
@@ -68,9 +69,11 @@ export function Transitionate({ children, enterFrom }: TransitionateProps) {
       setTimeout(() => {
         setQueue((queue) => {
           const [removed, ...rest] = queue;
-          setTimeout(() => {
-            containerRef.current?.removeChild(removed.element);
-          }, 0);
+          if (removed) {
+            setTimeout(() => {
+              containerRef.current?.removeChild(removed.element);
+            }, 0);
+          }
           return rest;
         });
       }, duration * 1000);

@@ -96,7 +96,7 @@ export function piramidal(list: Array<string>, blocks: Record<string, Block>, li
 
 export const dataFromMerkle = (hash: string, blocks: Record<string, Block>): string | null => {
   const block = blocks[hash];
-  if (block === null) return null;
+  if (block === undefined) return null;
   switch (block.type) {
     case "leaf":
       return block.data;

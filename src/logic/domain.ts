@@ -161,7 +161,7 @@ export const store = makeStore(
         return getConversation(myPublicKey, otherPublicKey).length;
       },
       ConversationListAtIndex(myPublicKey, otherPublicKey, index) {
-        return getConversation(myPublicKey, otherPublicKey)[index];
+        return getConversation(myPublicKey, otherPublicKey)[index] ?? null;
       },
       Preferences() {
         return preferences;
