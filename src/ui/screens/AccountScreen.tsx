@@ -9,14 +9,15 @@ import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
+import { NavigationContext } from "../NavigationStack";
 
 type AccountScreenProps = {
   publicKey: string;
-  onCancel(): void;
   onUse(accountPublicKey: string): void;
 };
 
-export function AccountScreen({ onCancel, publicKey, onUse }: AccountScreenProps) {
+export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
+  const navigationStack = React.useContext(NavigationContext);
   const { theme } = React.useContext(StyleContext);
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
@@ -32,9 +33,10 @@ export function AccountScreen({ onCancel, publicKey, onUse }: AccountScreenProps
   const onSave = React.useCallback(() => {
     FrontendFacade.doUpdateAccount(publicKey, name, notes);
   }, [name, notes, publicKey]);
-  const setCurrentAccount = React.useCallback(() => {
+  const setCurrentAccount = () => {
     onUse(publicKey);
-  }, [onUse, publicKey]);
+    navigationStack.pop();
+  };
   return (
     <HeaderContentControlsLayout
       header={<Text text="Account" color="primary" weight="bold" size="big" />}
@@ -57,7 +59,6 @@ export function AccountScreen({ onCancel, publicKey, onUse }: AccountScreenProps
         <ButtonGroup>
           <Button label="Share" icon={<Icon icon="Share" />} onClick={() => {}} enabled={false} />
           <Button label="Export" icon={<Icon icon="Export" />} onClick={() => {}} enabled={false} />
-          <Button label="Back" icon={<Icon icon="Cancel" />} onClick={onCancel} enabled={true} />
           <Button label="Save" icon={<Icon icon="Save" />} onClick={onSave} enabled={true} />
           <Button label="Use" icon={<Icon icon="UseAccount" />} onClick={setCurrentAccount} enabled={true} />
         </ButtonGroup>

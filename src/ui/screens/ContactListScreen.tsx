@@ -9,14 +9,18 @@ import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
+import { NavigationContext } from "../NavigationStack";
 
-type ContactListScreenProps = {
-  onCreate(): void;
-  onHome(): void;
-  onContact(publicKey: string): void;
-};
-export function ContactListScreen({ onCreate, onHome, onContact }: ContactListScreenProps) {
+type ContactListScreenProps = {};
+export function ContactListScreen(props: ContactListScreenProps) {
+  const navigationStack = React.useContext(NavigationContext);
   const contactCount = FrontendFacade.useContactListSize() ?? 0;
+  const onContact = (publicKey: string) => {
+    navigationStack.push({ screen: "contact", publicKey });
+  };
+  const onCreate = () => {
+    navigationStack.push({ screen: "create-contact" });
+  };
   return (
     <HeaderContentControlsLayout
       header={<Text text="Contacts" color="primary" weight="bold" size="big" />}
@@ -29,8 +33,7 @@ export function ContactListScreen({ onCreate, onHome, onContact }: ContactListSc
       }
       controls={
         <ButtonGroup>
-          <Button label="Home" icon={<Icon icon="Home" />} onClick={onHome} enabled={true} />
-          <Button label="Create" icon={<Icon icon="CreateAccount" />} onClick={onCreate} enabled={true} />
+          <Button label="Create" icon={<Icon icon="Create" />} onClick={onCreate} enabled={true} />
         </ButtonGroup>
       }
     />

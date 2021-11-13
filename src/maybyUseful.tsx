@@ -1,6 +1,36 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+function useResizeObserver(
+  ref: React.MutableRefObject<any>,
+  onSizeChange: (size: { width: number; height: number }) => void
+) {
+  React.useLayoutEffect(() => {
+    if (ref.current) {
+      const element = ref.current;
+      onSizeChange?.({ width: element.clientWidth, height: element.clientHeight });
+      const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          onSizeChange?.({ width, height });
+        }
+      });
+      observer.observe(element);
+      return () => {
+        observer.unobserve(element);
+      };
+    }
+  }, [onSizeChange, ref]);
+}
+
+function usePrevious<Value>(value: Value) {
+  const ref = React.useRef<Value>(value);
+  React.useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
+
 type TransitionateProps = {
   enterFrom: keyof typeof transformMap;
   children: React.ReactNode;

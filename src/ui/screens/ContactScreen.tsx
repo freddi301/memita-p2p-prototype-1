@@ -9,14 +9,14 @@ import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
+import { NavigationContext } from "../NavigationStack";
 
 type ContactScreenProps = {
   publicKey: string;
-  onCancel(): void;
-  onConversation(otherPublicKey: string): void;
 };
 
-export function ContactScreen({ publicKey, onCancel, onConversation }: ContactScreenProps) {
+export function ContactScreen({ publicKey }: ContactScreenProps) {
+  const navigationStack = React.useContext(NavigationContext);
   const { theme } = React.useContext(StyleContext);
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
@@ -32,13 +32,13 @@ export function ContactScreen({ publicKey, onCancel, onConversation }: ContactSc
   const onSave = React.useCallback(() => {
     FrontendFacade.doUpdateContact(publicKey, name, notes);
   }, [name, notes, publicKey]);
-  const onDelete = React.useCallback(() => {
+  const onDelete = () => {
     FrontendFacade.doDeleteContact(publicKey);
-    onCancel();
-  }, [onCancel, publicKey]);
-  const onOpenConversation = React.useCallback(() => {
-    onConversation(publicKey);
-  }, [onConversation, publicKey]);
+    navigationStack.pop();
+  };
+  const onConversation = () => {
+    navigationStack.push({ screen: "conversation", otherPublicKey: publicKey });
+  };
   return (
     <HeaderContentControlsLayout
       header={<Text text="Contact" color="primary" weight="bold" size="big" />}
@@ -59,16 +59,10 @@ export function ContactScreen({ publicKey, onCancel, onConversation }: ContactSc
       }
       controls={
         <ButtonGroup>
-          <Button label="Delete" icon={<Icon icon="DeleteContact" />} onClick={onDelete} enabled={isLoaded} />
+          <Button label="Delete" icon={<Icon icon="Delete" />} onClick={onDelete} enabled={isLoaded} />
           <Button label="Share" icon={<Icon icon="Share" />} onClick={() => {}} enabled={true} />
-          <Button label="Back" icon={<Icon icon="Cancel" />} onClick={onCancel} enabled={true} />
           <Button label="Save" icon={<Icon icon="Save" />} onClick={onSave} enabled={isLoaded} />
-          <Button
-            label="Conversation"
-            icon={<Icon icon="Conversation" />}
-            onClick={onOpenConversation}
-            enabled={true}
-          />
+          <Button label="Conversation" icon={<Icon icon="Conversation" />} onClick={onConversation} enabled={true} />
         </ButtonGroup>
       }
     />

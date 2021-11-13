@@ -9,14 +9,18 @@ import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
+import { NavigationContext } from "../NavigationStack";
 
-type AccountListScreenProps = {
-  onCreate(): void;
-  onHome(): void;
-  onAccount(publicKey: string): void;
-};
-export function AccountListScreen({ onCreate, onHome, onAccount }: AccountListScreenProps) {
+type AccountListScreenProps = {};
+export function AccountListScreen(props: AccountListScreenProps) {
+  const navigationStack = React.useContext(NavigationContext);
   const accountCount = FrontendFacade.useAccountListSize() ?? 0;
+  const onAccount = (publicKey: string) => {
+    navigationStack.push({ screen: "account", publicKey });
+  };
+  const onCreate = () => {
+    navigationStack.push({ screen: "create-account" });
+  };
   return (
     <HeaderContentControlsLayout
       header={<Text text="Accounts" color="primary" weight="bold" size="big" />}
@@ -29,9 +33,8 @@ export function AccountListScreen({ onCreate, onHome, onAccount }: AccountListSc
       }
       controls={
         <ButtonGroup>
-          <Button label="Home" icon={<Icon icon="Home" />} onClick={onHome} enabled={true} />
           <Button label="Import" icon={<Icon icon="Import" />} onClick={() => {}} enabled={false} />
-          <Button label="Create" icon={<Icon icon="CreateAccount" />} onClick={onCreate} enabled={true} />
+          <Button label="Create" icon={<Icon icon="Create" />} onClick={onCreate} enabled={true} />
         </ButtonGroup>
       }
     />

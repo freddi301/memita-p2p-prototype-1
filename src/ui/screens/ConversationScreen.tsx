@@ -8,23 +8,13 @@ import { Icon } from "../components/Icon";
 import { Textarea } from "../components/Textarea";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
-import { ButtonGroup } from "../components/ButtonGroup";
 import { FrontendFacade } from "../../logic/FrontendFacade";
 
 type ConversationScreenProps = {
   myPublicKey: string;
   otherPublicKey: string;
-  onHome(): void;
-  onContact(publicKey: string): void;
-  onConversations(): void;
 };
-export function ConversationScreen({
-  myPublicKey,
-  otherPublicKey,
-  onHome,
-  onContact,
-  onConversations,
-}: ConversationScreenProps) {
+export function ConversationScreen({ myPublicKey, otherPublicKey }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
   const [text, setText] = React.useState("");
   const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
@@ -117,12 +107,7 @@ export function ConversationScreen({
           </div>
         </div>
       }
-      controls={
-        <ButtonGroup>
-          <Button label="Home" icon={<Icon icon="Home" />} onClick={onHome} enabled={true} />
-          <Button label="Conversations" icon={<Icon icon="Conversations" />} onClick={onConversations} enabled={true} />
-        </ButtonGroup>
-      }
+      controls={null}
     />
   );
 }

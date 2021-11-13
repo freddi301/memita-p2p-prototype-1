@@ -1,21 +1,21 @@
 import React from "react";
-import { Button } from "../components/Button";
 import { HeaderContentControlsLayout } from "../components/HeaderContentControlsLayout";
 import { Text } from "../components/Text";
 import { Virtuoso } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
-import { Icon } from "../components/Icon";
-import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
+import { NavigationContext } from "../NavigationStack";
 
 type ConversationListScreenProps = {
-  onHome(): void;
   myPublicKey: string;
-  onConversation(myPublicKey: string, otherPublicKey: string): void;
 };
-export function ConversationListScreen({ myPublicKey, onHome, onConversation }: ConversationListScreenProps) {
+export function ConversationListScreen({ myPublicKey }: ConversationListScreenProps) {
+  const navigationStack = React.useContext(NavigationContext);
+  const onConversation = (otherPublicKey: string) => {
+    navigationStack.push({ screen: "conversation", otherPublicKey });
+  };
   const conversationsCount = FrontendFacade.useConversationsListSize(myPublicKey) ?? 0;
   return (
     <HeaderContentControlsLayout
@@ -29,11 +29,7 @@ export function ConversationListScreen({ myPublicKey, onHome, onConversation }: 
           )}
         />
       }
-      controls={
-        <ButtonGroup>
-          <Button label="Home" icon={<Icon icon="Home" />} onClick={onHome} enabled={true} />
-        </ButtonGroup>
-      }
+      controls={null}
     />
   );
 }
@@ -41,7 +37,7 @@ export function ConversationListScreen({ myPublicKey, onHome, onConversation }: 
 type ConversationItemProps = {
   index: number;
   myPublicKey: string;
-  onConversation(myPublicKey: string, otherPublicKey: string): void;
+  onConversation(otherPublicKey: string): void;
 };
 export function ConversationItem({ index, onConversation, myPublicKey }: ConversationItemProps) {
   const { theme } = React.useContext(StyleContext);
@@ -51,7 +47,7 @@ export function ConversationItem({ index, onConversation, myPublicKey }: Convers
     <Clickable
       onClick={() => {
         if (conversation) {
-          onConversation(myPublicKey, conversation.otherPublicKey);
+          onConversation(conversation.otherPublicKey);
         }
       }}
     >
