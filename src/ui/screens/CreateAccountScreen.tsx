@@ -41,7 +41,7 @@ export function CreateAccountScreen(props: CreateAccountScreenProps) {
       }
       controls={
         <ButtonGroup>
-          <Button label="Create" icon={<Icon icon="Create" />} onClick={onCreate} enabled={true} />
+          <Button label="Create" icon={<Icon icon="Save" />} onClick={onCreate} enabled={true} />
         </ButtonGroup>
       }
     />

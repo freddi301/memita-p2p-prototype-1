@@ -37,6 +37,10 @@ export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
     onUse(publicKey);
     navigationStack.pop();
   };
+  const onDelete = () => {
+    FrontendFacade.doDeleteAccount(publicKey);
+    navigationStack.pop();
+  };
   return (
     <HeaderContentControlsLayout
       header={<Text text="Account" color="primary" weight="bold" size="big" />}
@@ -57,6 +61,7 @@ export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
       }
       controls={
         <ButtonGroup>
+          <Button label="Delete" icon={<Icon icon="Delete" />} onClick={onDelete} enabled={isLoaded} />
           <Button label="Share" icon={<Icon icon="Share" />} onClick={() => {}} enabled={false} />
           <Button label="Export" icon={<Icon icon="Export" />} onClick={() => {}} enabled={false} />
           <Button label="Save" icon={<Icon icon="Save" />} onClick={onSave} enabled={true} />
