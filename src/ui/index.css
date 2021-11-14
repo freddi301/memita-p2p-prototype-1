@@ -3,13 +3,13 @@ body {
 }
 
 ::-webkit-scrollbar {
-  background-color: hsl(0, 0%, 15%);
+  background-color: hsl(0, 0%, 10%);
   width: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: hsl(0, 0%, 10%);
+  background-color: hsl(0, 0%, 15%);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-corner {
-  background-color: hsl(0, 0%, 15%);
+  background-color: hsl(0, 0%, 10%);
 }
