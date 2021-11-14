@@ -4,12 +4,12 @@ import { Input } from "../components/Input";
 import { Textarea } from "../components/Textarea";
 import { HeaderContentControlsLayout } from "../components/HeaderContentControlsLayout";
 import { Text } from "../components/Text";
-import { Icon } from "../components/Icon";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
+import { SimpleHeader } from "../components/SimpleHeader";
 
 type CreateContactScreenProps = {};
 
@@ -25,7 +25,11 @@ export function CreateContactScreen(props: CreateContactScreenProps) {
   };
   return (
     <HeaderContentControlsLayout
-      header={<Text text="Create Contact" color="primary" weight="bold" size="big" />}
+      header={
+        <SimpleHeader>
+          <Text text="Create Contact" color="primary" weight="bold" size="big" />
+        </SimpleHeader>
+      }
       content={
         <div
           css={css`
@@ -43,7 +47,7 @@ export function CreateContactScreen(props: CreateContactScreenProps) {
       }
       controls={
         <ButtonGroup>
-          <Button label="Create" icon={<Icon icon="Save" />} onClick={onCreate} enabled={true} />
+          <Button label="Create" icon="Save" onClick={onCreate} enabled={true} showLabel={false} />
         </ButtonGroup>
       }
     />

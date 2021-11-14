@@ -4,12 +4,12 @@ import { Input } from "../components/Input";
 import { Textarea } from "../components/Textarea";
 import { HeaderContentControlsLayout } from "../components/HeaderContentControlsLayout";
 import { Text } from "../components/Text";
-import { Icon } from "../components/Icon";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
+import { SimpleHeader } from "../components/SimpleHeader";
 
 type AccountScreenProps = {
   publicKey: string;
@@ -43,7 +43,11 @@ export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
   };
   return (
     <HeaderContentControlsLayout
-      header={<Text text="Account" color="primary" weight="bold" size="big" />}
+      header={
+        <SimpleHeader>
+          <Text text="Account" color="primary" weight="bold" size="big" />
+        </SimpleHeader>
+      }
       content={
         <div
           css={css`
@@ -61,11 +65,11 @@ export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
       }
       controls={
         <ButtonGroup>
-          <Button label="Delete" icon={<Icon icon="Delete" />} onClick={onDelete} enabled={isLoaded} />
-          <Button label="Share" icon={<Icon icon="Share" />} onClick={() => {}} enabled={false} />
-          <Button label="Export" icon={<Icon icon="Export" />} onClick={() => {}} enabled={false} />
-          <Button label="Save" icon={<Icon icon="Save" />} onClick={onSave} enabled={true} />
-          <Button label="Use" icon={<Icon icon="UseAccount" />} onClick={setCurrentAccount} enabled={true} />
+          <Button label="Delete" icon="Delete" onClick={onDelete} enabled={isLoaded} showLabel={false} />
+          <Button label="Share" icon="Share" onClick={() => {}} enabled={false} showLabel={false} />
+          <Button label="Export" icon="Export" onClick={() => {}} enabled={false} showLabel={false} />
+          <Button label="Save" icon="Save" onClick={onSave} enabled={true} showLabel={false} />
+          <Button label="Use" icon="UseAccount" onClick={setCurrentAccount} enabled={true} showLabel={true} />
         </ButtonGroup>
       }
     />
