@@ -7,29 +7,57 @@ import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
+import { EmptyListPlaceholder } from "../components/EmptyListPlaceholder";
+import { ButtonGroup } from "../components/ButtonGroup";
+import { Button } from "../components/Button";
 
 type ConversationListScreenProps = {
   myPublicKey: string;
 };
 export function ConversationListScreen({ myPublicKey }: ConversationListScreenProps) {
   const navigationStack = React.useContext(NavigationContext);
+  const { theme } = React.useContext(StyleContext);
+  const account = FrontendFacade.useAccountByPublicKey(myPublicKey);
   const onConversation = (otherPublicKey: string) => {
     navigationStack.push({ screen: "conversation", otherPublicKey });
+  };
+  const onCreate = () => {
+    navigationStack.push({ screen: "contact-list" });
   };
   const conversationsCount = FrontendFacade.useConversationsListSize(myPublicKey) ?? 0;
   return (
     <HeaderContentControlsLayout
-      header={<Text text="Conversations" color="primary" weight="bold" size="big" />}
-      content={
-        <Virtuoso
-          style={{ height: "100%" }}
-          totalCount={conversationsCount}
-          itemContent={(index) => (
-            <ConversationItem index={index} myPublicKey={myPublicKey} onConversation={onConversation} />
-          )}
-        />
+      header={
+        <div
+          css={css`
+            display: grid;
+            grid-auto-flow: row;
+            grid-auto-columns: auto;
+            padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+          `}
+        >
+          <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
+          <Text color="secondary" size="normal" weight="normal" text={myPublicKey} />
+        </div>
       }
-      controls={null}
+      content={
+        !conversationsCount ? (
+          <EmptyListPlaceholder>No conversations</EmptyListPlaceholder>
+        ) : (
+          <Virtuoso
+            style={{ height: "100%" }}
+            totalCount={conversationsCount}
+            itemContent={(index) => (
+              <ConversationItem index={index} myPublicKey={myPublicKey} onConversation={onConversation} />
+            )}
+          />
+        )
+      }
+      controls={
+        <ButtonGroup>
+          <Button label="Create" icon="Create" onClick={onCreate} enabled={true} showLabel={false} />
+        </ButtonGroup>
+      }
     />
   );
 }
