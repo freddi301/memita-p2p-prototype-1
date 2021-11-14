@@ -41,3 +41,7 @@
 - voice call
 - video call
 - screen sharing
+
+# Optimizations
+- deduplicate subsciptions to backend
+- restablish on connections lost to backend
