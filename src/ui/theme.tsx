@@ -8,18 +8,16 @@ import {
   faEnvelope,
   faFileExport,
   faFileImport,
-  faHome,
   faLock,
   faPaperPlane,
   faPlus,
   faSave,
   faShareAlt,
-  faTimes,
   faTrash,
   faUser,
-  faUserMinus,
-  faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
+
+export type IconName = keyof typeof theme["icons"];
 
 export const theme = {
   colors: {
