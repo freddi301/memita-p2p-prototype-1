@@ -4,7 +4,6 @@ import { HeaderContentControlsLayout } from "../components/HeaderContentControls
 import { Text } from "../components/Text";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
-import { Icon } from "../components/Icon";
 import { Textarea } from "../components/Textarea";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
@@ -32,7 +31,19 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
   const [scrollPosition, setScrollPosition] = useConversationScrollPosition(myPublicKey, otherPublicKey);
   return (
     <HeaderContentControlsLayout
-      header={<Text text="Conversation" color="primary" weight="bold" size="big" />}
+      header={
+        <div
+          css={css`
+            display: grid;
+            grid-auto-flow: row;
+            grid-auto-columns: auto;
+            padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+          `}
+        >
+          <Text color="primary" size="normal" weight="bold" text={other?.name ?? "..."} />
+          <Text color="secondary" size="normal" weight="normal" text={otherPublicKey} />
+        </div>
+      }
       content={
         <div
           css={css`
@@ -80,22 +91,24 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
                 position: absolute;
                 right: ${theme.spacing.text.horizontal};
                 top: -${theme.sizes.vertical};
-                transition: 1s;
+                transition: ${theme.transitions.input};
+                transition-delay: 0.5s;
                 opacity: ${isAtBottom ? 0 : 1};
               `}
             >
               <Button
-                icon={theme.icons.ScrollToBottom}
+                icon="ScrollToBottom"
                 label="Scroll to end"
                 enabled={!isAtBottom}
                 onClick={() => scrollTo(conversationCount + 1)}
+                showLabel={false}
               />
             </div>
             <Textarea
               value={text}
               onChange={setText}
               rows={text.split("\n").length}
-              actions={<Button label="Send" icon={<Icon icon="Send" />} onClick={onSend} enabled={false} />}
+              actions={<Button label="Send" icon="Send" onClick={onSend} enabled={false} showLabel={false} />}
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
