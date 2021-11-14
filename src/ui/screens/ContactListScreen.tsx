@@ -4,12 +4,13 @@ import { HeaderContentControlsLayout } from "../components/HeaderContentControls
 import { Text } from "../components/Text";
 import { Virtuoso } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
-import { Icon } from "../components/Icon";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
+import { EmptyListPlaceholder } from "../components/EmptyListPlaceholder";
+import { SimpleHeader } from "../components/SimpleHeader";
 
 type ContactListScreenProps = {};
 export function ContactListScreen(props: ContactListScreenProps) {
@@ -23,17 +24,25 @@ export function ContactListScreen(props: ContactListScreenProps) {
   };
   return (
     <HeaderContentControlsLayout
-      header={<Text text="Contacts" color="primary" weight="bold" size="big" />}
+      header={
+        <SimpleHeader>
+          <Text text="Contacts" color="primary" weight="bold" size="big" />
+        </SimpleHeader>
+      }
       content={
-        <Virtuoso
-          style={{ height: "100%" }}
-          totalCount={contactCount}
-          itemContent={(index) => <ContactItem index={index} onContact={onContact} />}
-        />
+        !contactCount ? (
+          <EmptyListPlaceholder>No Contacts</EmptyListPlaceholder>
+        ) : (
+          <Virtuoso
+            style={{ height: "100%" }}
+            totalCount={contactCount}
+            itemContent={(index) => <ContactItem index={index} onContact={onContact} />}
+          />
+        )
       }
       controls={
         <ButtonGroup>
-          <Button label="Create" icon={<Icon icon="Create" />} onClick={onCreate} enabled={true} />
+          <Button label="Create" icon="Create" onClick={onCreate} enabled={true} showLabel={false} />
         </ButtonGroup>
       }
     />
