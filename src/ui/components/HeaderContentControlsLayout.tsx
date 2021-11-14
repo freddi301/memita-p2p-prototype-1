@@ -16,41 +16,42 @@ export function HeaderContentControlsLayout({ header, content, controls }: Heade
         height: 100%;
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows:
-          calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2)
-          1fr
-          calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
+        grid-template-rows: auto 1fr auto;
       `}
     >
-      <div
-        css={css`
-          grid-column: 1;
-          grid-row: 1;
-          align-self: center;
-          padding-left: ${theme.spacing.text.horizontal};
-        `}
-      >
-        {header}
-      </div>
+      {header && (
+        <div
+          css={css`
+            grid-column: 1;
+            grid-row: 1;
+            height: calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
+            border-bottom: 1px solid ${theme.colors.background.active};
+          `}
+        >
+          {header}
+        </div>
+      )}
       <div
         css={css`
           grid-column: 1;
           grid-row: 2;
           overflow-y: auto;
-          border-top: 1px solid ${theme.colors.background.active};
-          border-bottom: 1px solid ${theme.colors.background.active};
         `}
       >
         {content}
       </div>
-      <div
-        css={css`
-          grid-column: 1;
-          grid-row: 3;
-        `}
-      >
-        {controls}
-      </div>
+      {controls && (
+        <div
+          css={css`
+            grid-column: 1;
+            grid-row: 3;
+            height: calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
+            border-top: 1px solid ${theme.colors.background.active};
+          `}
+        >
+          {controls}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,19 +1,20 @@
 import React from "react";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
+import { IconName } from "../theme";
+import { Icon } from "./Icon";
 
 type ButtonProps = {
   label: string;
-  icon: React.ReactNode;
+  icon?: IconName;
   enabled: boolean;
   onClick(): void;
+  showLabel: boolean;
 };
 
-function Button({ label, icon, onClick, enabled }: ButtonProps) {
+function Button({ label, icon, onClick, enabled, showLabel }: ButtonProps) {
   const { theme } = React.useContext(StyleContext);
   const ref = React.useRef<HTMLButtonElement | null>(null);
-  const showButtonLabel = false;
-  const showButtonIcon = true;
   return (
     <button
       ref={ref}
@@ -41,8 +42,8 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
         }
         padding-top: ${theme.spacing.text.vertical};
         padding-bottom: ${theme.spacing.text.vertical};
-        padding-left: ${showButtonLabel ? theme.spacing.text.horizontal : ""};
-        padding-right: ${showButtonLabel ? theme.spacing.text.horizontal : ""};
+        padding-left: ${showLabel ? theme.spacing.text.horizontal : ""};
+        padding-right: ${showLabel ? theme.spacing.text.horizontal : ""};
         transition: ${theme.transitions.input.duration};
       `}
       onMouseEnter={() => {
@@ -52,15 +53,15 @@ function Button({ label, icon, onClick, enabled }: ButtonProps) {
         ref.current?.blur();
       }}
     >
-      {showButtonIcon && icon}
-      {showButtonIcon && showButtonLabel && (
+      {icon && <Icon icon={icon} />}
+      {icon && showLabel && (
         <div
           css={css`
             width: ${theme.spacing.text.horizontal};
           `}
         ></div>
       )}
-      {showButtonLabel && label}
+      {showLabel && label}
     </button>
   );
 }
