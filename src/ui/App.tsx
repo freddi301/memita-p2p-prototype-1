@@ -10,16 +10,19 @@ import { ContactListScreen } from "./screens/ContactListScreen";
 import { ContactScreen } from "./screens/ContactScreen";
 import { ConversationScreen } from "./screens/ConversationScreen";
 import { FrontendFacade } from "../logic/FrontendFacade";
-import { ConversationItem, ConversationListScreen } from "./screens/ConversationListScreen";
+import { ConversationListScreen } from "./screens/ConversationListScreen";
 import { css } from "styled-components/macro";
-import { Virtuoso } from "react-virtuoso";
 import { NavigationContext, useNavigationStack } from "./NavigationStack";
 import { MustSelectAccountScreen } from "./screens/MustSelectAccountScreen";
+import { LeftPanelConversationList } from "./components/LeftPanelConversationList";
 
 export function App() {
   const styleProviderValue = useStyleProvider();
   const navigationStack = useNavigationStack();
   const preferences = FrontendFacade.usePreferences();
+  const currentAccountPublicKey = FrontendFacade.useAccountByPublicKey(preferences?.currentAccountPublicKey ?? "")
+    ? preferences?.currentAccountPublicKey
+    : null;
   const setCurrentAccount = React.useCallback(
     (accountPublickKey: string) => {
       FrontendFacade.doUpdatePreferences({ ...preferences, currentAccountPublicKey: accountPublickKey });
@@ -50,27 +53,26 @@ export function App() {
         return <ContactScreen publicKey={navigationStack.current.publicKey} />;
       }
       case "conversation": {
-        if (preferences?.currentAccountPublicKey) {
+        if (currentAccountPublicKey) {
           return (
             <ConversationScreen
-              myPublicKey={preferences.currentAccountPublicKey}
+              myPublicKey={currentAccountPublicKey}
               otherPublicKey={navigationStack.current.otherPublicKey}
             />
           );
         } else {
-          return <MustSelectAccountScreen />;
+          return <MustSelectAccountScreen onUse={setCurrentAccount} />;
         }
       }
       case "conversation-list": {
-        if (preferences?.currentAccountPublicKey) {
-          return <ConversationListScreen myPublicKey={preferences.currentAccountPublicKey} />;
+        if (currentAccountPublicKey) {
+          return <ConversationListScreen myPublicKey={currentAccountPublicKey} />;
         } else {
-          return <MustSelectAccountScreen />;
+          return <MustSelectAccountScreen onUse={setCurrentAccount} />;
         }
       }
     }
-  }, [navigationStack, preferences?.currentAccountPublicKey, setCurrentAccount]);
-  const conversationsCount = FrontendFacade.useConversationsListSize(preferences?.currentAccountPublicKey ?? "") ?? 0;
+  }, [navigationStack, currentAccountPublicKey, setCurrentAccount]);
   return (
     <StyleContext.Provider value={styleProviderValue}>
       <NavigationContext.Provider value={navigationStack}>
@@ -83,34 +85,20 @@ export function App() {
               height: 100%;
             `}
           >
-            {styleProviderValue.showLeftPanel && navigationStack.current.screen !== "conversation-list" && (
-              <div
-                css={css`
-                  grid-column: 1;
-                  grid-row: 1;
-                  border-right: 1px solid ${styleProviderValue.theme.colors.background.active};
-                  width: 350px;
-                `}
-              >
-                <Virtuoso
-                  style={{ height: "100%" }}
-                  totalCount={conversationsCount}
-                  itemContent={(index) => (
-                    <ConversationItem
-                      index={index}
-                      myPublicKey={preferences?.currentAccountPublicKey ?? ""}
-                      onConversation={(otherPublicKey) => {
-                        // TODO better
-                        navigationStack.push({
-                          screen: "conversation",
-                          otherPublicKey,
-                        });
-                      }}
-                    />
-                  )}
-                />
-              </div>
-            )}
+            {styleProviderValue.showLeftPanel &&
+              navigationStack.current.screen !== "conversation-list" &&
+              currentAccountPublicKey && (
+                <div
+                  css={css`
+                    grid-column: 1;
+                    grid-row: 1;
+                    border-right: 1px solid ${styleProviderValue.theme.colors.background.active};
+                    width: 350px;
+                  `}
+                >
+                  <LeftPanelConversationList currentAccountPublicKey={currentAccountPublicKey} />
+                </div>
+              )}
             <div
               css={css`
                 grid-column: 2;
