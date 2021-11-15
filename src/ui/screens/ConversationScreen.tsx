@@ -6,7 +6,7 @@ import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
-import { FrontendFacade } from "../../logic/FrontendFacade";
+import { FrontendFacade } from "../FrontendFacade";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 

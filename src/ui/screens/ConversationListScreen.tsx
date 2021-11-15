@@ -5,7 +5,7 @@ import { Virtuoso } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
-import { FrontendFacade } from "../../logic/FrontendFacade";
+import { FrontendFacade } from "../FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
 import { EmptyListPlaceholder } from "../components/EmptyListPlaceholder";
 import { ButtonGroup } from "../components/ButtonGroup";

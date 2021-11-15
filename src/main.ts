@@ -1,14 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
-import libsodium from "libsodium-wrappers";
-
-require("source-map-support").install(); // need for node
-
-(async () => {
-  await libsodium.ready;
-  // await import("./legacy/rpc/local/electron/server");
-  // await import("./legacy/rpc/remote/hyperswarm/server");
-})();
+import "./rpc/local/electron/entry";
 
 function createWindow() {
   const mainWindow = new BrowserWindow({

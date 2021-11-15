@@ -7,7 +7,7 @@ import { Clickable } from "../components/Clickable";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
-import { FrontendFacade } from "../../logic/FrontendFacade";
+import { FrontendFacade } from "../FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
 import { EmptyListPlaceholder } from "../components/EmptyListPlaceholder";
 import { SimpleHeader } from "../components/SimpleHeader";

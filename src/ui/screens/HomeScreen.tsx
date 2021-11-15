@@ -4,7 +4,7 @@ import { HeaderContentControlsLayout } from "../components/HeaderContentControls
 import { Button } from "../components/Button";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { NavigationContext } from "../NavigationStack";
-import { FrontendFacade } from "../../logic/FrontendFacade";
+import { FrontendFacade } from "../FrontendFacade";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 

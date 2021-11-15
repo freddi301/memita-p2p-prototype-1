@@ -8,8 +8,7 @@
   "scripts": {
     "build:typescript": "tsc && cp public/index.html dist/index.html",
     "build:react": "webpack",
-    "build:prisma": "prisma migrate dev",
-    "build": "yarn build:prisma && yarn build:typescript && yarn build:react",
+    "build": "yarn build:typescript && yarn build:react",
     "start": "yarn build && electron dist/main.js",
     "dev:frontend": "webpack serve --config dev.webpack.config.js",
     "dev:backend": "tsc && node dist/rpc/local/websocket/entry.js",

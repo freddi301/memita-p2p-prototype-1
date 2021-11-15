@@ -1,9 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import libsodium from "libsodium-wrappers";
+import { RemoteCommands, RemoteQueries } from "./logic/plumbing";
+
+export let frontendStore: { command: RemoteCommands; query: RemoteQueries };
 
 (async () => {
   await libsodium.ready;
   const { App } = await import("./ui/App");
+  if ("rendererIpc" in window) {
+    const { localRpcRendererClient } = await import("./rpc/local/electron/renderer");
+    frontendStore = localRpcRendererClient;
+  } else {
+    const { localRpcWebsocketClient } = await import("./rpc/local/websocket/client");
+    frontendStore = localRpcWebsocketClient;
+  }
   ReactDOM.render(<App />, document.getElementById("root"));
 })();

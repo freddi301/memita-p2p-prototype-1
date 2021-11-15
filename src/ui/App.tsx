@@ -9,7 +9,7 @@ import { CreateContactScreen } from "./screens/CreateContactScreen";
 import { ContactListScreen } from "./screens/ContactListScreen";
 import { ContactScreen } from "./screens/ContactScreen";
 import { ConversationScreen } from "./screens/ConversationScreen";
-import { FrontendFacade } from "../logic/FrontendFacade";
+import { FrontendFacade } from "./FrontendFacade";
 import { ConversationListScreen } from "./screens/ConversationListScreen";
 import { css } from "styled-components/macro";
 import { NavigationContext, useNavigationStack } from "./NavigationStack";

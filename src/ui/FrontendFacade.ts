@@ -1,8 +1,6 @@
 import React from "react";
-import { localRpcWebsocketClient } from "../rpc/local/websocket/client";
-import { Commands, Queries } from "./domain";
-
-const store = localRpcWebsocketClient;
+import { frontendStore } from "..";
+import { Commands, Queries } from "../logic/domain";
 
 // frontend machinery
 type CommandFacade = {
@@ -31,7 +29,7 @@ export const FrontendFacade: CommandFacade & QueryFacade = new Proxy(
 const dispatchSingletonsByKey = makeSingletonByKey(
   <Key extends keyof Commands>(name: Key) =>
     (...args: Parameters<Commands[Key]>) => {
-      (store.command[name] as any)(...args);
+      (frontendStore.command[name] as any)(...args);
     }
 );
 const subscribeSingletonByKey = makeSingletonByKey(
@@ -39,7 +37,7 @@ const subscribeSingletonByKey = makeSingletonByKey(
     (...args: Parameters<Queries[Key]>): ReturnType<Queries[Key]> | null => {
       const [state, setState] = React.useState<ReturnType<Queries[Key]> | null>(null);
       React.useLayoutEffect(() => {
-        return (store.query[key] as any)(...args)(setState);
+        return (frontendStore.query[key] as any)(...args)(setState);
         // eslint-disable-next-line
       }, args);
       return state;

@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleContext } from "../StyleProvider";
-import { FrontendFacade } from "../../logic/FrontendFacade";
+import { FrontendFacade } from "../FrontendFacade";
 import { ConversationItem } from "../screens/ConversationListScreen";
 import { css } from "styled-components/macro";
 import { Virtuoso } from "react-virtuoso";
