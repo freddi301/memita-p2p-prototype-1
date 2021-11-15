@@ -9,6 +9,7 @@ import {
   faFileExport,
   faFileImport,
   faLock,
+  faPaperclip,
   faPaperPlane,
   faPlus,
   faSave,
@@ -80,5 +81,6 @@ export const theme = {
     ScrollToBottom: <FontAwesomeIcon icon={faAngleDoubleDown} />,
     Send: <FontAwesomeIcon icon={faPaperPlane} />,
     Emoji: <FontAwesomeIcon icon={faSmile} />,
+    Attachment: <FontAwesomeIcon icon={faPaperclip} />,
   },
 };

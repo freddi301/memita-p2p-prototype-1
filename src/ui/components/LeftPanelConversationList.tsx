@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../FrontendFacade";
-import { ConversationItem } from "../screens/ConversationListScreen";
+import { ConversationLisItem } from "../screens/ConversationListScreen";
 import { css } from "styled-components/macro";
 import { Virtuoso } from "react-virtuoso";
 import { NavigationContext } from "../NavigationStack";
@@ -40,7 +40,7 @@ export function LeftPanelConversationList({ currentAccountPublicKey }: LeftPanel
         style={{ flexGrow: 1 }}
         totalCount={conversationsCount}
         itemContent={(index) => (
-          <ConversationItem index={index} myPublicKey={currentAccountPublicKey} onConversation={onConversation} />
+          <ConversationLisItem index={index} myPublicKey={currentAccountPublicKey} onConversation={onConversation} />
         )}
       />
     </div>

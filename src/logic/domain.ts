@@ -8,7 +8,13 @@ export type Commands = {
   CreateAccount(name: string, notes: string): void;
   UpdateAccount(publicKey: string, name: string, notes: string): void;
   DeleteAccount(publickKey: string): void;
-  Message(senderPublicKey: string, recipientPublicKey: string, createdAtEpoch: number, text: string): void;
+  Message(
+    senderPublicKey: string,
+    recipientPublicKey: string,
+    createdAtEpoch: number,
+    text: string,
+    attachments: Array<{ name: string; type: string; content: Uint8Array }>
+  ): void;
   UpdatePreferences(preferences: Preferences): void;
 };
 export type Queries = {
@@ -23,14 +29,26 @@ export type Queries = {
     myPublicKey: string,
     otherPublicKey: string,
     index: number
-  ): { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number } | null;
+  ): {
+    senderPublicKey: string;
+    recipientPublicKey: string;
+    createdAtEpoch: number;
+    text: string;
+    attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+  } | null;
   ConversationsListSize(myPublicKey: string): number;
   ConversationsListAtIndex(
     myPublicKey: string,
     index: number
   ): {
     otherPublicKey: string;
-    lastMessage: { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number };
+    lastMessage: {
+      senderPublicKey: string;
+      recipientPublicKey: string;
+      text: string;
+      createdAtEpoch: number;
+      attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+    };
   } | null;
   Preferences(): Preferences;
 };
@@ -70,13 +88,28 @@ export const store = makeStore(
     messageMap(
       messageMap: Record<
         string,
-        { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number }
+        {
+          senderPublicKey: string;
+          recipientPublicKey: string;
+          text: string;
+          createdAtEpoch: number;
+          attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+        }
       >
     ) {
       return {
-        Message(senderPublicKey, recipientPublicKey, createdAtEpoch, text) {
-          const messageHash = calculateMessageHash({ senderPublicKey, recipientPublicKey, createdAtEpoch, text });
-          return { ...messageMap, [messageHash]: { senderPublicKey, recipientPublicKey, text, createdAtEpoch } };
+        Message(senderPublicKey, recipientPublicKey, createdAtEpoch, text, attachments) {
+          const messageHash = calculateMessageHash({
+            senderPublicKey,
+            recipientPublicKey,
+            createdAtEpoch,
+            text,
+            attachments,
+          });
+          return {
+            ...messageMap,
+            [messageHash]: { senderPublicKey, recipientPublicKey, text, createdAtEpoch, attachments },
+          };
         },
       };
     },
@@ -105,7 +138,13 @@ export const store = makeStore(
         )
         .sort((a, b) => a.createdAtEpoch - b.createdAtEpoch);
     const getConversations = (myPublickKey: string) => {
-      type Message = { senderPublicKey: string; recipientPublicKey: string; text: string; createdAtEpoch: number };
+      type Message = {
+        senderPublicKey: string;
+        recipientPublicKey: string;
+        text: string;
+        createdAtEpoch: number;
+        attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+      };
       const lastMessageByConversationKey = Object.values(messageMap).reduce(
         (lastMessageByKey: Record<string, Message>, message) => {
           const replace = (otherPublicKey: string) => {
@@ -181,16 +220,23 @@ function calculateMessageHash({
   recipientPublicKey,
   text,
   createdAtEpoch,
+  attachments,
 }: {
   senderPublicKey: string;
   recipientPublicKey: string;
   text: string;
   createdAtEpoch: number;
+  attachments: Array<{ type: string; name: string; content: Uint8Array }>;
 }) {
-  const state = libsodium.crypto_generichash_init(null, libsodium.crypto_generichash_KEYBYTES);
+  const state = libsodium.crypto_generichash_init("message", libsodium.crypto_generichash_KEYBYTES);
   libsodium.crypto_generichash_update(state, senderPublicKey);
   libsodium.crypto_generichash_update(state, recipientPublicKey);
   libsodium.crypto_generichash_update(state, createdAtEpoch.toString());
   libsodium.crypto_generichash_update(state, text);
+  for (const attachment of attachments) {
+    libsodium.crypto_generichash_update(state, attachment.type);
+    libsodium.crypto_generichash_update(state, attachment.name);
+    libsodium.crypto_generichash_update(state, attachment.content);
+  }
   return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES, "hex");
 }

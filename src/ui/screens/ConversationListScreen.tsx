@@ -10,6 +10,7 @@ import { NavigationContext } from "../NavigationStack";
 import { EmptyListPlaceholder } from "../components/EmptyListPlaceholder";
 import { ButtonGroup } from "../components/ButtonGroup";
 import { Button } from "../components/Button";
+import { Icon } from "../components/Icon";
 
 type ConversationListScreenProps = {
   myPublicKey: string;
@@ -48,7 +49,7 @@ export function ConversationListScreen({ myPublicKey }: ConversationListScreenPr
             style={{ height: "100%" }}
             totalCount={conversationsCount}
             itemContent={(index) => (
-              <ConversationItem index={index} myPublicKey={myPublicKey} onConversation={onConversation} />
+              <ConversationLisItem index={index} myPublicKey={myPublicKey} onConversation={onConversation} />
             )}
           />
         )
@@ -67,7 +68,7 @@ type ConversationItemProps = {
   myPublicKey: string;
   onConversation(otherPublicKey: string): void;
 };
-export function ConversationItem({ index, onConversation, myPublicKey }: ConversationItemProps) {
+export function ConversationLisItem({ index, onConversation, myPublicKey }: ConversationItemProps) {
   const { theme } = React.useContext(StyleContext);
   const conversation = FrontendFacade.useConversationsListAtIndex(myPublicKey, index);
   const contact = FrontendFacade.useContactByPublicKey(conversation?.otherPublicKey ?? "");
@@ -112,15 +113,44 @@ export function ConversationItem({ index, onConversation, myPublicKey }: Convers
           css={css`
             grid-column: 1 / span 2;
             grid-row: 2;
+            display: flex;
           `}
         >
-          <Text
-            color="primary"
-            size="normal"
-            weight="normal"
-            truncatedLine={true}
-            text={conversation?.lastMessage.text ?? "..."}
-          />
+          <div
+            css={css`
+              flex-grow: 1;
+            `}
+          >
+            <Text
+              color="primary"
+              size="normal"
+              weight="normal"
+              truncatedLine={true}
+              text={conversation?.lastMessage.text ?? "..."}
+            />
+          </div>
+          {conversation && conversation.lastMessage.attachments.length > 0 && (
+            <div
+              css={css`
+                color: ${theme.colors.text.secondary};
+                font-family: ${theme.font.family};
+                font-size: ${theme.font.size.normal};
+                margin-left: ${theme.spacing.text.vertical};
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              `}
+            >
+              <Icon icon="Attachment" />
+              <div
+                css={css`
+                  margin-left: ${theme.spacing.text.vertical};
+                `}
+              >
+                {conversation.lastMessage.attachments.length}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Clickable>

@@ -1,5 +1,6 @@
 import { Commands, Queries } from "../../../logic/domain";
 import { RemoteCommands, RemoteQueries } from "../../../logic/plumbing";
+import { JSONB } from "../../JSONB";
 import { LOCAL_RPC_WEBSOCKET_PORT, LOCAL_RPC_WEBSOCKET_HOST } from "./common";
 
 // TODO improve performance using only one message listener
@@ -16,18 +17,13 @@ function pushToQueue(message: string) {
 
 let socket = new WebSocket(`ws://${LOCAL_RPC_WEBSOCKET_HOST}:${LOCAL_RPC_WEBSOCKET_PORT}`);
 socket.addEventListener("open", (event) => {
-  // console.log("websocket opened", event);
   isReady = true;
   for (let message = messageQueue.shift(); message; message = messageQueue.shift()) {
     socket.send(message);
   }
 });
-socket.addEventListener("close", (event) => {
-  // console.log("websocket closed", event);
-});
-socket.addEventListener("error", (event) => {
-  // console.log("websocket error", event);
-});
+socket.addEventListener("close", (event) => {});
+socket.addEventListener("error", (event) => {});
 
 export const localRpcWebsocketClient: {
   command: RemoteCommands;
@@ -41,7 +37,7 @@ export const localRpcWebsocketClient: {
           const name = property as Key;
           const id = Math.random().toString();
           pushToQueue(
-            JSON.stringify({
+            JSONB.stringify({
               id,
               type: "command",
               name,
@@ -61,7 +57,7 @@ export const localRpcWebsocketClient: {
             const name = property as Key;
             const id = Math.random().toString();
             pushToQueue(
-              JSON.stringify({
+              JSONB.stringify({
                 id,
                 type: "query",
                 name,
@@ -69,7 +65,7 @@ export const localRpcWebsocketClient: {
               })
             );
             const onMessage = (event: MessageEvent<any>) => {
-              const parsed = JSON.parse(event.data);
+              const parsed = JSONB.parse(event.data);
               if (parsed.id === id) {
                 listener(parsed.value);
               }
@@ -78,7 +74,7 @@ export const localRpcWebsocketClient: {
             return () => {
               socket.removeEventListener("message", onMessage);
               pushToQueue(
-                JSON.stringify({
+                JSONB.stringify({
                   id,
                   type: "unsubscribe",
                 })

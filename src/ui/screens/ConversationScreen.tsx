@@ -8,7 +8,8 @@ import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../FrontendFacade";
 import "emoji-mart/css/emoji-mart.css";
-import { Picker } from "emoji-mart";
+import { Attachment, AttachmentPreview } from "../components/AttachmentPreview";
+import { MessageEditor } from "../components/MessageEditor";
 
 type ConversationScreenProps = {
   myPublicKey: string;
@@ -16,8 +17,8 @@ type ConversationScreenProps = {
 };
 export function ConversationScreen({ myPublicKey, otherPublicKey }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
-  const onSend = (text: string) => {
-    FrontendFacade.doMessage(myPublicKey, otherPublicKey, new Date().getTime(), text);
+  const onSend = (text: string, attachments: Array<Attachment>) => {
+    FrontendFacade.doMessage(myPublicKey, otherPublicKey, new Date().getTime(), text, attachments);
   };
   const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
   const me = FrontendFacade.useAccountByPublicKey(myPublicKey);
@@ -85,7 +86,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
               css={css`
                 position: absolute;
                 right: ${theme.spacing.text.horizontal};
-                bottom: 0px;
+                bottom: ${theme.spacing.text.vertical};
                 transition: 0.5s;
                 transition-delay: 0.5s;
                 opacity: ${isAtBottom ? 0 : 1};
@@ -125,7 +126,7 @@ function ConversationItem({ index, myPublicKey, otherPublicKey, myName, otherNam
         css={css`
           display: grid;
           grid-template-columns: 1fr auto;
-          grid-template-rows: auto auto;
+          grid-template-rows: auto auto auto;
           padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
         `}
       >
@@ -159,8 +160,33 @@ function ConversationItem({ index, myPublicKey, otherPublicKey, myName, otherNam
             grid-column: 1 / span 2;
           `}
         >
-          <Text color="primary" size="normal" weight="normal" text={message ? message.text : "..."} />
+          <Text color="primary" size="normal" weight="normal" text={message ? message.text.trim() : "..."} />
         </div>
+        {message && message.attachments.length > 0 && (
+          <div
+            css={css`
+              grid-column: 1 / span 2;
+              grid-row: 3;
+              position: relative;
+              display: flex;
+              flex-wrap: wrap;
+            `}
+          >
+            {message.attachments.map((attachment, index) => {
+              return (
+                <div
+                  key={index}
+                  css={css`
+                    margin-top: ${theme.spacing.text.vertical};
+                    margin-right: ${theme.spacing.text.vertical};
+                  `}
+                >
+                  <AttachmentPreview attachment={attachment} />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </Clickable>
   );
@@ -190,128 +216,4 @@ function useConversationScrollPosition(myPublicKey: string, otherPublicKey: stri
     rangeRef.current = index;
   }, []);
   return [scrollPosition, setScrollPosition] as const;
-}
-
-type MessageEditorProps = {
-  onSend: (text: string) => void;
-};
-function MessageEditor({ onSend }: MessageEditorProps) {
-  const { theme } = React.useContext(StyleContext);
-  const [text, setText] = React.useState("");
-  const send = () => {
-    onSend(text);
-    setText("");
-  };
-  const textRef = React.useRef<HTMLTextAreaElement | null>(null);
-  const [showEmojis, setShowEmojis] = React.useState(false);
-  return (
-    <div
-      css={css`
-        padding-top: ${theme.spacing.text.vertical};
-        padding-bottom: ${theme.spacing.text.vertical};
-        padding-left: ${theme.spacing.text.horizontal};
-        padding-right: ${theme.spacing.text.horizontal};
-        box-sizing: border-box;
-      `}
-    >
-      <div
-        css={css`
-          position: relative;
-        `}
-      >
-        {showEmojis && (
-          <div
-            css={css`
-              position: absolute;
-              bottom: ${theme.spacing.text.vertical};
-              right: 48px;
-              display: flex;
-              flex-direction: column;
-              align-items: flex-end;
-              transition: 0.5s;
-            `}
-          >
-            <Button icon="Close" label="Close" enabled={true} onClick={() => setShowEmojis(false)} showLabel={false} />
-            <Picker
-              style={{ marginTop: theme.spacing.text.vertical }}
-              theme="dark"
-              native={true}
-              showSkinTones={true}
-              emojiTooltip={true}
-              title="choose skin tone"
-              emoji=""
-              onSelect={(emoji) => {
-                if (textRef.current) {
-                  textRef.current.setRangeText(
-                    (emoji as any).native,
-                    textRef.current.selectionStart,
-                    textRef.current.selectionEnd,
-                    "end"
-                  );
-                  textRef.current.focus();
-                }
-              }}
-            />
-          </div>
-        )}
-      </div>
-      <div
-        css={css`
-          min-height: ${theme.sizes.vertical};
-          display: flex;
-          align-items: flex-end;
-          box-sizing: border-box;
-          background-color: ${theme.colors.background.active};
-          font-family: ${theme.font.family};
-          font-size: ${theme.font.size.normal};
-          border-radius: ${theme.spacing.border.radius};
-          :focus-within {
-            background-color: ${theme.colors.background.focus};
-          }
-          transition: ${theme.transitions.input.duration};
-        `}
-      >
-        <Button
-          icon="Emoji"
-          label="Emoji"
-          enabled={true}
-          onClick={() => setShowEmojis((showEmojis) => !showEmojis)}
-          showLabel={false}
-        />
-        <textarea
-          value={text}
-          onChange={(event) => setText(event.currentTarget.value)}
-          rows={text.split("\n").length}
-          autoComplete="off"
-          spellCheck={false}
-          css={css`
-            flex-grow: 1;
-            color: ${theme.colors.text.primary};
-            border: none;
-            outline: none;
-            resize: none;
-            background-color: inherit;
-            font-family: inherit;
-            font-size: inherit;
-            padding: 0px;
-            margin-top: ${theme.spacing.text.vertical};
-            margin-bottom: ${theme.spacing.text.vertical};
-            margin-left: ${theme.spacing.text.horizontal};
-            margin-right: ${theme.spacing.text.horizontal};
-          `}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              send();
-              event.currentTarget.focus();
-            }
-          }}
-          onBlur={(event) => {
-            textRef.current = event.currentTarget;
-          }}
-        />
-        <Button label="Send" icon="Send" onClick={send} enabled={false} showLabel={false} />
-      </div>
-    </div>
-  );
 }
