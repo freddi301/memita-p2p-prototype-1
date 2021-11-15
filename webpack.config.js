@@ -8,14 +8,9 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     fallback: {
-      // path: require.resolve("path-browserify"),
-      // crypto: require.resolve("crypto-browserify"),
-      // buffer: require.resolve("buffer-browserify"),
-      // stream: require.resolve("stream-browserify"),
-      // assert: require.resolve("assert-browserify"),
       path: false,
       crypto: false,
-      buffer: false,
+      buffer: require.resolve("buffer/"),
       stream: false,
       assert: false,
     },
@@ -59,6 +54,9 @@ module.exports = {
   plugins: [
     new webpack.EnvironmentPlugin({
       PORT: null,
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ["buffer", "Buffer"],
     }),
   ],
 };

@@ -1,3 +1,4 @@
+- remove attachments from draft
 - choose account for conversation screen and left panel
 - conversation detail screen
 - use libsodium to create accounts
@@ -53,3 +54,9 @@
 # Optimizations
 - deduplicate subsciptions to backend
 - restablish on connections lost to backend
+
+# Cryptography
+- imlement forward secrecy
+
+# Privacy settings
+- manage what to share and what not
