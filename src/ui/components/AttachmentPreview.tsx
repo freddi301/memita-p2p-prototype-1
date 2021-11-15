@@ -31,6 +31,32 @@ export function AttachmentPreview({ attachment: { type, name, content } }: Attac
               />
             );
           }
+          if (type.startsWith("audio/")) {
+            return (
+              <audio
+                controls
+                css={css`
+                  width: 300px;
+                  height: 300px;
+                `}
+              >
+                <source src={src} type={type} />
+              </audio>
+            );
+          }
+          if (type.startsWith("video/")) {
+            return (
+              <video
+                controls
+                css={css`
+                  width: 300px;
+                  height: 300px;
+                `}
+              >
+                <source src={src} type={type} />
+              </video>
+            );
+          }
           if (type === "application/pdf") {
             return (
               <iframe
