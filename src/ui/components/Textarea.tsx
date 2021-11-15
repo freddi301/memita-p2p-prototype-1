@@ -14,9 +14,7 @@ function Textarea({ value, label, rows, onChange }: TextareaProps) {
   return (
     <div
       css={css`
-        display: flex;
         min-height: ${theme.sizes.vertical};
-        justify-content: center;
         box-sizing: border-box;
         background-color: ${theme.colors.background.active};
         font-family: ${theme.font.family};
@@ -48,7 +46,7 @@ function Textarea({ value, label, rows, onChange }: TextareaProps) {
         autoComplete="off"
         spellCheck={false}
         css={css`
-          flex-grow: 1;
+          width: calc(100% - ${theme.spacing.text.horizontal} * 2);
           color: ${theme.colors.text.primary};
           border: none;
           outline: none;
