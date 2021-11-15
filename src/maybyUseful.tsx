@@ -131,3 +131,7 @@ const transformMap3d = {
     entering: "perspective(100px) translate3d(0%, 0%, 0px)",
   },
 } as const;
+
+function stringToUint8Array(string: string) {
+  return new TextEncoder().encode(string);
+}

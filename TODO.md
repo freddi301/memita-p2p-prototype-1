@@ -1,3 +1,5 @@
+- choose account for conversation screen and left panel
+- conversation detail screen
 - use libsodium to create accounts
 - encrypt / decrypt messages
 - refactor hyperswarm sincronisation
@@ -37,7 +39,7 @@
 # Build
 - linux, windows, android build
 
-# After streaming implmentation
+# After streaming implementation
 - voice call
 - video call
 - screen sharing

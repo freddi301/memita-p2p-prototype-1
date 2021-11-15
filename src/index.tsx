@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import libsodium from "libsodium-wrappers";
-import "./merkle";
 
 (async () => {
   await libsodium.ready;

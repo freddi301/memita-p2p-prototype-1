@@ -1,42 +1,44 @@
 import Hyperswarm from "hyperswarm";
 import { store } from "../../../logic/domain";
-import * as merkle from "../../../merkle";
+import * as merkle from "../../../logic/merkle/merkle";
+import cbor from "cbor";
+
+// TODO refactor syncronisation mechanism
+// TODO implement state of already asked hashes
+// TODO validate incoming msg
 
 const swarm = new Hyperswarm();
 
 const GLOBAL_TOPIC = Buffer.alloc(32).fill("sms-desktop-global-topic");
 
+// TODO join topics based on contacts shared secret
 swarm.join(GLOBAL_TOPIC, {
   server: true,
   client: true,
 });
 
-const blocks: Record<string, merkle.Block> = {};
-
 swarm.on("connection", (connection, info) => {
-  let receiveRootHash: string | null = null;
-  let sentRootHash: string | null = null;
-  const write = (msg: Protocol) => {
-    connection.write(Buffer.from(JSON.stringify(msg)));
-  };
+  console.log("connection");
+  let receivedRootHash: merkle.Hash | null = null;
+  let sentRootHash: merkle.Hash | null = null;
   connection.on("data", (data) => {
-    const msg = JSON.parse(data.toString()) as Protocol;
+    const msg = deserialize(data);
+    console.dir(msg, { depth: null });
     switch (msg.type) {
       case "update": {
-        receiveRootHash = msg.hash;
+        receivedRootHash = msg.hash;
         acquire();
         break;
       }
       case "require": {
-        const block = blocks[msg.hash];
-        if (block) {
-          write({ type: "provide", block });
+        const fromRepo = merkle.repo.from(msg.hash);
+        if (fromRepo.type === "found") {
+          connection.write(serialize({ type: "provide", block: fromRepo.value }));
         }
         break;
       }
       case "provide": {
-        const hash = merkle.calculateBlockHash(msg.block);
-        blocks[hash] = msg.block;
+        merkle.repo.to(msg.block);
         if (msg.block.type === "leaf") {
           const { senderPublicKey, recipientPublicKey, createdAtEpoch, text } = JSON.parse(msg.block.data);
           store.command.Message(senderPublicKey, recipientPublicKey, createdAtEpoch, text);
@@ -45,22 +47,19 @@ swarm.on("connection", (connection, info) => {
     }
   });
   function acquire() {
-    if (receiveRootHash) {
-      for (const hash of merkle.missingFromMerkle(receiveRootHash, blocks).slice(0, 32)) {
-        write({ type: "require", hash });
+    if (receivedRootHash) {
+      for (const hash of merkle.factory.missing(receivedRootHash).slice(0, 32)) {
+        connection.write(serialize({ type: "require", hash }));
       }
     }
   }
   function update() {
-    const messageSetMerkle = merkle.merkleFromSet(
-      Object.values(store.currentState.messageMap).map((message) => JSON.stringify(message)),
-      32
+    const hash = merkle.factory.to(
+      Object.values(store.currentState.messageMap).map((message) => JSON.stringify(message))
     );
-    if (sentRootHash !== messageSetMerkle.hash) {
-      // console.dir(messageSetMerkle, { depth: null });
-      Object.assign(blocks, messageSetMerkle.blocks);
-      write({ type: "update", hash: messageSetMerkle.hash });
-      sentRootHash = messageSetMerkle.hash;
+    if (sentRootHash === null || !merkle.equalsHash(sentRootHash, hash)) {
+      connection.write(serialize({ type: "update", hash }));
+      sentRootHash = hash;
     }
   }
   const acquireIntervalId = setInterval(acquire, 100);
@@ -78,13 +77,21 @@ swarm.on("connection", (connection, info) => {
 type Protocol =
   | {
       type: "update";
-      hash: string;
+      hash: merkle.Hash;
     }
   | {
       type: "require";
-      hash: string;
+      hash: merkle.Hash;
     }
   | {
       type: "provide";
       block: merkle.Block;
     };
+
+function serialize(msg: Protocol): Buffer {
+  return cbor.encode(msg);
+}
+
+function deserialize(msg: Buffer): Protocol {
+  return cbor.decode(msg);
+}
