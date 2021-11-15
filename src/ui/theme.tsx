@@ -13,6 +13,7 @@ import {
   faPlus,
   faSave,
   faShareAlt,
+  faSmile,
   faTrash,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
@@ -76,5 +77,6 @@ export const theme = {
     UseAccount: <FontAwesomeIcon icon={faCheck} />,
     ScrollToBottom: <FontAwesomeIcon icon={faAngleDoubleDown} />,
     Send: <FontAwesomeIcon icon={faPaperPlane} />,
+    Emoji: <FontAwesomeIcon icon={faSmile} />,
   },
 };

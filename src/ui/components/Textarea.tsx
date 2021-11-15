@@ -9,14 +9,13 @@ type TextareaProps = {
   onChange(value: string): void;
   actions?: React.ReactNode;
   onKeyDown?: React.HTMLProps<HTMLTextAreaElement>["onKeyDown"];
+  onBlur?: React.HTMLProps<HTMLTextAreaElement>["onBlur"];
 };
 
-function Textarea({ value, label, rows, onChange, actions, onKeyDown }: TextareaProps) {
+function Textarea({ value, label, rows, onChange, actions, onKeyDown, onBlur }: TextareaProps) {
   const { theme } = React.useContext(StyleContext);
-  const ref = React.useRef<HTMLDivElement | null>(null);
   return (
     <div
-      ref={ref}
       css={css`
         display: flex;
         flex-direction: column;
@@ -59,6 +58,7 @@ function Textarea({ value, label, rows, onChange, actions, onKeyDown }: Textarea
           autoComplete="off"
           spellCheck={false}
           onKeyDown={onKeyDown}
+          onBlur={onBlur}
           css={css`
             flex-grow: 1;
             color: ${theme.colors.text.primary};

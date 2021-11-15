@@ -8,6 +8,8 @@ import { Textarea } from "../components/Textarea";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../../logic/FrontendFacade";
+import "emoji-mart/css/emoji-mart.css";
+import { Picker } from "emoji-mart";
 
 type ConversationScreenProps = {
   myPublicKey: string;
@@ -16,6 +18,7 @@ type ConversationScreenProps = {
 export function ConversationScreen({ myPublicKey, otherPublicKey }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
   const [text, setText] = React.useState("");
+  const textRef = React.useRef<HTMLTextAreaElement | null>(null);
   const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
   const onSend = React.useCallback(() => {
     FrontendFacade.doMessage(myPublicKey, otherPublicKey, new Date().getTime(), text);
@@ -29,6 +32,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
     virtuosoRef.current?.scrollToIndex({ index, behavior: "smooth" });
   }, []);
   const [scrollPosition, setScrollPosition] = useConversationScrollPosition(myPublicKey, otherPublicKey);
+  const [showEmojis, setShowEmojis] = React.useState(false);
   return (
     <HeaderContentControlsLayout
       header={
@@ -83,26 +87,71 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
               padding-left: ${theme.spacing.text.horizontal};
               padding-right: ${theme.spacing.text.horizontal};
               box-sizing: border-box;
-              position: relative;
             `}
           >
             <div
               css={css`
-                position: absolute;
-                right: ${theme.spacing.text.horizontal};
-                top: -${theme.sizes.vertical};
-                transition: ${theme.transitions.input};
-                transition-delay: 0.5s;
-                opacity: ${isAtBottom ? 0 : 1};
+                position: relative;
               `}
             >
-              <Button
-                icon="ScrollToBottom"
-                label="Scroll to end"
-                enabled={!isAtBottom}
-                onClick={() => scrollTo(conversationCount + 1)}
-                showLabel={false}
-              />
+              <div
+                css={css`
+                  position: absolute;
+                  right: ${theme.spacing.text.horizontal};
+                  bottom: ${theme.spacing.text.vertical};
+                  transition: ${theme.transitions.input};
+                  transition-delay: 0.5s;
+                  opacity: ${isAtBottom ? 0 : 1};
+                `}
+              >
+                <Button
+                  icon="ScrollToBottom"
+                  label="Scroll to end"
+                  enabled={!isAtBottom}
+                  onClick={() => scrollTo(conversationCount + 1)}
+                  showLabel={false}
+                />
+              </div>
+              <div
+                css={css`
+                  position: absolute;
+                  bottom: ${theme.spacing.text.vertical};
+                  right: 72px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-end;
+                `}
+              >
+                <Button
+                  icon="Emoji"
+                  label="Emoji"
+                  enabled={true}
+                  onClick={() => setShowEmojis((showEmojis) => !showEmojis)}
+                  showLabel={false}
+                />
+                {showEmojis && (
+                  <Picker
+                    style={{ marginTop: theme.spacing.text.vertical }}
+                    theme="dark"
+                    native={true}
+                    showSkinTones={true}
+                    emojiTooltip={true}
+                    title="choose skin tone"
+                    emoji=""
+                    onSelect={(emoji) => {
+                      if (textRef.current) {
+                        textRef.current.setRangeText(
+                          (emoji as any).native,
+                          textRef.current.selectionStart,
+                          textRef.current.selectionEnd,
+                          "end"
+                        );
+                        textRef.current.focus();
+                      }
+                    }}
+                  />
+                )}
+              </div>
             </div>
             <Textarea
               value={text}
@@ -115,6 +164,9 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
                   onSend();
                   event.currentTarget.focus();
                 }
+              }}
+              onBlur={(event) => {
+                textRef.current = event.currentTarget;
               }}
             />
           </div>

@@ -35,6 +35,8 @@
   - conversation
   - account
   - contact
+- animation for page transitions
+- animation for emoji picker
 
 # Build
 - linux, windows, android build
