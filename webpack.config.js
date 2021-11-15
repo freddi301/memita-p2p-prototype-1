@@ -56,5 +56,9 @@ module.exports = {
     filename: "index.js",
     path: path.resolve(__dirname, "dist"),
   },
-  plugins: [new webpack.EnvironmentPlugin(["PORT"])],
+  plugins: [
+    new webpack.EnvironmentPlugin({
+      PORT: null,
+    }),
+  ],
 };

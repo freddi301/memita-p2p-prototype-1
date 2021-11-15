@@ -1,10 +1,11 @@
 {
-  "name": "@p2p-apps/sms-desktop",
+  "name": "p2p-apps-chat-desktop",
   "version": "0.0.0",
   "description": "peer-to-peer sms desktop application",
   "author": "Frederik Batuna <gobi301@gmail.com>",
   "license": "MIT",
   "private": true,
+  "main": "dist/main.js",
   "scripts": {
     "build:typescript": "tsc && cp public/index.html dist/index.html",
     "build:react": "webpack",
@@ -12,7 +13,11 @@
     "start": "yarn build && electron dist/main.js",
     "dev:frontend": "webpack serve --config dev.webpack.config.js",
     "dev:backend": "tsc && node dist/rpc/local/websocket/entry.js",
-    "dev": "concurrently --kill-others \"yarn dev:frontend\" \"yarn dev:backend\""
+    "dev": "concurrently --kill-others \"yarn dev:frontend\" \"yarn dev:backend\"",
+    "electron-forge:start": "yarn build && electron-forge start",
+    "electron-forge:package": "electron-forge package",
+    "electron-forge:make": "electron-forge make",
+    "distribute": "yarn build && yarn electron-forge make"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
@@ -21,14 +26,14 @@
     "@babel/preset-react": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
     "@babel/runtime": "^7.16.0",
-    "@fontsource/roboto": "^4.5.1",
-    "@fortawesome/fontawesome-svg-core": "^1.2.36",
-    "@fortawesome/free-brands-svg-icons": "^5.15.4",
-    "@fortawesome/free-regular-svg-icons": "^5.15.4",
-    "@fortawesome/free-solid-svg-icons": "^5.15.4",
-    "@fortawesome/react-fontawesome": "^0.1.16",
+    "@electron-forge/cli": "^6.0.0-beta.61",
+    "@electron-forge/maker-deb": "^6.0.0-beta.61",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.61",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
+    "@electron-forge/maker-zip": "^6.0.0-beta.61",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
     "@types/electron": "^1.6.10",
+    "@types/emoji-mart": "^3.0.8",
     "@types/libsodium-wrappers": "^0.7.9",
     "@types/lodash": "^4.14.176",
     "@types/luxon": "^2.0.5",
@@ -43,12 +48,10 @@
     "babel-loader": "^8.2.2",
     "babel-plugin-macros": "^3.1.0",
     "buffer-browserify": "^0.2.5",
-    "cbor": "^8.1.0",
     "concurrently": "^6.3.0",
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.4.0",
     "electron": "^15.2.0",
-    "emoji-mart": "^3.0.1",
     "eslint": "^7.5.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",
@@ -56,27 +59,61 @@
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.2.1-alpha-fd5e01c2e-20210913",
-    "hyperswarm": "^3.0.0",
-    "libsodium-wrappers": "^0.7.9",
-    "lodash": "^4.17.21",
-    "luxon": "^2.0.2",
     "path-browserify": "^1.0.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "react-refresh": "^0.10.0",
-    "react-responsive": "^9.0.0-beta.4",
-    "react-virtuoso": "^2.2.6",
-    "source-map-support": "^0.5.20",
     "stream-browserify": "^3.0.0",
     "style-loader": "^3.3.0",
-    "styled-components": "^5.3.3",
     "ts-loader": "^9.2.6",
     "typescript": "^4.4.4",
     "webpack": "^5.58.2",
     "webpack-cli": "^4.9.0",
     "webpack-dev-server": "^4.3.1",
-    "ws": "^8.2.3",
-    "@types/emoji-mart": "^3.0.8"
+    "ws": "^8.2.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "libsodium-wrappers": "^0.7.9",
+    "hyperswarm": "^3.0.0",
+    "source-map-support": "^0.5.20",
+    "@fontsource/roboto": "^4.5.1",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-regular-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.16",
+    "cbor": "^8.1.0",
+    "emoji-mart": "^3.0.1",
+    "lodash": "^4.17.21",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-responsive": "^9.0.0-beta.4",
+    "react-virtuoso": "^2.2.6",
+    "styled-components": "^5.3.3"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "p2p_apps_chat_desktop"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  }
 }

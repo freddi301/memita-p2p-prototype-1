@@ -6,3 +6,4 @@ prisma/*.db
 tsconfig.tsbuildinfo
 yarn-error.log
 user-data
+out/

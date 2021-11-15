@@ -39,7 +39,11 @@
 - animation for emoji picker
 
 # Build
-- linux, windows, android build
+- windows
+  - let choose user folder
+  - hide native app bar
+- linux
+- android
 
 # After streaming implementation
 - voice call

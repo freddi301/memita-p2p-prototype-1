@@ -23,7 +23,6 @@ swarm.on("connection", (connection, info) => {
   let sentRootHash: merkle.Hash | null = null;
   connection.on("data", (data) => {
     const msg = deserialize(data);
-    console.dir(msg, { depth: null });
     switch (msg.type) {
       case "update": {
         receivedRootHash = msg.hash;
