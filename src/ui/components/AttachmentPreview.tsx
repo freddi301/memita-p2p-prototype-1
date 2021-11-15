@@ -10,11 +10,7 @@ export function AttachmentPreview({ attachment: { type, name, content } }: Attac
   const { theme } = React.useContext(StyleContext);
   const src = React.useMemo(() => window.URL.createObjectURL(new Blob([content], { type })), [content, type]);
   return (
-    <div
-      css={css`
-        border: 1px solid ${theme.colors.background.active};
-      `}
-    >
+    <div>
       <div
         css={css`
           display: flex;
