@@ -14,6 +14,7 @@ import {
   faSave,
   faShareAlt,
   faSmile,
+  faTimes,
   faTrash,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
@@ -74,6 +75,7 @@ export const theme = {
     Conversation: <FontAwesomeIcon icon={faEnvelope} />,
     Conversations: <FontAwesomeIcon icon={faCommentAlt} />,
     ReadOnly: <FontAwesomeIcon icon={faLock} />,
+    Close: <FontAwesomeIcon icon={faTimes} />,
     UseAccount: <FontAwesomeIcon icon={faCheck} />,
     ScrollToBottom: <FontAwesomeIcon icon={faAngleDoubleDown} />,
     Send: <FontAwesomeIcon icon={faPaperPlane} />,

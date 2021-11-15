@@ -3,22 +3,18 @@ import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 
 type TextareaProps = {
-  value: string;
   label?: string;
-  rows: number;
+  value: string;
   onChange(value: string): void;
-  actions?: React.ReactNode;
-  onKeyDown?: React.HTMLProps<HTMLTextAreaElement>["onKeyDown"];
-  onBlur?: React.HTMLProps<HTMLTextAreaElement>["onBlur"];
+  rows: number;
 };
 
-function Textarea({ value, label, rows, onChange, actions, onKeyDown, onBlur }: TextareaProps) {
+function Textarea({ value, label, rows, onChange }: TextareaProps) {
   const { theme } = React.useContext(StyleContext);
   return (
     <div
       css={css`
         display: flex;
-        flex-direction: column;
         min-height: ${theme.sizes.vertical};
         justify-content: center;
         box-sizing: border-box;
@@ -45,38 +41,28 @@ function Textarea({ value, label, rows, onChange, actions, onKeyDown, onBlur }: 
           {label}
         </div>
       )}
-      <div
+      <textarea
+        value={value}
+        onChange={(event) => onChange(event.currentTarget.value)}
+        rows={rows}
+        autoComplete="off"
+        spellCheck={false}
         css={css`
-          display: flex;
-          align-items: end;
+          flex-grow: 1;
+          color: ${theme.colors.text.primary};
+          border: none;
+          outline: none;
+          resize: none;
+          background-color: inherit;
+          font-family: inherit;
+          font-size: inherit;
+          padding: 0px;
+          margin-top: ${theme.spacing.text.vertical};
+          margin-bottom: ${theme.spacing.text.vertical};
+          margin-left: ${theme.spacing.text.horizontal};
+          margin-right: ${theme.spacing.text.horizontal};
         `}
-      >
-        <textarea
-          value={value}
-          onChange={(event) => onChange(event.currentTarget.value)}
-          rows={rows}
-          autoComplete="off"
-          spellCheck={false}
-          onKeyDown={onKeyDown}
-          onBlur={onBlur}
-          css={css`
-            flex-grow: 1;
-            color: ${theme.colors.text.primary};
-            border: none;
-            outline: none;
-            resize: none;
-            background-color: inherit;
-            font-family: inherit;
-            font-size: inherit;
-            padding: 0px;
-            margin-top: ${theme.spacing.text.vertical};
-            margin-bottom: ${theme.spacing.text.vertical};
-            margin-left: ${theme.spacing.text.horizontal};
-            margin-right: ${theme.spacing.text.horizontal};
-          `}
-        />
-        <div>{actions}</div>
-      </div>
+      />
     </div>
   );
 }
