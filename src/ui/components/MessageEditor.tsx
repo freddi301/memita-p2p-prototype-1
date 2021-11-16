@@ -75,7 +75,7 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
         css={css`
           min-height: ${theme.sizes.vertical};
           display: grid;
-          grid-template-columns: auto auto 1fr auto;
+          grid-template-columns: auto 1fr auto auto;
           grid-template-rows: auto auto;
           box-sizing: border-box;
           background-color: ${theme.colors.background.active};
@@ -85,6 +85,33 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
           overflow: hidden;
         `}
       >
+        {attachments && attachments.length > 0 && (
+          <div
+            css={css`
+              grid-column: 1 / span 4;
+              grid-row: 1;
+              overflow-x: auto;
+              position: relative;
+              height: 343px;
+              border-bottom: 1px solid ${theme.colors.background.passive};
+            `}
+          >
+            <div
+              css={css`
+                position: absolute;
+                display: grid;
+                grid-auto-flow: column;
+                grid-auto-columns: auto;
+                grid-column-gap: ${theme.spacing.text.vertical};
+                width: min-content;
+              `}
+            >
+              {attachments.map((attachment, index) => {
+                return <AttachmentPreview key={index} attachment={attachment} />;
+              })}
+            </div>
+          </div>
+        )}
         <div
           css={css`
             grid-column: 1;
@@ -103,6 +130,43 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
         <div
           css={css`
             grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            align-self: center;
+          `}
+        >
+          <textarea
+            ref={textRef}
+            value={text}
+            onChange={(event) => setText(event.currentTarget.value)}
+            rows={text.split("\n").length}
+            autoComplete="off"
+            spellCheck={false}
+            css={css`
+              flex-grow: 1;
+              color: ${theme.colors.text.primary};
+              border: none;
+              outline: none;
+              resize: none;
+              background-color: inherit;
+              font-family: inherit;
+              font-size: inherit;
+              padding: 0px;
+              margin-top: ${theme.spacing.text.vertical};
+              margin-bottom: ${theme.spacing.text.vertical};
+            `}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                send();
+                event.currentTarget.focus();
+              }
+            }}
+          />
+        </div>
+        <div
+          css={css`
+            grid-column: 3;
             grid-row: 2;
             align-self: end;
           `}
@@ -149,44 +213,6 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
         </div>
         <div
           css={css`
-            grid-column: 3;
-            grid-row: 2;
-            display: flex;
-          `}
-        >
-          <textarea
-            ref={textRef}
-            value={text}
-            onChange={(event) => setText(event.currentTarget.value)}
-            rows={text.split("\n").length}
-            autoComplete="off"
-            spellCheck={false}
-            css={css`
-              flex-grow: 1;
-              color: ${theme.colors.text.primary};
-              border: none;
-              outline: none;
-              resize: none;
-              background-color: inherit;
-              font-family: inherit;
-              font-size: inherit;
-              padding: 0px;
-              margin-top: ${theme.spacing.text.vertical};
-              margin-bottom: ${theme.spacing.text.vertical};
-              margin-left: ${theme.spacing.text.horizontal};
-              margin-right: ${theme.spacing.text.horizontal};
-            `}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                send();
-                event.currentTarget.focus();
-              }
-            }}
-          />
-        </div>
-        <div
-          css={css`
             grid-column: 4;
             grid-row: 2;
             align-self: end;
@@ -194,33 +220,6 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
         >
           <Button label="Send" icon="Send" onClick={send} enabled={false} showLabel={false} />
         </div>
-        {attachments && attachments.length > 0 && (
-          <div
-            css={css`
-              grid-column: 1 / span 4;
-              grid-row: 1;
-              overflow-x: auto;
-              position: relative;
-              height: 343px;
-              border-bottom: 1px solid ${theme.colors.background.passive};
-            `}
-          >
-            <div
-              css={css`
-                position: absolute;
-                display: grid;
-                grid-auto-flow: column;
-                grid-auto-columns: auto;
-                grid-column-gap: ${theme.spacing.text.vertical};
-                width: min-content;
-              `}
-            >
-              {attachments.map((attachment, index) => {
-                return <AttachmentPreview key={index} attachment={attachment} />;
-              })}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
