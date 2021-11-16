@@ -6,6 +6,7 @@ import { css } from "styled-components/macro";
 import { Virtuoso } from "react-virtuoso";
 import { NavigationContext } from "../NavigationStack";
 import { Text } from "./Text";
+import { Clickable } from "./Clickable";
 
 type LeftPanelConversationListProps = { currentAccountPublicKey: string };
 export function LeftPanelConversationList({ currentAccountPublicKey }: LeftPanelConversationListProps) {
@@ -15,6 +16,9 @@ export function LeftPanelConversationList({ currentAccountPublicKey }: LeftPanel
   const conversationsCount = FrontendFacade.useConversationsListSize(currentAccountPublicKey) ?? 0;
   const onConversation = (otherPublicKey: string) => {
     navigationStack.push({ screen: "conversation", otherPublicKey });
+  };
+  const selectAccount = () => {
+    navigationStack.push({ screen: "select-account" });
   };
   return (
     <div
@@ -29,12 +33,19 @@ export function LeftPanelConversationList({ currentAccountPublicKey }: LeftPanel
           display: grid;
           grid-auto-flow: row;
           grid-auto-columns: auto;
-          padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
           border-bottom: 1px solid ${theme.colors.background.active};
         `}
       >
-        <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
-        <Text color="secondary" size="normal" weight="normal" text={currentAccountPublicKey} />
+        <Clickable onClick={selectAccount}>
+          <div
+            css={css`
+              padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+            `}
+          >
+            <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
+            <Text color="secondary" size="normal" weight="normal" text={currentAccountPublicKey} />
+          </div>
+        </Clickable>
       </div>
       <Virtuoso
         style={{ flexGrow: 1 }}

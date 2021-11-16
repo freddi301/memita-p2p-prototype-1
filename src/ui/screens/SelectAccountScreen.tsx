@@ -12,17 +12,17 @@ import { css } from "styled-components/macro";
 import { EmptyListPlaceholder } from "../components/EmptyListPlaceholder";
 import { SimpleHeader } from "../components/SimpleHeader";
 
-type MustSelectAccountScreenProps = {
-  onUse(accountPublicKey: string): void;
+type SelectAccountScreenProps = {
+  onSelect(accountPublicKey: string): void;
 };
-export function MustSelectAccountScreen({ onUse }: MustSelectAccountScreenProps) {
+export function SelectAccountScreen({ onSelect }: SelectAccountScreenProps) {
   const navigationStack = React.useContext(NavigationContext);
   const onAccounts = () => {
     navigationStack.push({ screen: "account-list" });
   };
   const accountCount = FrontendFacade.useAccountListSize() ?? 0;
   const onAccount = (publicKey: string) => {
-    onUse(publicKey);
+    onSelect(publicKey);
   };
   const onCreate = () => {
     navigationStack.push({ screen: "create-account" });
@@ -31,7 +31,7 @@ export function MustSelectAccountScreen({ onUse }: MustSelectAccountScreenProps)
     <HeaderContentControlsLayout
       header={
         <SimpleHeader>
-          <Text text="You must select an account" color="primary" weight="bold" size="big" />
+          <Text text="Select an account" color="primary" weight="bold" size="big" />
         </SimpleHeader>
       }
       content={

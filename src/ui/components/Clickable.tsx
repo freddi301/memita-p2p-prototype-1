@@ -8,10 +8,8 @@ type ClickableProps = {
 };
 export function Clickable({ children, onClick }: ClickableProps) {
   const { theme } = React.useContext(StyleContext);
-  const ref = React.useRef<HTMLDivElement | null>(null);
   return (
     <div
-      ref={ref}
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(event) => {

@@ -13,7 +13,7 @@ import { FrontendFacade } from "./FrontendFacade";
 import { ConversationListScreen } from "./screens/ConversationListScreen";
 import { css } from "styled-components/macro";
 import { NavigationContext, useNavigationStack } from "./NavigationStack";
-import { MustSelectAccountScreen } from "./screens/MustSelectAccountScreen";
+import { SelectAccountScreen } from "./screens/SelectAccountScreen";
 import { LeftPanelConversationList } from "./components/LeftPanelConversationList";
 
 export function App() {
@@ -61,15 +61,25 @@ export function App() {
             />
           );
         } else {
-          return <MustSelectAccountScreen onUse={setCurrentAccount} />;
+          return <SelectAccountScreen onSelect={setCurrentAccount} />;
         }
       }
       case "conversation-list": {
         if (currentAccountPublicKey) {
           return <ConversationListScreen myPublicKey={currentAccountPublicKey} />;
         } else {
-          return <MustSelectAccountScreen onUse={setCurrentAccount} />;
+          return <SelectAccountScreen onSelect={setCurrentAccount} />;
         }
+      }
+      case "select-account": {
+        return (
+          <SelectAccountScreen
+            onSelect={(publicKey: string) => {
+              setCurrentAccount(publicKey);
+              navigationStack.pop();
+            }}
+          />
+        );
       }
     }
   }, [navigationStack, currentAccountPublicKey, setCurrentAccount]);

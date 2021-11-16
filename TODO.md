@@ -1,6 +1,3 @@
-- remove attachments from draft
-- dont block ui while loading attachments
-- choose account for conversation screen and left panel
 - conversation detail screen
 - use libsodium to create accounts
 - encrypt / decrypt messages
@@ -19,6 +16,8 @@
 - import account
 - share account
 - profile frontend
+- remove attachments from draft
+- dont block ui while loading attachments
 
 # After merkle refactor
 - pin/archive conversations

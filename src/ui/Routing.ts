@@ -26,5 +26,7 @@ export type Routing =
     }
   | {
       screen: "conversation-list";
-    };
+    }
+  | { screen: "select-account" };
+
 export const rootRouting: Routing = { screen: "home" };
