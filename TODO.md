@@ -1,4 +1,3 @@
-- conversation detail screen
 - use libsodium to create accounts
 - encrypt / decrypt messages
 - refactor hyperswarm sincronisation
@@ -18,9 +17,14 @@
 - profile frontend
 - remove attachments from draft
 - dont block ui while loading attachments
+- conversation detail
+  - add contact details
+  - add total messages
+  - add total attachements
 
 # After merkle refactor
 - pin/archive conversations
+- star message
 - file share
   - image viewer
   - audio viewer

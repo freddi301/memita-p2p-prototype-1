@@ -10,6 +10,8 @@ import { FrontendFacade } from "../FrontendFacade";
 import "emoji-mart/css/emoji-mart.css";
 import { Attachment, AttachmentPreview } from "../components/AttachmentPreview";
 import { MessageEditor } from "../components/MessageEditor";
+import { SimpleHeader } from "../components/SimpleHeader";
+import { NavigationContext } from "../NavigationStack";
 
 type ConversationScreenProps = {
   myPublicKey: string;
@@ -17,6 +19,7 @@ type ConversationScreenProps = {
 };
 export function ConversationScreen({ myPublicKey, otherPublicKey }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
+  const navigationStack = React.useContext(NavigationContext);
   const onSend = (text: string, attachments: Array<Attachment>) => {
     FrontendFacade.doMessage(myPublicKey, otherPublicKey, new Date().getTime(), text, attachments);
   };
@@ -29,20 +32,27 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
     virtuosoRef.current?.scrollToIndex({ index: conversationCount + 1, behavior: "smooth" });
   };
   const [scrollPosition, setScrollPosition] = useConversationScrollPosition(myPublicKey, otherPublicKey);
+  const onConversationDetail = () => {
+    navigationStack.push({ screen: "conversation-detail", otherPublicKey });
+  };
   return (
     <HeaderContentControlsLayout
       header={
-        <div
-          css={css`
-            display: grid;
-            grid-auto-flow: row;
-            grid-auto-columns: auto;
-            padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
-          `}
-        >
-          <Text color="primary" size="normal" weight="bold" text={other?.name ?? "..."} />
-          <Text color="secondary" size="normal" weight="normal" text={otherPublicKey} />
-        </div>
+        <Clickable onClick={onConversationDetail}>
+          <div
+            css={css`
+              display: grid;
+              grid-auto-flow: row;
+              grid-auto-columns: auto;
+              padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+              height: calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
+              box-sizing: border-box;
+            `}
+          >
+            <Text color="primary" size="normal" weight="bold" text={other?.name ?? "..."} />
+            <Text color="secondary" size="normal" weight="normal" text={otherPublicKey} />
+          </div>
+        </Clickable>
       }
       content={
         <div

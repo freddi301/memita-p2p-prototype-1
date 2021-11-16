@@ -25,21 +25,28 @@ export function ConversationListScreen({ myPublicKey }: ConversationListScreenPr
   const onCreate = () => {
     navigationStack.push({ screen: "contact-list" });
   };
+  const selectAccount = () => {
+    navigationStack.push({ screen: "select-account" });
+  };
   const conversationsCount = FrontendFacade.useConversationsListSize(myPublicKey) ?? 0;
   return (
     <HeaderContentControlsLayout
       header={
-        <div
-          css={css`
-            display: grid;
-            grid-auto-flow: row;
-            grid-auto-columns: auto;
-            padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
-          `}
-        >
-          <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
-          <Text color="secondary" size="normal" weight="normal" text={myPublicKey} />
-        </div>
+        <Clickable onClick={selectAccount}>
+          <div
+            css={css`
+              display: grid;
+              grid-auto-flow: row;
+              grid-auto-columns: auto;
+              padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+              height: calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
+              box-sizing: border-box;
+            `}
+          >
+            <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
+            <Text color="secondary" size="normal" weight="normal" text={myPublicKey} />
+          </div>
+        </Clickable>
       }
       content={
         !conversationsCount ? (

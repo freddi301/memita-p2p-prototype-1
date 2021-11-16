@@ -12,7 +12,7 @@ export function SimpleHeader({ children }: SimpleHeaderProps) {
       css={css`
         display: flex;
         align-items: center;
-        padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+        padding-top: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
         height: calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
         box-sizing: border-box;
       `}

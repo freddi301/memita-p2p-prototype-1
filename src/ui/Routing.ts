@@ -27,6 +27,10 @@ export type Routing =
   | {
       screen: "conversation-list";
     }
-  | { screen: "select-account" };
+  | { screen: "select-account" }
+  | {
+      screen: "conversation-detail";
+      otherPublicKey: string;
+    };
 
 export const rootRouting: Routing = { screen: "home" };

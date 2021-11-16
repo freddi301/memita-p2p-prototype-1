@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAddressBook,
   faAngleDoubleDown,
+  faAngleLeft,
   faCheck,
   faCommentAlt,
   faEnvelope,
@@ -82,5 +83,6 @@ export const theme = {
     Send: <FontAwesomeIcon icon={faPaperPlane} />,
     Emoji: <FontAwesomeIcon icon={faSmile} />,
     Attachment: <FontAwesomeIcon icon={faPaperclip} />,
+    Back: <FontAwesomeIcon icon={faAngleLeft} />,
   },
 };

@@ -15,6 +15,7 @@ import { css } from "styled-components/macro";
 import { NavigationContext, useNavigationStack } from "./NavigationStack";
 import { SelectAccountScreen } from "./screens/SelectAccountScreen";
 import { LeftPanelConversationList } from "./components/LeftPanelConversationList";
+import { ConversationDetailScreen } from "./screens/ConversationDetailScreen";
 
 export function App() {
   const styleProviderValue = useStyleProvider();
@@ -81,8 +82,24 @@ export function App() {
           />
         );
       }
+      case "conversation-detail": {
+        if (currentAccountPublicKey) {
+          return (
+            <ConversationDetailScreen
+              myPublicKey={currentAccountPublicKey}
+              otherPublicKey={navigationStack.current.otherPublicKey}
+            />
+          );
+        } else {
+          return <SelectAccountScreen onSelect={setCurrentAccount} />;
+        }
+      }
     }
   }, [navigationStack, currentAccountPublicKey, setCurrentAccount]);
+  const showLeftPanel =
+    styleProviderValue.showLeftPanel &&
+    ["home", "conversation"].includes(navigationStack.current.screen) &&
+    currentAccountPublicKey;
   return (
     <StyleContext.Provider value={styleProviderValue}>
       <NavigationContext.Provider value={navigationStack}>
@@ -95,20 +112,18 @@ export function App() {
               height: 100%;
             `}
           >
-            {styleProviderValue.showLeftPanel &&
-              navigationStack.current.screen !== "conversation-list" &&
-              currentAccountPublicKey && (
-                <div
-                  css={css`
-                    grid-column: 1;
-                    grid-row: 1;
-                    border-right: 1px solid ${styleProviderValue.theme.colors.background.active};
-                    width: 350px;
-                  `}
-                >
-                  <LeftPanelConversationList currentAccountPublicKey={currentAccountPublicKey} />
-                </div>
-              )}
+            {showLeftPanel && (
+              <div
+                css={css`
+                  grid-column: 1;
+                  grid-row: 1;
+                  border-right: 1px solid ${styleProviderValue.theme.colors.background.active};
+                  width: 350px;
+                `}
+              >
+                <LeftPanelConversationList currentAccountPublicKey={currentAccountPublicKey} />
+              </div>
+            )}
             <div
               css={css`
                 grid-column: 2;

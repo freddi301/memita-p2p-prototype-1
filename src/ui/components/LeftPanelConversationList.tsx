@@ -7,6 +7,7 @@ import { Virtuoso } from "react-virtuoso";
 import { NavigationContext } from "../NavigationStack";
 import { Text } from "./Text";
 import { Clickable } from "./Clickable";
+import { EmptyListPlaceholder } from "./EmptyListPlaceholder";
 
 type LeftPanelConversationListProps = { currentAccountPublicKey: string };
 export function LeftPanelConversationList({ currentAccountPublicKey }: LeftPanelConversationListProps) {
@@ -40,6 +41,9 @@ export function LeftPanelConversationList({ currentAccountPublicKey }: LeftPanel
           <div
             css={css`
               padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+              height: calc(${theme.sizes.vertical} + ${theme.spacing.text.vertical} * 2);
+              box-sizing: border-box;
+              align-items: center;
             `}
           >
             <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
@@ -47,13 +51,17 @@ export function LeftPanelConversationList({ currentAccountPublicKey }: LeftPanel
           </div>
         </Clickable>
       </div>
-      <Virtuoso
-        style={{ flexGrow: 1 }}
-        totalCount={conversationsCount}
-        itemContent={(index) => (
-          <ConversationLisItem index={index} myPublicKey={currentAccountPublicKey} onConversation={onConversation} />
-        )}
-      />
+      {!conversationsCount ? (
+        <EmptyListPlaceholder>No conversations</EmptyListPlaceholder>
+      ) : (
+        <Virtuoso
+          style={{ flexGrow: 1 }}
+          totalCount={conversationsCount}
+          itemContent={(index) => (
+            <ConversationLisItem index={index} myPublicKey={currentAccountPublicKey} onConversation={onConversation} />
+          )}
+        />
+      )}
     </div>
   );
 }
