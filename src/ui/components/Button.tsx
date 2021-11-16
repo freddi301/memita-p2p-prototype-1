@@ -21,6 +21,7 @@ function Button({ label, icon, onClick, enabled, showLabel }: ButtonProps) {
       onClick={() => {
         onClick();
       }}
+      disabled={!enabled}
       css={css`
         display: flex;
         justify-content: center;

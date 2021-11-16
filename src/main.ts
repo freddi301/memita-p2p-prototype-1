@@ -10,7 +10,11 @@ function createWindow() {
       preload: path.join(__dirname, "preload.js"),
     },
   });
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+  if (process.env["PORT"]) {
+    mainWindow.loadURL(`http://localhost:${process.env["PORT"]}`);
+  } else {
+    mainWindow.loadFile(path.join(__dirname, "index.html"));
+  }
   mainWindow.webContents.openDevTools();
 }
 

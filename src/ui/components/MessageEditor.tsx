@@ -39,11 +39,10 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
             css={css`
               position: absolute;
               bottom: ${theme.spacing.text.vertical};
-              right: 48px;
+              right: 0px;
               display: flex;
               flex-direction: column;
               align-items: flex-end;
-              transition: 0.5s;
             `}
           >
             <Button icon="Close" label="Close" enabled={true} onClick={() => setShowEmojis(false)} showLabel={false} />
@@ -218,7 +217,13 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
             align-self: end;
           `}
         >
-          <Button label="Send" icon="Send" onClick={send} enabled={false} showLabel={false} />
+          <Button
+            label="Send"
+            icon="Send"
+            onClick={send}
+            enabled={text.trim() !== "" || attachments.length > 0}
+            showLabel={false}
+          />
         </div>
       </div>
     </div>

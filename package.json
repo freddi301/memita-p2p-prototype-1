@@ -14,6 +14,7 @@
     "dev:frontend": "webpack serve --config dev.webpack.config.js",
     "dev:backend": "tsc && node dist/rpc/local/websocket/entry.js",
     "dev": "concurrently --kill-others \"yarn dev:frontend\" \"yarn dev:backend\"",
+    "dev:electron": "concurrently --kill-others \"yarn dev:frontend\" \"yarn start\"",
     "electron-forge:start": "yarn build && electron-forge start",
     "electron-forge:package": "electron-forge package",
     "electron-forge:make": "electron-forge make",
