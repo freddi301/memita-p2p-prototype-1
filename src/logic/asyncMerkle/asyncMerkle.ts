@@ -1,11 +1,11 @@
 import libsodium from "libsodium-wrappers";
-import { NaiveHashRepo } from "./HashRepo";
-import * as MerkleTreeSequence from "./MerkleTreeSet";
+import { LevelAsyncHashRepo } from "./AsyncHashRepo";
+import * as AsyncMerkleTreeSet from "./AsyncMerkleTreeSet";
 
-export const repo = new NaiveHashRepo(hashFunction, equalsUint8Array);
-export const factory = new MerkleTreeSequence.Factory(repo, getHashPrefix);
+export const repo = new LevelAsyncHashRepo("messages", hashFunction, equalsUint8Array);
+export const factory = new AsyncMerkleTreeSet.Factory(repo, getHashPrefix);
 export type Hash = Uint8Array;
-export type Block = MerkleTreeSequence.Tree<Hash, string>; // TODO replace string with message type
+export type Block = AsyncMerkleTreeSet.Tree<Hash, string>; // TODO replace string with message type
 export const equalsHash = equalsUint8Array;
 
 function hashFunction(value: Block) {
