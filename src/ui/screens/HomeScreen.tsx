@@ -7,6 +7,7 @@ import { NavigationContext } from "../NavigationStack";
 import { FrontendFacade } from "../FrontendFacade";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
+import { selectFiles } from "../../other/fileDialog/fileDialog";
 
 type HomeScreenProps = {};
 export function HomeScreen(props: HomeScreenProps) {
@@ -37,6 +38,7 @@ export function HomeScreen(props: HomeScreenProps) {
         >
           {accountCount === 0 && <CreateAccountHint />}
           {contactsCount === 0 && <AddContactHint />}
+          <NativeDialog />
         </div>
       }
       controls={
@@ -117,6 +119,28 @@ function AddContactHint() {
       >
         <Button label="AddContact" icon="Create" onClick={onCreate} enabled={true} showLabel={true} />
       </div>
+    </div>
+  );
+}
+
+function NativeDialog() {
+  const [paths, setPaths] = React.useState<Array<string>>([]);
+  return (
+    <div>
+      <button
+        onClick={() => {
+          selectFiles().then(setPaths);
+        }}
+      >
+        files
+      </button>
+      {paths.map((path, index) => {
+        return (
+          <video key={index} controls>
+            <source src={path} />
+          </video>
+        );
+      })}
     </div>
   );
 }

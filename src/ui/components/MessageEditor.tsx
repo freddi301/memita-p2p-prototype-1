@@ -170,45 +170,7 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
             align-self: end;
           `}
         >
-          <Button
-            icon="Attachment"
-            label="Attach"
-            enabled={true}
-            onClick={() => {
-              const input = document.createElement("input");
-              input.type = "file";
-              input.multiple = true;
-              input.addEventListener("change", (event) => {
-                const files = (event.target as HTMLInputElement)?.files;
-                if (files) {
-                  const attachments = Array.from(files).map(
-                    (file) =>
-                      new Promise<Attachment>((resolve, reject) => {
-                        const fileReader = new FileReader();
-                        fileReader.addEventListener("progress", (event) => {
-                          if (event.loaded && event.total) {
-                            const percent = (event.loaded / event.total) * 100;
-                            console.log(`Progress: ${Math.round(percent)}`); // TODO
-                          }
-                        });
-                        fileReader.addEventListener("load", (event) => {
-                          const data = event.target?.result as ArrayBuffer;
-                          if (data) {
-                            resolve({ type: file.type, name: file.name, content: new Uint8Array(data) });
-                          }
-                        });
-                        fileReader.readAsArrayBuffer(file);
-                      })
-                  );
-                  Promise.all(attachments).then((moreAttachemnts) =>
-                    setAttachments((attachments) => [...attachments, ...moreAttachemnts])
-                  );
-                }
-              });
-              input.click();
-            }}
-            showLabel={false}
-          />
+          <Button icon="Attachment" label="Attach" enabled={true} onClick={() => {}} showLabel={false} />
         </div>
         <div
           css={css`

@@ -1,5 +1,3 @@
-// window.rendererIpc.subscribe
-
 import { Commands, Queries } from "../../../logic/domain";
 import { RemoteCommands, RemoteQueries } from "../../../logic/plumbing";
 import { LOCAL_RCP_ELECTRON_CHANNEL } from "./common";

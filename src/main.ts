@@ -7,7 +7,9 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
+      sandbox: true,
       preload: path.join(__dirname, "preload.js"),
+      webSecurity: false, // TODO remove https://github.com/electron/electron/issues/23393#issuecomment-623759531
     },
   });
   if (process.env["PORT"]) {

@@ -7,4 +7,6 @@ require("source-map-support").install(); // need for node
   await import("../../../logic/persistance");
   await import("./main");
   await import("../../remote/hyperswarm/node");
+
+  await import("../../../other/fileDialog/electron/main");
 })();
