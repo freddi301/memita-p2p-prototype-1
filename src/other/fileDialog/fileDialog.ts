@@ -1,11 +1,11 @@
 import isElectron from "is-electron";
 
-export async function selectFiles(): Promise<Array<string>> {
+export async function selectFiles(): Promise<Array<{ name: string; src: string }>> {
   if (isElectron()) {
-    const { selectFiles } = await import("./electron/renderer");
-    return selectFiles();
+    const { selectFilesRenderer } = await import("./electron/renderer");
+    return selectFilesRenderer();
   } else {
-    const { selectFiles } = await import("./websocket/client");
-    return selectFiles();
+    const { selectFilesWebsocket } = await import("./websocket/client");
+    return selectFilesWebsocket();
   }
 }

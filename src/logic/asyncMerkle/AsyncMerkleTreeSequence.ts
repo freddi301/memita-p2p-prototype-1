@@ -19,10 +19,13 @@ export class Factory<Hash, Data> {
       return this.toBalancedTree(branches);
     }
   }
-  async to(datas: Array<Data>): Promise<Hash> {
-    return this.toBalancedTree(
-      await Promise.all(datas.map((data) => this.asyncCryptoHashRepo.to({ type: "leaf", data })))
-    );
+  async to(datas: AsyncIterable<Data>): Promise<Hash> {
+    const hashes: Array<Hash> = [];
+    for await (const data of datas) {
+      const hash = await this.asyncCryptoHashRepo.to({ type: "leaf", data });
+      hashes.push(hash);
+    }
+    return this.toBalancedTree(hashes);
   }
   async missing(hash: Hash): Promise<Array<Hash>> {
     const fromRepo = await this.asyncCryptoHashRepo.from(hash);

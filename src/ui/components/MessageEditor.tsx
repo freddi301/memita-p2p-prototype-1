@@ -3,22 +3,34 @@ import { Button } from "./Button";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { Picker } from "emoji-mart";
-import { Attachment, AttachmentPreview } from "./AttachmentPreview";
+import { FileView } from "./FileView";
+import { Text } from "./Text";
+import { selectFiles } from "../../other/fileDialog/fileDialog";
+import { fileHash } from "../../other/fileHash/fileHash";
 
 type MessageEditorProps = {
-  onSend: (text: string, attachments: Array<Attachment>) => void;
+  onSend: (text: string, attachments: Array<{ name: string; contentHash: string }>) => void;
 };
 export function MessageEditor({ onSend }: MessageEditorProps) {
   const { theme } = React.useContext(StyleContext);
   const [text, setText] = React.useState("");
-  const [attachments, setAttachments] = React.useState<Array<{ type: string; name: string; content: Uint8Array }>>([]);
-  const send = () => {
-    onSend(text, attachments);
+  const [attachments, setAttachments] = React.useState<Array<{ name: string; src: string }>>([]);
+  const send = async () => {
     setText("");
     setAttachments([]);
+    onSend(
+      text,
+      await Promise.all(
+        attachments.map(async ({ src, name }) => {
+          const hash = await fileHash(src);
+          return { name, contentHash: hash };
+        })
+      )
+    );
   };
   const textRef = React.useRef<HTMLTextAreaElement | null>(null);
   const [showEmojis, setShowEmojis] = React.useState(false);
+  const canSend = text.trim() !== "" || attachments.length > 0;
   return (
     <div
       css={css`
@@ -81,7 +93,6 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
           font-family: ${theme.font.family};
           font-size: ${theme.font.size.normal};
           border-radius: ${theme.spacing.border.radius};
-          overflow: hidden;
         `}
       >
         {attachments && attachments.length > 0 && (
@@ -90,23 +101,60 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
               grid-column: 1 / span 4;
               grid-row: 1;
               overflow-x: auto;
-              position: relative;
-              height: 343px;
               border-bottom: 1px solid ${theme.colors.background.passive};
             `}
           >
             <div
               css={css`
-                position: absolute;
                 display: grid;
                 grid-auto-flow: column;
                 grid-auto-columns: auto;
-                grid-column-gap: ${theme.spacing.text.vertical};
                 width: min-content;
               `}
             >
               {attachments.map((attachment, index) => {
-                return <AttachmentPreview key={index} attachment={attachment} />;
+                return (
+                  <div
+                    key={index}
+                    css={css`
+                      border-right: 1px solid ${theme.colors.background.passive};
+                      width: 200px;
+                      position: relative;
+                    `}
+                  >
+                    <FileView name={attachment.name} src={attachment.src} width={200} height={200} />
+                    <div
+                      css={css`
+                        padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
+                      `}
+                    >
+                      <Text
+                        color="secondary"
+                        text={attachment.name}
+                        truncatedLine={true}
+                        size="normal"
+                        weight="normal"
+                      />
+                    </div>
+                    <div
+                      css={css`
+                        position: absolute;
+                        top: ${theme.spacing.text.vertical};
+                        right: ${theme.spacing.text.vertical};
+                      `}
+                    >
+                      <Button
+                        icon="Close"
+                        label="Remove"
+                        onClick={() => {
+                          setAttachments(attachments.filter((a, i) => i !== index));
+                        }}
+                        enabled={true}
+                        showLabel={false}
+                      />
+                    </div>
+                  </div>
+                );
               })}
             </div>
           </div>
@@ -170,7 +218,17 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
             align-self: end;
           `}
         >
-          <Button icon="Attachment" label="Attach" enabled={true} onClick={() => {}} showLabel={false} />
+          <Button
+            icon="Attachment"
+            label="Attach"
+            enabled={true}
+            onClick={() => {
+              selectFiles().then((moreAttachments) => {
+                setAttachments((attachments) => [...attachments, ...moreAttachments]);
+              });
+            }}
+            showLabel={false}
+          />
         </div>
         <div
           css={css`
@@ -179,13 +237,7 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
             align-self: end;
           `}
         >
-          <Button
-            label="Send"
-            icon="Send"
-            onClick={send}
-            enabled={text.trim() !== "" || attachments.length > 0}
-            showLabel={false}
-          />
+          <Button label="Send" icon="Send" onClick={send} enabled={canSend} showLabel={false} />
         </div>
       </div>
     </div>

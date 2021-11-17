@@ -13,7 +13,7 @@ export type Commands = {
     recipientPublicKey: string,
     createdAtEpoch: number,
     text: string,
-    attachments: Array<{ name: string; type: string; content: Uint8Array }>
+    attachments: Array<{ name: string; contentHash: string }>
   ): void;
   UpdatePreferences(preferences: Preferences): void;
 };
@@ -34,7 +34,7 @@ export type Queries = {
     recipientPublicKey: string;
     createdAtEpoch: number;
     text: string;
-    attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+    attachments: Array<{ name: string; contentHash: string }>;
   } | null;
   ConversationsListSize(myPublicKey: string): number;
   ConversationsListAtIndex(
@@ -47,7 +47,7 @@ export type Queries = {
       recipientPublicKey: string;
       text: string;
       createdAtEpoch: number;
-      attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+      attachments: Array<{ name: string; contentHash: string }>;
     };
   } | null;
   Preferences(): Preferences;
@@ -93,7 +93,7 @@ export const store = makeStore(
           recipientPublicKey: string;
           text: string;
           createdAtEpoch: number;
-          attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+          attachments: Array<{ name: string; contentHash: string }>;
         }
       >
     ) {
@@ -143,7 +143,7 @@ export const store = makeStore(
         recipientPublicKey: string;
         text: string;
         createdAtEpoch: number;
-        attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+        attachments: Array<{ name: string; contentHash: string }>;
       };
       const lastMessageByConversationKey = Object.values(messageMap).reduce(
         (lastMessageByKey: Record<string, Message>, message) => {
@@ -226,7 +226,7 @@ function calculateMessageHash({
   recipientPublicKey: string;
   text: string;
   createdAtEpoch: number;
-  attachments: Array<{ type: string; name: string; content: Uint8Array }>;
+  attachments: Array<{ name: string; contentHash: string }>;
 }) {
   const state = libsodium.crypto_generichash_init("message", libsodium.crypto_generichash_KEYBYTES);
   libsodium.crypto_generichash_update(state, senderPublicKey);
@@ -234,9 +234,8 @@ function calculateMessageHash({
   libsodium.crypto_generichash_update(state, createdAtEpoch.toString());
   libsodium.crypto_generichash_update(state, text);
   for (const attachment of attachments) {
-    libsodium.crypto_generichash_update(state, attachment.type);
     libsodium.crypto_generichash_update(state, attachment.name);
-    libsodium.crypto_generichash_update(state, attachment.content);
+    libsodium.crypto_generichash_update(state, attachment.contentHash);
   }
   return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES, "hex");
 }

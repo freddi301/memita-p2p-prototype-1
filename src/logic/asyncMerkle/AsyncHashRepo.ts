@@ -1,5 +1,5 @@
 import level from "level";
-import { userFolderPath } from "../userFolderPath";
+import { userFolderPath } from "../folderPaths";
 import path from "path";
 import { JSONB } from "../../rpc/JSONB";
 

@@ -8,10 +8,10 @@ import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../FrontendFacade";
 import "emoji-mart/css/emoji-mart.css";
-import { Attachment, AttachmentPreview } from "../components/AttachmentPreview";
 import { MessageEditor } from "../components/MessageEditor";
-import { SimpleHeader } from "../components/SimpleHeader";
 import { NavigationContext } from "../NavigationStack";
+import { FileView } from "../components/FileView";
+import { fileSrc } from "../../other/fileSrc/fileSrc";
 
 type ConversationScreenProps = {
   myPublicKey: string;
@@ -20,7 +20,7 @@ type ConversationScreenProps = {
 export function ConversationScreen({ myPublicKey, otherPublicKey }: ConversationScreenProps) {
   const { theme } = React.useContext(StyleContext);
   const navigationStack = React.useContext(NavigationContext);
-  const onSend = (text: string, attachments: Array<Attachment>) => {
+  const onSend = (text: string, attachments: Array<{ name: string; contentHash: string }>) => {
     FrontendFacade.doMessage(myPublicKey, otherPublicKey, new Date().getTime(), text, attachments);
   };
   const conversationCount = FrontendFacade.useConversationListSize(myPublicKey, otherPublicKey) ?? 0;
@@ -83,7 +83,6 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
               rangeChanged={(range) => {
                 setScrollPosition(range.startIndex);
               }}
-              overscan={10}
             />
           )}
           <div
@@ -182,18 +181,8 @@ function ConversationItem({ index, myPublicKey, otherPublicKey, myName, otherNam
               flex-wrap: wrap;
             `}
           >
-            {message.attachments.map((attachment, index) => {
-              return (
-                <div
-                  key={index}
-                  css={css`
-                    margin-top: ${theme.spacing.text.vertical};
-                    margin-right: ${theme.spacing.text.vertical};
-                  `}
-                >
-                  <AttachmentPreview attachment={attachment} />
-                </div>
-              );
+            {message.attachments.map(({ name, contentHash }, index) => {
+              return <FileHashView key={index} name={name} hash={contentHash} />;
             })}
           </div>
         )}
@@ -226,4 +215,45 @@ function useConversationScrollPosition(myPublicKey: string, otherPublicKey: stri
     rangeRef.current = index;
   }, []);
   return [scrollPosition, setScrollPosition] as const;
+}
+
+type FileHashViewProps = {
+  name: string;
+  hash: string;
+};
+function FileHashView({ name, hash }: FileHashViewProps) {
+  const { theme } = React.useContext(StyleContext);
+  const [src, setSrc] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    let isActive = true;
+    fileSrc(hash).then((src) => {
+      if (isActive) setSrc(src);
+    });
+    return () => {
+      isActive = false;
+    };
+  }, [hash]);
+  return (
+    <div
+      css={css`
+        margin-top: ${theme.spacing.text.vertical};
+        margin-right: ${theme.spacing.text.vertical};
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        border: 1px solid ${theme.colors.background.active};
+      `}
+    >
+      <div>
+        {src && <FileView name={name} src={src} width={350} height={200} />}
+        <div
+          css={css`
+            padding: ${theme.spacing.text.vertical};
+          `}
+        >
+          <Text color="secondary" size="normal" weight="normal" text={name} truncatedLine={true} />
+        </div>
+      </div>
+    </div>
+  );
 }

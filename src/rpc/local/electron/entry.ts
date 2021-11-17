@@ -9,4 +9,6 @@ require("source-map-support").install(); // need for node
   await import("../../remote/hyperswarm/node");
 
   await import("../../../other/fileDialog/electron/main");
+  await import("../../../other/fileHash/electron/main");
+  await import("../../../other/fileSrc/electron/main");
 })();

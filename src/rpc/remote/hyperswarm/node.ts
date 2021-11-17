@@ -29,14 +29,14 @@ swarm.on("connection", (connection, info) => {
         break;
       }
       case "require": {
-        const fromRepo = await asyncMerkle.repo.from(msg.hash);
+        const fromRepo = await asyncMerkle.messagesRepo.from(msg.hash);
         if (fromRepo.type === "found") {
           connection.write(Buffer.from(serialize({ type: "provide", block: fromRepo.value })));
         }
         break;
       }
       case "provide": {
-        await asyncMerkle.repo.to(msg.block);
+        await asyncMerkle.messagesRepo.to(msg.block);
         if (msg.block.type === "leaf") {
           const { senderPublicKey, recipientPublicKey, createdAtEpoch, text, attachments } = JSONB.parse(
             msg.block.data
@@ -49,14 +49,14 @@ swarm.on("connection", (connection, info) => {
   let connectionAlive = true;
   async function acquire() {
     if (receivedRootHash) {
-      for (const hash of (await asyncMerkle.factory.missing(receivedRootHash)).slice(0, 32)) {
+      for (const hash of (await asyncMerkle.messagesFactory.missing(receivedRootHash)).slice(0, 32)) {
         connection.write(Buffer.from(serialize({ type: "require", hash })));
       }
     }
     if (connectionAlive) setTimeout(acquire, 100);
   }
   async function update() {
-    const hash = await asyncMerkle.factory.to(
+    const hash = await asyncMerkle.messagesFactory.to(
       Object.values(store.currentState.messageMap).map((message) => JSONB.stringify(message))
     );
     if (sentRootHash === null || !asyncMerkle.equalsHash(sentRootHash, hash)) {
@@ -86,7 +86,7 @@ type Protocol =
     }
   | {
       type: "provide";
-      block: asyncMerkle.Block;
+      block: asyncMerkle.MessageBlock;
     };
 
 function serialize(msg: Protocol): string {

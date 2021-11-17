@@ -135,3 +135,13 @@ const transformMap3d = {
 function stringToUint8Array(string: string) {
   return new TextEncoder().encode(string);
 }
+
+function chunkUint8Array(data: Uint8Array, chunkSize: number): Array<Uint8Array> {
+  const blockCount = Math.ceil(data.length / chunkSize);
+  const chunks: Array<Uint8Array> = [];
+  for (let i = 0; i < blockCount; i++) {
+    const chunk = data.slice(i * chunkSize, i * chunkSize + chunkSize);
+    chunks.push(chunk);
+  }
+  return chunks;
+}

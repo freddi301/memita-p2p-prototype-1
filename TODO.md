@@ -1,3 +1,4 @@
+- fix conversation scrolling with long messages
 - use libsodium to create accounts
 - encrypt / decrypt messages
 - refactor hyperswarm sincronisation
@@ -15,8 +16,7 @@
 - import account
 - share account
 - profile frontend
-- remove attachments from draft
-- dont block ui while loading attachments
+- display attachemnt loading
 - conversation detail
   - add contact details
   - add total messages

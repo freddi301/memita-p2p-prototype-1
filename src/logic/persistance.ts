@@ -1,7 +1,7 @@
 import { store } from "./domain";
 import { readFile, writeFile, mkdir } from "fs";
 import path from "path";
-import { userFolderPath } from "./userFolderPath";
+import { userFolderPath } from "./folderPaths";
 
 const userFilePath = path.resolve(userFolderPath, "dump.json");
 mkdir(userFolderPath, { recursive: true }, (err) => {
