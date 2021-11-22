@@ -19,11 +19,21 @@ export function makeStore<Reducers extends Record<string, CommandInterpreterRedu
 ): {
   command: RemoteCommands;
   query: RemoteQueries;
-  currentState: typeof initialState;
+  publish(state: typeof initialState): void;
+  subscribe(listener: (state: typeof initialState) => void): () => void;
 } {
   let currentState = initialState;
   type Subscription = { query: (states: typeof initialState) => any; listener: (value: any) => void; lastValue: any };
   const subscriptions = new Set<Subscription>();
+  const notify = () => {
+    for (const subscription of Array.from(subscriptions)) {
+      const newValue = subscription.query(currentState);
+      if (!_.isEqual(newValue, subscription.lastValue)) {
+        subscription.listener(newValue);
+        subscription.lastValue = newValue;
+      }
+    }
+  };
   const command = new Proxy(
     {},
     {
@@ -37,13 +47,7 @@ export function makeStore<Reducers extends Record<string, CommandInterpreterRedu
             })
           ) as typeof initialState;
           currentState = newState;
-          for (const subscription of Array.from(subscriptions)) {
-            const newValue = subscription.query(newState);
-            if (!_.isEqual(newValue, subscription.lastValue)) {
-              subscription.listener(newValue);
-              subscription.lastValue = newValue;
-            }
-          }
+          notify();
         };
       },
     }
@@ -68,14 +72,26 @@ export function makeStore<Reducers extends Record<string, CommandInterpreterRedu
       },
     }
   ) as RemoteQueries;
+  const subscribe = (listener: (value: typeof initialState) => void) => {
+    const query = (states: typeof initialState) => states;
+    const lastValue = query(currentState);
+    const subscription: Subscription = {
+      query,
+      listener,
+      lastValue,
+    };
+    subscriptions.add(subscription);
+    listener(lastValue);
+    return () => subscriptions.delete(subscription);
+  };
+  const publish = (state: typeof initialState) => {
+    currentState = state;
+    notify();
+  };
   return {
     command,
     query,
-    get currentState() {
-      return currentState;
-    },
-    set currentState(newState: typeof initialState) {
-      currentState = newState;
-    },
+    publish,
+    subscribe,
   };
 }

@@ -2,6 +2,7 @@ import { store } from "./domain";
 import { readFile, writeFile, mkdir } from "fs";
 import path from "path";
 import { userFolderPath } from "./folderPaths";
+import { JSONB } from "../other/JSONB";
 
 const userFilePath = path.resolve(userFolderPath, "dump.json");
 mkdir(userFolderPath, { recursive: true }, (err) => {
@@ -10,33 +11,14 @@ mkdir(userFolderPath, { recursive: true }, (err) => {
 readFile(userFilePath, (error, data) => {
   if (!error) {
     try {
-      store.currentState = JSON.parse(data.toString(), (key, value) => {
-        if (value && value.Uint8Array) {
-          return Buffer.from(value.Uint8Array, "base64");
-        }
-        return value;
-      });
+      store.publish(JSONB.parse(data.toString()) as any);
     } catch (error) {
       console.error("cannot load dump");
     }
   }
-  persist();
+  store.subscribe((state) => {
+    writeFile(userFilePath, JSONB.stringify(state, null, 2), (error) => {
+      if (error) console.error("cannot save dump");
+    });
+  });
 });
-function persist() {
-  writeFile(
-    userFilePath,
-    JSON.stringify(
-      store.currentState,
-      (key, value) => {
-        if (value instanceof Uint8Array) {
-          return { Uint8Array: Buffer.from(value).toString("base64") };
-        }
-        return value;
-      },
-      2
-    ),
-    () => {
-      setTimeout(persist, 1000);
-    }
-  );
-}

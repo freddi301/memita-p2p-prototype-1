@@ -9,9 +9,6 @@ mkdir(filesFolderPath, { recursive: true }, (err) => {
 });
 
 ipcMain.on("file-hash", async (event, filePath) => {
-  // for await (const piece of readFileByChunks(filePath, 4)) {
-  //   console.log(piece.toString());
-  // }
   filesFactory.to(readFileByChunks(filePath, 256000)).then((hash) => {
     const hashString = Buffer.from(hash).toString("hex");
     event.reply("file-hash", {

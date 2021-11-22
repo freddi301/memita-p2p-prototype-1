@@ -145,3 +145,14 @@ function chunkUint8Array(data: Uint8Array, chunkSize: number): Array<Uint8Array>
   }
   return chunks;
 }
+
+function equalsUint8Array(typedArrayA: Uint8Array, typedArrayB: Uint8Array) {
+  if (typedArrayA === typedArrayB) return true;
+  if (typedArrayA.byteLength !== typedArrayB.byteLength) return false;
+  const dataViewA = new DataView(typedArrayA.buffer);
+  const dataViewB = new DataView(typedArrayB.buffer);
+  for (let i = 0; i < typedArrayA.byteLength; i++) {
+    if (dataViewA.getUint8(i) !== dataViewB.getUint8(i)) return false;
+  }
+  return true;
+}
