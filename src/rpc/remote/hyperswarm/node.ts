@@ -1,7 +1,7 @@
 import Hyperswarm from "hyperswarm";
-import { store } from "../../../logic/domain";
-import * as asyncMerkle from "../../../logic/asyncMerkle/asyncMerkle";
-import { JSONB } from "../../JSONB";
+import * as asyncMerkle from "../../../other/asyncMerkle/asyncMerkle";
+import { store } from "../../../other/domain";
+import { JSONB } from "../../../other/JSONB";
 
 // TODO refactor syncronisation mechanism
 // TODO implement state of already asked hashes
@@ -94,5 +94,5 @@ function serialize(msg: Protocol): string {
 }
 
 function deserialize(msg: string): Protocol {
-  return JSONB.parse(msg);
+  return JSONB.parse(msg) as any;
 }

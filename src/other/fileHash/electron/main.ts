@@ -1,8 +1,8 @@
 import { ipcMain } from "electron";
 import { copyFile, createReadStream, mkdir } from "fs";
-import { filesFactory } from "../../../logic/asyncMerkle/asyncMerkle";
+import { filesFactory } from "../../asyncMerkle/asyncMerkle";
 import path from "path";
-import { filesFolderPath } from "../../../logic/folderPaths";
+import { filesFolderPath } from "../../folderPaths";
 
 mkdir(filesFolderPath, { recursive: true }, (err) => {
   if (err) throw err;
