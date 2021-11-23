@@ -1,5 +1,4 @@
 import Hyperswarm from "hyperswarm";
-import { JSONB } from "../../../other/JSONB";
 import { isAlternative, isLiteral, isObject } from "../../../other/assertion";
 import { store } from "../../../other/domain";
 import {
@@ -20,6 +19,9 @@ import { filesFolderPath } from "../../../other/folderPaths";
 import path from "path";
 import { cpus } from "os";
 import { filter, isEmpty, takeWhile } from "../../../other/asyncIteratorOperators";
+import cbor from "cbor";
+
+const TRUST_SELF = true;
 
 const swarm = new Hyperswarm();
 
@@ -134,7 +136,7 @@ swarm.on("connection", (connection, info) => {
     }
     cpuUsagePercentage = Math.trunc(measureCpuUsage() * 100);
     // console.log(`${cpuUsagePercentage}%`);
-    if (isConnectionAlive) setTimeout(loop, 10);
+    if (isConnectionAlive) setTimeout(loop, 100);
   }
   loop();
   const unsubscribe = store.subscribe(async (state) => {
@@ -186,17 +188,21 @@ type Protocol =
 const MAX_SERIALIZED_BYTES = 512000;
 
 function serialize(deserialized: Protocol): Buffer {
-  if (!isValidProtocolMessage(deserialized)) throw new Error();
-  const stringified = JSONB.stringify(deserialized);
-  const serialized = Buffer.from(stringified);
-  if (serialized.byteLength > MAX_SERIALIZED_BYTES) throw new Error();
-  return serialized;
+  if (TRUST_SELF) {
+    const serialized = cbor.encode(deserialized);
+    if (serialized.byteLength > MAX_SERIALIZED_BYTES) throw new Error();
+    return serialized;
+  } else {
+    if (!isValidProtocolMessage(deserialized)) throw new Error();
+    const serialized = cbor.encode(deserialized);
+    if (serialized.byteLength > MAX_SERIALIZED_BYTES) throw new Error();
+    return serialized;
+  }
 }
 
 function deserialize(serialized: Buffer): Protocol {
   if (serialized.byteLength > MAX_SERIALIZED_BYTES) throw new Error();
-  const stringified = serialized.toString();
-  const deserialized = JSONB.parse(stringified);
+  const deserialized = cbor.decode(serialized);
   if (!isValidProtocolMessage(deserialized)) throw new Error();
   return deserialized;
 }

@@ -5,6 +5,8 @@ import { JSONB } from "../JSONB";
 import { Assertion } from "../assertion";
 import { AsyncCryptoHashRepo } from "./AsynMerkleTree";
 
+const TRUST_SELF = true;
+
 export class LevelAsyncCryptoHashRepo<Hash, Value> implements AsyncCryptoHashRepo<Hash, Value> {
   constructor(
     private folder: string,
@@ -14,13 +16,18 @@ export class LevelAsyncCryptoHashRepo<Hash, Value> implements AsyncCryptoHashRep
   private db = level(path.resolve(userFolderPath, this.folder));
   async from(hash: Hash): Promise<{ type: "found"; value: Value } | { type: "missing" }> {
     try {
-      const existing = JSONB.parse(await this.db.get(hash));
-      if (!this.assertFunction(existing)) throw new Error();
-      if (hash === this.hashFunction(existing)) {
+      if (TRUST_SELF) {
+        const existing = JSONB.parse(await this.db.get(hash)) as any;
         return { type: "found", value: existing };
       } else {
-        this.db.del(hash);
-        return { type: "missing" };
+        const existing = JSONB.parse(await this.db.get(hash));
+        if (!this.assertFunction(existing)) throw new Error();
+        if (hash === this.hashFunction(existing)) {
+          return { type: "found", value: existing };
+        } else {
+          this.db.del(hash);
+          return { type: "missing" };
+        }
       }
     } catch (error) {
       if ((error as any).notFound) {
