@@ -1,16 +1,21 @@
 import { WebSocketServer } from "ws";
+import express from "express";
 import { LOCAL_RPC_WEBSOCKET_PORT } from "./common";
-import { store } from "../../../logic/domain";
-import { JSONB } from "../../JSONB";
+import { store } from "../../../other/domain";
+import { JSONB } from "../../../other/JSONB";
 
-const wss = new WebSocketServer({ port: LOCAL_RPC_WEBSOCKET_PORT }, () => {
+export const app = express();
+
+const server = app.listen(LOCAL_RPC_WEBSOCKET_PORT, () => {
   console.log(`server started on port ${LOCAL_RPC_WEBSOCKET_PORT}`);
 });
+
+const wss = new WebSocketServer({ server });
 
 wss.on("connection", (ws) => {
   const subscriptionMap: Record<string, () => void> = {};
   ws.on("message", async (message) => {
-    const parsed = JSONB.parse(message.toString());
+    const parsed = JSONB.parse(message.toString()) as any;
     switch (parsed.type) {
       case "command": {
         (store.command as any)[parsed.name](...parsed.args);

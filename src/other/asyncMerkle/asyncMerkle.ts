@@ -1,65 +1,108 @@
 import libsodium from "libsodium-wrappers";
-import { LevelAsyncHashRepo } from "./AsyncHashRepo";
 import * as AsyncMerkleTreeSet from "./AsyncMerkleTreeSet";
 import * as AsyncMerkleTreeSequence from "./AsyncMerkleTreeSequence";
+import { LevelAsyncCryptoHashRepo } from "./LevelAsyncCryptoHashRepo";
+import { Tree } from "./AsynMerkleTree";
+import { refine, isArray, isNumber, isObject, isString, isAlternative, isLiteral, isInstanceof } from "../assertion";
+import { JSONB } from "../JSONB";
 
-export const messagesRepo = new LevelAsyncHashRepo("replication/messages", setTreeHashFunction, equalsUint8Array);
+export type Hash = string;
+export type FileData = Uint8Array;
+export type MessageData = {
+  senderPublicKey: string;
+  recipientPublicKey: string;
+  createdAtEpoch: number;
+  text: string;
+  attachments: Array<{ name: string; contentHash: Hash }>;
+};
+
+export type MessageBlock = Tree<Hash, MessageData>;
+export type FileBlock = Tree<Hash, Uint8Array>;
+
+export const isValidHash = refine(isString, (string) => string.length === 64);
+
+const isValidMessage = isObject({
+  senderPublicKey: isString, // TODO
+  recipientPublicKey: isString, // TODO
+  createdAtEpoch: isNumber,
+  text: isString,
+  attachments: isArray(
+    isObject({
+      name: isString,
+      contentHash: isValidHash,
+    })
+  ),
+});
+
+export const isValidMessageBlock = isAlternative([
+  isObject({
+    type: isLiteral("leaf"),
+    data: isValidMessage,
+  }),
+  isObject({
+    type: isLiteral("branch"),
+    branches: isArray(isValidHash),
+  }),
+]);
+
+export const isValidFileBlock = isAlternative([
+  isObject({
+    type: isLiteral("leaf"),
+    data: isInstanceof(Uint8Array),
+  }),
+  isObject({
+    type: isLiteral("branch"),
+    branches: isArray(isValidHash),
+  }),
+]);
+
+export const messagesRepo = new LevelAsyncCryptoHashRepo(
+  "replication/messages",
+  setTreeHashFunction,
+  isValidMessageBlock
+);
+
+export const filesRepo = new LevelAsyncCryptoHashRepo("replication/files", sequenceTreeHashFunction, isValidFileBlock);
+
 export const messagesFactory = new AsyncMerkleTreeSet.Factory(messagesRepo, getHashPrefix);
-export type MessageBlock = AsyncMerkleTreeSet.Tree<Hash, string>; // TODO replace string with message type
 
-export const filesRepo = new LevelAsyncHashRepo("replication/files", sequenceTreeHashFunction, equalsUint8Array);
 export const filesFactory = new AsyncMerkleTreeSequence.Factory(filesRepo, 4000);
-export type FileBlock = AsyncMerkleTreeSequence.Tree<Hash, Uint8Array>;
 
-export type Hash = Uint8Array;
-export const equalsHash = equalsUint8Array;
-
-function setTreeHashFunction(value: MessageBlock) {
+function setTreeHashFunction(value: MessageBlock): Hash {
   switch (value.type) {
     case "leaf": {
       const state = libsodium.crypto_generichash_init("leaf", libsodium.crypto_generichash_KEYBYTES);
-      libsodium.crypto_generichash_update(state, value.data);
-      return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES);
+      libsodium.crypto_generichash_update(state, JSONB.stringify(value.data));
+      return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES, "hex");
     }
     case "branch": {
       const state = libsodium.crypto_generichash_init("branch", libsodium.crypto_generichash_KEYBYTES);
       for (const hash of value.branches) {
         libsodium.crypto_generichash_update(state, hash);
       }
-      return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES);
+      return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES, "hex");
     }
   }
 }
 
-function sequenceTreeHashFunction(value: FileBlock) {
+function sequenceTreeHashFunction(value: FileBlock): Hash {
   switch (value.type) {
     case "leaf": {
       const state = libsodium.crypto_generichash_init("leaf", libsodium.crypto_generichash_KEYBYTES);
       libsodium.crypto_generichash_update(state, value.data);
-      return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES);
+      return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES, "hex");
     }
     case "branch": {
       const state = libsodium.crypto_generichash_init("branch", libsodium.crypto_generichash_KEYBYTES);
       for (const hash of value.branches) {
         libsodium.crypto_generichash_update(state, hash);
       }
-      return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES);
+      return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES, "hex");
     }
   }
 }
 
-function equalsUint8Array(typedArrayA: Uint8Array, typedArrayB: Uint8Array) {
-  if (typedArrayA === typedArrayB) return true;
-  if (typedArrayA.byteLength !== typedArrayB.byteLength) return false;
-  const dataViewA = new DataView(typedArrayA.buffer);
-  const dataViewB = new DataView(typedArrayB.buffer);
-  for (let i = 0; i < typedArrayA.byteLength; i++) {
-    if (dataViewA.getUint8(i) !== dataViewB.getUint8(i)) return false;
-  }
-  return true;
-}
-
-function getHashPrefix(hash: Uint8Array, level: number) {
-  const dataView = new DataView(hash.buffer);
+function getHashPrefix(hash: Hash, level: number) {
+  const dataView = new DataView(Buffer.from(hash, "hex"));
   return dataView.getUint8(level);
 }

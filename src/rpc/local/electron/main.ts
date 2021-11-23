@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { store } from "../../../logic/domain";
+import { store } from "../../../other/domain";
 import { LOCAL_RCP_ELECTRON_CHANNEL } from "./common";
 
 const subscriptionMap: Record<string, () => void> = {};

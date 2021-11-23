@@ -1,6 +1,6 @@
 import React from "react";
 import { frontendStore } from "..";
-import { Commands, Queries } from "../logic/domain";
+import { Commands, Queries } from "../other/domain";
 
 // frontend machinery
 type CommandFacade = {

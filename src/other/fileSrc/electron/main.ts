@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import path from "path";
-import { filesFolderPath } from "../../../logic/folderPaths";
+import { filesFolderPath } from "../../folderPaths";
 
 ipcMain.on("file-src", async (event, hash) => {
   event.reply("file-src", {

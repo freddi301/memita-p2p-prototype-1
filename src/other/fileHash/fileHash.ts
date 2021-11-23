@@ -5,8 +5,7 @@ export async function fileHash(src: string): Promise<string> {
     const { fileHashRenderer } = await import("./electron/renderer");
     return fileHashRenderer(src);
   } else {
-    throw new Error("not implemented");
-    // const { selectFilesWebsocket: selectFiles } = await import("./websocket/client");
-    // return selectFiles();
+    const { fileHashClient } = await import("./websocket/client");
+    return fileHashClient(src);
   }
 }

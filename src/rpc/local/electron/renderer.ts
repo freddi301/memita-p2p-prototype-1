@@ -1,5 +1,5 @@
-import { Commands, Queries } from "../../../logic/domain";
-import { RemoteCommands, RemoteQueries } from "../../../logic/plumbing";
+import { Commands, Queries } from "../../../other/domain";
+import { RemoteCommands, RemoteQueries } from "../../../other/plumbing";
 import { LOCAL_RCP_ELECTRON_CHANNEL } from "./common";
 
 export const localRpcRendererClient: {

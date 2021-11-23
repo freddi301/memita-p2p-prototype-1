@@ -215,7 +215,7 @@ export const store = makeStore(
   }
 );
 
-function calculateMessageHash({
+export function calculateMessageHash({
   senderPublicKey,
   recipientPublicKey,
   text,

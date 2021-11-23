@@ -1,8 +1,5 @@
-import { AsyncCryptoHashRepo } from "./AsyncHashRepo";
-
-export type Tree<Hash, Data> = Branch<Hash> | Leaf<Data>;
-type Branch<Hash> = { type: "branch"; branches: Array<Hash> };
-type Leaf<Data> = { type: "leaf"; data: Data };
+import { AsyncCryptoHashRepo } from "./AsyncCryptoHashRepo";
+import { Tree } from "./AsynMerkleTree";
 
 export class Factory<Hash, Data> {
   constructor(

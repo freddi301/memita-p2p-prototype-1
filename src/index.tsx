@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import libsodium from "libsodium-wrappers";
-import { RemoteCommands, RemoteQueries } from "./logic/plumbing";
+import { RemoteCommands, RemoteQueries } from "./other/plumbing";
 import isElectron from "is-electron";
 
 export let frontendStore: { command: RemoteCommands; query: RemoteQueries };

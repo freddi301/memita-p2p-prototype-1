@@ -7,7 +7,6 @@ import { NavigationContext } from "../NavigationStack";
 import { FrontendFacade } from "../FrontendFacade";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
-import { selectFiles } from "../../other/fileDialog/fileDialog";
 
 type HomeScreenProps = {};
 export function HomeScreen(props: HomeScreenProps) {

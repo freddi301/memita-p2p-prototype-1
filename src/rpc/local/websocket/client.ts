@@ -1,7 +1,7 @@
-import { Commands, Queries } from "../../../logic/domain";
-import { RemoteCommands, RemoteQueries } from "../../../logic/plumbing";
-import { JSONB } from "../../JSONB";
-import { LOCAL_RPC_WEBSOCKET_PORT, LOCAL_RPC_WEBSOCKET_HOST } from "./common";
+import { Commands, Queries } from "../../../other/domain";
+import { JSONB } from "../../../other/JSONB";
+import { RemoteCommands, RemoteQueries } from "../../../other/plumbing";
+import { LOCAL_RPC_WEBSOCKET_PATH } from "./common";
 
 // TODO improve performance using only one message listener
 
@@ -15,7 +15,9 @@ function pushToQueue(message: string) {
   }
 }
 
-let socket = new WebSocket(`ws://${LOCAL_RPC_WEBSOCKET_HOST}:${LOCAL_RPC_WEBSOCKET_PORT}`);
+var url = new URL(LOCAL_RPC_WEBSOCKET_PATH, window.location.href);
+url.protocol = url.protocol.replace("http", "ws");
+let socket = new WebSocket(url.href);
 socket.addEventListener("open", (event) => {
   isReady = true;
   for (let message = messageQueue.shift(); message; message = messageQueue.shift()) {
@@ -65,7 +67,7 @@ export const localRpcWebsocketClient: {
               })
             );
             const onMessage = (event: MessageEvent<any>) => {
-              const parsed = JSONB.parse(event.data);
+              const parsed = JSONB.parse(event.data) as any;
               if (parsed.id === id) {
                 listener(parsed.value);
               }

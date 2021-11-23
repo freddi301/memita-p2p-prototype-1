@@ -1,5 +1,6 @@
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const config = require("./webpack.config");
+const { LOCAL_RPC_WEBSOCKET_PORT, LOCAL_RPC_WEBSOCKET_PATH } = require("./dist/rpc/local/websocket/common");
 
 if (!process.env.PORT) throw new Error("PORT not specified");
 
@@ -13,6 +14,13 @@ module.exports = {
     },
     hot: true,
     port: Number(process.env.PORT),
+    proxy: {
+      [LOCAL_RPC_WEBSOCKET_PATH]: {
+        target: `http://localhost:${LOCAL_RPC_WEBSOCKET_PORT}`,
+        ws: true,
+        changeOrigin: true,
+      },
+    },
   },
   module: {
     ...config.module,

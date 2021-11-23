@@ -1,13 +1,11 @@
 import { store } from "./domain";
-import { readFile, writeFile, mkdir } from "fs";
+import { readFile, writeFile } from "fs";
 import path from "path";
 import { userFolderPath } from "./folderPaths";
 import { JSONB } from "../other/JSONB";
 
 const userFilePath = path.resolve(userFolderPath, "dump.json");
-mkdir(userFolderPath, { recursive: true }, (err) => {
-  if (err) throw err;
-});
+
 readFile(userFilePath, (error, data) => {
   if (!error) {
     try {
