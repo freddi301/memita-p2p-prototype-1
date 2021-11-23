@@ -1,10 +1,10 @@
 import { ipcMain } from "electron";
 import path from "path";
 import { filesFolderPath } from "../../folderPaths";
-import { watchFile } from "../watchFiles";
+import { waitUntilFileExists } from "../../fileUtils";
 
 ipcMain.on("file-src", async (event, hash) => {
-  const abort = watchFile(filesFolderPath, hash, () => {
+  const abort = waitUntilFileExists(filesFolderPath, hash, () => {
     event.reply("file-src", {
       hash,
       src: path.resolve(filesFolderPath, hash),

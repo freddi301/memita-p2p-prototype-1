@@ -23,3 +23,9 @@ export async function* filter<T>(
     if (await criteria(value)) yield value;
   }
 }
+
+export async function* map<A, B>(asyncGenerator: AsyncGenerator<A, any, any>, mapper: (value: A) => Promise<B>) {
+  for await (const value of asyncGenerator) {
+    yield await mapper(value);
+  }
+}

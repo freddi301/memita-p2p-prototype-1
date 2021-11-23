@@ -1,3 +1,6 @@
+- wipe temp files on startup (uploads and .materializing)
+- select contact for new conversation screen
+- view pending messages with attachments
 - fix conversation scrolling with long messages
 - use libsodium to create accounts
 - encrypt / decrypt messages

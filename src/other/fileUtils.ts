@@ -2,7 +2,7 @@ import fs from "fs";
 import { AbortController } from "node-abort-controller";
 import path from "path";
 
-export function watchFile(dirPath: string, fileName: string, onExists: () => void) {
+export function waitUntilFileExists(dirPath: string, fileName: string, onExists: () => void) {
   if (fs.existsSync(path.resolve(dirPath, fileName))) {
     setImmediate(() => onExists());
     return () => {};
@@ -16,4 +16,12 @@ export function watchFile(dirPath: string, fileName: string, onExists: () => voi
     }
   });
   return () => abortController.abort();
+}
+
+export function checkFileExists(filePath: string) {
+  return new Promise((resolve, reject) => {
+    fs.access(filePath, fs.constants.F_OK, (error) => {
+      resolve(!error);
+    });
+  });
 }

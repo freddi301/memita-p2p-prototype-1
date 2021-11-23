@@ -20,6 +20,7 @@ import path from "path";
 import { cpus } from "os";
 import { filter, isEmpty, takeWhile } from "../../../other/asyncIteratorOperators";
 import cbor from "cbor";
+import { checkFileExists } from "../../../other/fileUtils";
 
 const TRUST_SELF = true;
 
@@ -111,26 +112,24 @@ swarm.on("connection", (connection, info) => {
         }
       }
     }
-    if (cpuUsagePercentage <= 20) {
-      // try download files
+    if (cpuUsagePercentage <= 15) {
       for (const fileHash of fileHashes) {
-        const missingHashes = filesFactory.missing(fileHash);
-        const requireableHashes = filter(missingHashes, async (hash) => !requiredFileHashes.has(hash));
-        const limitedRequireableHashes = takeWhile(requireableHashes, async () => requiredFileHashes.size <= 100);
-        for await (const hash of limitedRequireableHashes) {
-          send({ scope: "files", type: "require", hash });
-          requiredFileHashes.add(hash);
-        }
-      }
-      // try materialize files
-      for (const fileHash of fileHashes) {
-        if (await isEmpty(filesFactory.missing(fileHash))) {
-          const temptFilePath = path.join(filesFolderPath, fileHash + ".materializing");
-          await fs.promises.writeFile(temptFilePath, filesFactory.from(fileHash));
-          const filePath = path.join(filesFolderPath, fileHash);
-          await fs.promises.rename(temptFilePath, filePath).catch(() => {
-            /* TODO */
-          });
+        const temptFilePath = path.join(filesFolderPath, fileHash + ".materializing");
+        const filePath = path.join(filesFolderPath, fileHash);
+        if (!(await checkFileExists(temptFilePath)) && !(await checkFileExists(filePath))) {
+          // try download files
+          const missingHashes = filesFactory.missing(fileHash);
+          const requireableHashes = filter(missingHashes, async (hash) => !requiredFileHashes.has(hash));
+          const limitedRequireableHashes = takeWhile(requireableHashes, async () => requiredFileHashes.size <= 10);
+          for await (const hash of limitedRequireableHashes) {
+            send({ scope: "files", type: "require", hash });
+            requiredFileHashes.add(hash);
+          }
+          // try materialize files
+          if (await isEmpty(filesFactory.missing(fileHash))) {
+            await fs.promises.writeFile(temptFilePath, filesFactory.from(fileHash));
+            await fs.promises.rename(temptFilePath, filePath);
+          }
         }
       }
     }
@@ -189,12 +188,12 @@ const MAX_SERIALIZED_BYTES = 512000;
 
 function serialize(deserialized: Protocol): Buffer {
   if (TRUST_SELF) {
-    const serialized = cbor.encode(deserialized);
+    const serialized = cbor.encodeOne(deserialized, { highWaterMark: 512000 } as any);
     if (serialized.byteLength > MAX_SERIALIZED_BYTES) throw new Error();
     return serialized;
   } else {
     if (!isValidProtocolMessage(deserialized)) throw new Error();
-    const serialized = cbor.encode(deserialized);
+    const serialized = cbor.encode(deserialized, { highWaterMark: 512000 } as any);
     if (serialized.byteLength > MAX_SERIALIZED_BYTES) throw new Error();
     return serialized;
   }
@@ -202,7 +201,7 @@ function serialize(deserialized: Protocol): Buffer {
 
 function deserialize(serialized: Buffer): Protocol {
   if (serialized.byteLength > MAX_SERIALIZED_BYTES) throw new Error();
-  const deserialized = cbor.decode(serialized);
+  const deserialized = cbor.decodeFirstSync(serialized, { highWaterMark: 512000 } as any);
   if (!isValidProtocolMessage(deserialized)) throw new Error();
   return deserialized;
 }
