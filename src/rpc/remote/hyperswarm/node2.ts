@@ -19,6 +19,7 @@ import fs from "fs";
 import { filesFolderPath } from "../../../other/folderPaths";
 import path from "path";
 import { cpus } from "os";
+import { filter, isEmpty, takeWhile } from "../../../other/asyncIteratorOperators";
 
 const swarm = new Hyperswarm();
 
@@ -97,31 +98,43 @@ swarm.on("connection", (connection, info) => {
   async function loop() {
     if (!isConnectionAlive) return;
     const measureCpuUsage = startMeasureCpuUsage();
-    if (cpuUsagePercentage <= 20) {
+    if (cpuUsagePercentage <= 30) {
       if (receivedRootHash) {
-        const missingHashes = await messagesFactory.missing(receivedRootHash);
-        const requireableHashes = missingHashes.filter((hash) => !requiredMessageHashes.has(hash));
-        const requireableCount = Math.max(0, 10 - requiredMessageHashes.size);
-        for (const hash of requireableHashes.slice(0, requireableCount)) {
+        const missingHashes = messagesFactory.missing(receivedRootHash);
+        const requireableHashes = filter(missingHashes, async (hash) => !requiredMessageHashes.has(hash));
+        const limitedRequireableHashes = takeWhile(requireableHashes, async () => requiredMessageHashes.size <= 10);
+        for await (const hash of limitedRequireableHashes) {
           send({ scope: "messages", type: "require", hash });
           requiredMessageHashes.add(hash);
         }
       }
     }
-    if (cpuUsagePercentage <= 10) {
+    if (cpuUsagePercentage <= 20) {
+      // try download files
       for (const fileHash of fileHashes) {
-        const missingHashes = await filesFactory.missing(fileHash);
-        const requireableHashes = missingHashes.filter((hash) => !requiredFileHashes.has(hash));
-        const requireableCount = Math.max(0, 100 - requiredFileHashes.size);
-        for (const hash of requireableHashes.slice(0, requireableCount)) {
+        const missingHashes = filesFactory.missing(fileHash);
+        const requireableHashes = filter(missingHashes, async (hash) => !requiredFileHashes.has(hash));
+        const limitedRequireableHashes = takeWhile(requireableHashes, async () => requiredFileHashes.size <= 100);
+        for await (const hash of limitedRequireableHashes) {
           send({ scope: "files", type: "require", hash });
           requiredFileHashes.add(hash);
+        }
+      }
+      // try materialize files
+      for (const fileHash of fileHashes) {
+        if (await isEmpty(filesFactory.missing(fileHash))) {
+          const temptFilePath = path.join(filesFolderPath, fileHash + ".materializing");
+          await fs.promises.writeFile(temptFilePath, filesFactory.from(fileHash));
+          const filePath = path.join(filesFolderPath, fileHash);
+          await fs.promises.rename(temptFilePath, filePath).catch(() => {
+            /* TODO */
+          });
         }
       }
     }
     cpuUsagePercentage = Math.trunc(measureCpuUsage() * 100);
     // console.log(`${cpuUsagePercentage}%`);
-    if (isConnectionAlive) setTimeout(loop, 100);
+    if (isConnectionAlive) setTimeout(loop, 10);
   }
   loop();
   const unsubscribe = store.subscribe(async (state) => {
@@ -132,16 +145,6 @@ swarm.on("connection", (connection, info) => {
       sentRootHash = hash;
     }
     fileHashes = messages.flatMap((message) => message.attachments.map((attachment) => attachment.contentHash));
-    for (const fileHash of fileHashes) {
-      const filePath = path.join(filesFolderPath, fileHash);
-      const isMaterialized = fs.existsSync(filePath);
-      if (!isMaterialized) {
-        const fileChunks = await filesFactory.from(fileHash);
-        if (fileChunks) {
-          await fs.promises.writeFile(filePath, fileChunks);
-        }
-      }
-    }
   });
   connection.on("close", () => {
     isConnectionAlive = false;

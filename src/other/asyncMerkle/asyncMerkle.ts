@@ -1,8 +1,6 @@
 import libsodium from "libsodium-wrappers";
-import * as AsyncMerkleTreeSet from "./AsyncMerkleTreeSet";
-import * as AsyncMerkleTreeSequence from "./AsyncMerkleTreeSequence";
 import { LevelAsyncCryptoHashRepo } from "./LevelAsyncCryptoHashRepo";
-import { Tree } from "./AsynMerkleTree";
+import { Tree, MerkleTreeSet, MerkleTreeSequence } from "./AsynMerkleTree";
 import { refine, isArray, isNumber, isObject, isString, isAlternative, isLiteral, isInstanceof } from "../assertion";
 import { JSONB } from "../JSONB";
 
@@ -64,9 +62,9 @@ export const messagesRepo = new LevelAsyncCryptoHashRepo(
 
 export const filesRepo = new LevelAsyncCryptoHashRepo("replication/files", sequenceTreeHashFunction, isValidFileBlock);
 
-export const messagesFactory = new AsyncMerkleTreeSet.Factory(messagesRepo, getHashPrefix);
+export const messagesFactory = new MerkleTreeSet(messagesRepo, getHashPrefix);
 
-export const filesFactory = new AsyncMerkleTreeSequence.Factory(filesRepo, 4000);
+export const filesFactory = new MerkleTreeSequence(filesRepo, 4000);
 
 function setTreeHashFunction(value: MessageBlock): Hash {
   switch (value.type) {

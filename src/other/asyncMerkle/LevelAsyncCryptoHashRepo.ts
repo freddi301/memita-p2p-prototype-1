@@ -1,9 +1,9 @@
 import level from "level";
 import { userFolderPath } from "../folderPaths";
 import path from "path";
-import { AsyncCryptoHashRepo } from "./AsyncCryptoHashRepo";
 import { JSONB } from "../JSONB";
 import { Assertion } from "../assertion";
+import { AsyncCryptoHashRepo } from "./AsynMerkleTree";
 
 export class LevelAsyncCryptoHashRepo<Hash, Value> implements AsyncCryptoHashRepo<Hash, Value> {
   constructor(
