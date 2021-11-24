@@ -14,7 +14,9 @@ type MessageEditorProps = {
 export function MessageEditor({ onSend }: MessageEditorProps) {
   const { theme } = React.useContext(StyleContext);
   const [text, setText] = React.useState("");
-  const [attachments, setAttachments] = React.useState<Array<{ name: string; src: string }>>([]);
+  const [attachments, setAttachments] = React.useState<
+    Array<{ name: string; src: { type: "path"; path: string } | { type: "file"; file: File } }>
+  >([]);
   const send = async () => {
     setText("");
     setAttachments([]);
@@ -122,7 +124,14 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
                       position: relative;
                     `}
                   >
-                    <FileView name={attachment.name} src={attachment.src} width={200} height={200} />
+                    <FileView
+                      name={attachment.name}
+                      src={
+                        attachment.src.type === "path" ? attachment.src.path : URL.createObjectURL(attachment.src.file)
+                      }
+                      width={200}
+                      height={200}
+                    />
                     <div
                       css={css`
                         padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};

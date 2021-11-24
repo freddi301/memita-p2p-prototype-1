@@ -1,5 +1,5 @@
 export function selectFilesWebsocket() {
-  return new Promise<Array<{ name: string; src: string }>>((resolve) => {
+  return new Promise<Array<{ name: string; src: { type: "file"; file: File } }>>((resolve) => {
     const input = document.createElement("input");
     input.type = "file";
     input.multiple = true;
@@ -10,7 +10,7 @@ export function selectFilesWebsocket() {
           Array.from(files).map((file) => {
             return {
               name: file.name,
-              src: URL.createObjectURL(file),
+              src: { type: "file", file },
             };
           })
         );

@@ -8,7 +8,7 @@ ipcMain.on("select-files", async (event, parsed) => {
     result.filePaths.map((filePath) => {
       return {
         name: path.basename(filePath),
-        src: filePath,
+        src: { type: "path", path: filePath },
       };
     })
   );
