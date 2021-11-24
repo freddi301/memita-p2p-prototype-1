@@ -17,10 +17,10 @@ import { Tree } from "../../../other/asyncMerkle/AsynMerkleTree";
 import fs from "fs";
 import { filesFolderPath } from "../../../other/folderPaths";
 import path from "path";
-import { cpus } from "os";
 import { filter, isEmpty, takeWhile } from "../../../other/asyncIteratorOperators";
 import cbor from "cbor";
 import { checkFileExists } from "../../../other/fileUtils";
+import { startMeasureCpuUsage } from "../../../other/startMeasureCpuUsage";
 
 const TRUST_SELF = true;
 
@@ -36,9 +36,12 @@ swarm.join(GLOBAL_TOPIC, {
 
 swarm.on("connection", (connection, info) => {
   console.log("connection");
+  let isConnectionAlive = true;
   let receivedRootHash: Hash | null = null;
   let sentRootHash: Hash | null = null;
+  const requiredMessageHashes = new Set<Hash>();
   let fileHashes: Array<Hash> = [];
+  const requiredFileHashes = new Set<Hash>();
   const send = (deserialized: Protocol) => {
     if (!isConnectionAlive) return;
     const serialized = serialize(deserialized);
@@ -46,6 +49,7 @@ swarm.on("connection", (connection, info) => {
     connection.write(serialized);
   };
   connection.on("data", async (data) => {
+    loop.wake();
     if (data.length > MAX_SERIALIZED_BYTES) throw new Error();
     const deserialized = deserialize(data);
     switch (deserialized.scope) {
@@ -93,51 +97,8 @@ swarm.on("connection", (connection, info) => {
         break;
       }
     }
+    loop.wake();
   });
-  let isConnectionAlive = true;
-  let cpuUsagePercentage = 0;
-  const requiredMessageHashes = new Set<Hash>();
-  const requiredFileHashes = new Set<Hash>();
-  async function loop() {
-    if (!isConnectionAlive) return;
-    const measureCpuUsage = startMeasureCpuUsage();
-    if (cpuUsagePercentage <= 30) {
-      if (receivedRootHash) {
-        const missingHashes = messagesFactory.missing(receivedRootHash);
-        const requireableHashes = filter(missingHashes, async (hash) => !requiredMessageHashes.has(hash));
-        const limitedRequireableHashes = takeWhile(requireableHashes, async () => requiredMessageHashes.size <= 10);
-        for await (const hash of limitedRequireableHashes) {
-          send({ scope: "messages", type: "require", hash });
-          requiredMessageHashes.add(hash);
-        }
-      }
-    }
-    if (cpuUsagePercentage <= 15) {
-      for (const fileHash of fileHashes) {
-        const temptFilePath = path.join(filesFolderPath, fileHash + ".materializing");
-        const filePath = path.join(filesFolderPath, fileHash);
-        if (!(await checkFileExists(temptFilePath)) && !(await checkFileExists(filePath))) {
-          // try download files
-          const missingHashes = filesFactory.missing(fileHash);
-          const requireableHashes = filter(missingHashes, async (hash) => !requiredFileHashes.has(hash));
-          const limitedRequireableHashes = takeWhile(requireableHashes, async () => requiredFileHashes.size <= 10);
-          for await (const hash of limitedRequireableHashes) {
-            send({ scope: "files", type: "require", hash });
-            requiredFileHashes.add(hash);
-          }
-          // try materialize files
-          if (await isEmpty(filesFactory.missing(fileHash))) {
-            await fs.promises.writeFile(temptFilePath, filesFactory.from(fileHash));
-            await fs.promises.rename(temptFilePath, filePath);
-          }
-        }
-      }
-    }
-    cpuUsagePercentage = Math.trunc(measureCpuUsage() * 100);
-    // console.log(`${cpuUsagePercentage}%`);
-    if (isConnectionAlive) setTimeout(loop, 100);
-  }
-  loop();
   const unsubscribe = store.subscribe(async (state) => {
     const messages = Object.values(state.messageMap);
     const hash = await messagesFactory.to(messages);
@@ -147,12 +108,48 @@ swarm.on("connection", (connection, info) => {
     }
     fileHashes = messages.flatMap((message) => message.attachments.map((attachment) => attachment.contentHash));
   });
+  const loop = new Loop(async (cpuUsagePercentage) => {
+    if (!isConnectionAlive) return;
+    if (receivedRootHash) {
+      const missingHashes = messagesFactory.missing(receivedRootHash);
+      const requireableHashes = filter(missingHashes, async (hash) => !requiredMessageHashes.has(hash));
+      const limitedRequireableHashes = takeWhile(requireableHashes, async () => requiredMessageHashes.size <= 10);
+      for await (const hash of limitedRequireableHashes) {
+        send({ scope: "messages", type: "require", hash });
+        requiredMessageHashes.add(hash);
+      }
+    }
+    for (const fileHash of fileHashes) {
+      const temptFilePath = path.join(filesFolderPath, fileHash + ".materializing");
+      const filePath = path.join(filesFolderPath, fileHash);
+      if (!(await checkFileExists(temptFilePath)) && !(await checkFileExists(filePath))) {
+        // try download files
+        const missingHashes = filesFactory.missing(fileHash);
+        const requireableHashes = filter(missingHashes, async (hash) => !requiredFileHashes.has(hash));
+        const limitedRequireableHashes = takeWhile(requireableHashes, async () => requiredFileHashes.size <= 10);
+        for await (const hash of limitedRequireableHashes) {
+          send({ scope: "files", type: "require", hash });
+          requiredFileHashes.add(hash);
+        }
+        // try materialize files
+        if (await isEmpty(filesFactory.missing(fileHash))) {
+          await fs.promises.writeFile(temptFilePath, filesFactory.from(fileHash));
+          await fs.promises.rename(temptFilePath, filePath);
+        }
+      }
+    }
+  });
+  const wakeIntervalId = setInterval(() => {
+    loop.wake();
+  }, 100);
   connection.on("close", () => {
     isConnectionAlive = false;
+    clearInterval(wakeIntervalId);
     unsubscribe();
   });
   connection.on("error", () => {
     isConnectionAlive = false;
+    clearInterval(wakeIntervalId);
     unsubscribe();
   });
 });
@@ -234,18 +231,25 @@ const isValidProtocolMessage = isAlternative([
   }),
 ]);
 
-const cores = cpus().length;
-function startMeasureCpuUsage() {
-  const startTimeNanoSeconds = process.hrtime.bigint();
-  const startCpuUsage = process.cpuUsage();
-  function endMeasureCpuUsage() {
-    const endTimeNanoSeconds = process.hrtime.bigint();
-    const deltaTimeNanoSeconds = endTimeNanoSeconds - startTimeNanoSeconds;
-    const deltaTimeMicroSeconds = Number(deltaTimeNanoSeconds / BigInt(1000));
-    const deltaCpuUsage = process.cpuUsage(startCpuUsage);
-    const deltaCpuTimeMicroSeconds = deltaCpuUsage.user + deltaCpuUsage.system;
-    const percentage = deltaCpuTimeMicroSeconds / deltaTimeMicroSeconds / cores;
-    return percentage;
+class Loop {
+  constructor(private loop: (cpuUsagePercentage: number) => Promise<void>) {}
+  private isExecuting = false;
+  private scheduleNext = false;
+  private cpuUsagePercentage = 0;
+  wake() {
+    if (this.isExecuting) {
+      this.scheduleNext = true;
+    } else {
+      this.isExecuting = true;
+      const measureCpuUsage = startMeasureCpuUsage();
+      this.loop(this.cpuUsagePercentage).then(() => {
+        this.cpuUsagePercentage = Math.trunc(measureCpuUsage() * 100);
+        this.isExecuting = false;
+        if (this.scheduleNext) {
+          this.scheduleNext = false;
+          this.wake();
+        }
+      });
+    }
   }
-  return endMeasureCpuUsage;
 }
