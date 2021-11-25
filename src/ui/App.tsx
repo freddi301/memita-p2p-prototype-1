@@ -16,6 +16,7 @@ import { NavigationContext, useNavigationStack } from "./NavigationStack";
 import { SelectAccountScreen } from "./screens/SelectAccountScreen";
 import { LeftPanelConversationList } from "./components/LeftPanelConversationList";
 import { ConversationDetailScreen } from "./screens/ConversationDetailScreen";
+import { SelectContactScreen } from "./screens/SelectContactScreen";
 
 export function App() {
   const styleProviderValue = useStyleProvider();
@@ -78,6 +79,16 @@ export function App() {
             onSelect={(publicKey: string) => {
               setCurrentAccount(publicKey);
               navigationStack.pop();
+            }}
+          />
+        );
+      }
+      case "select-contact": {
+        return (
+          <SelectContactScreen
+            onSelect={(publicKey: string) => {
+              navigationStack.pop();
+              navigationStack.push({ screen: "conversation", otherPublicKey: publicKey });
             }}
           />
         );

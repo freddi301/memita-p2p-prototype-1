@@ -7,7 +7,7 @@ type TextProps = {
   weight: "normal" | "bold";
   size: "small" | "normal" | "big";
   text: string;
-  textAlign?: "left" | "right";
+  textAlign?: "left" | "right" | "center";
   truncatedLine?: boolean;
 };
 

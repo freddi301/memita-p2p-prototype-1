@@ -28,6 +28,7 @@ export type Routing =
       screen: "conversation-list";
     }
   | { screen: "select-account" }
+  | { screen: "select-contact" }
   | {
       screen: "conversation-detail";
       otherPublicKey: string;

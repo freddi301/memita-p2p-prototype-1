@@ -12,7 +12,7 @@ export function EmptyListPlaceholder({ children }: EmptyListPlaceholderProps) {
         padding: ${theme.spacing.text.vertical} ${theme.spacing.text.horizontal};
       `}
     >
-      <Text color="secondary" size="normal" weight="normal" text={children} />
+      <Text color="secondary" size="normal" weight="normal" text={children} textAlign="center" />
     </div>
   );
 }

@@ -23,7 +23,7 @@ export function ConversationListScreen({ myPublicKey }: ConversationListScreenPr
     navigationStack.push({ screen: "conversation", otherPublicKey });
   };
   const onCreate = () => {
-    navigationStack.push({ screen: "contact-list" });
+    navigationStack.push({ screen: "select-contact" });
   };
   const selectAccount = () => {
     navigationStack.push({ screen: "select-account" });
