@@ -242,10 +242,11 @@ function FileHashView({ name, hash }: FileHashViewProps) {
         flex-direction: column;
         justify-content: end;
         border: 1px solid ${theme.colors.background.active};
+        box-sizing: border-box;
       `}
     >
       <div>
-        {src && <FileView name={name} src={src} width={350} height={200} />}
+        {src && <FileView name={name} src={src} width={300} height={200} />}
         <div
           css={css`
             padding: ${theme.spacing.text.vertical};

@@ -2,18 +2,22 @@ import React from "react";
 import { rootRouting, Routing } from "./Routing";
 
 export function useNavigationStack() {
-  const [stack, setStack] = React.useState<Array<Routing>>([]);
-  const [lastAction, setLastAction] = React.useState<"push" | "pop">("push");
-  const current = stack[stack.length - 1] ?? rootRouting;
+  const [state, setState] = React.useState<{ stack: Array<Routing>; lastAction: "push" | "pop" }>({
+    stack: [rootRouting],
+    lastAction: "push",
+  });
+  const current = state.stack[state.stack.length - 1] as Routing;
   const push = React.useCallback((next: Routing) => {
-    setStack((stack) => [...stack, next]);
-    setLastAction("push");
+    setState((state) => ({
+      stack: [...state.stack, next],
+      lastAction: "push",
+    }));
   }, []);
   const pop = React.useCallback(() => {
-    setStack((stack) => {
-      return stack.slice(0, -1);
-    });
-    setLastAction("pop");
+    setState((state) => ({
+      stack: state.stack.length > 1 ? state.stack.slice(0, -1) : state.stack,
+      lastAction: "pop",
+    }));
   }, []);
   React.useLayoutEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
@@ -26,7 +30,7 @@ export function useNavigationStack() {
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [pop]);
-  return { push, pop, current, lastAction };
+  return { push, pop, current, lastAction: state.lastAction };
 }
 
 export type NavigationStackContextValue = {

@@ -17,100 +17,20 @@ import { SelectAccountScreen } from "./screens/SelectAccountScreen";
 import { LeftPanelConversationList } from "./components/LeftPanelConversationList";
 import { ConversationDetailScreen } from "./screens/ConversationDetailScreen";
 import { SelectContactScreen } from "./screens/SelectContactScreen";
+import { Transitionate } from "./components/Transitionate";
+import { Routing } from "./Routing";
 
 export function App() {
   const styleProviderValue = useStyleProvider();
   const navigationStack = useNavigationStack();
+  const routing = navigationStack.current;
+  const theme = styleProviderValue.theme;
   const preferences = FrontendFacade.usePreferences();
   const currentAccountPublicKey = FrontendFacade.useAccountByPublicKey(preferences?.currentAccountPublicKey ?? "")
     ? preferences?.currentAccountPublicKey
     : null;
-  const setCurrentAccount = React.useCallback(
-    (accountPublickKey: string) => {
-      FrontendFacade.doUpdatePreferences({ ...preferences, currentAccountPublicKey: accountPublickKey });
-    },
-    [preferences]
-  );
-  const screen = React.useMemo(() => {
-    switch (navigationStack.current.screen) {
-      case "home": {
-        return <HomeScreen />;
-      }
-      case "account-list": {
-        return <AccountListScreen />;
-      }
-      case "create-account": {
-        return <CreateAccountScreen />;
-      }
-      case "account": {
-        return <AccountScreen publicKey={navigationStack.current.publicKey} onUse={setCurrentAccount} />;
-      }
-      case "contact-list": {
-        return <ContactListScreen />;
-      }
-      case "create-contact": {
-        return <CreateContactScreen />;
-      }
-      case "contact": {
-        return <ContactScreen publicKey={navigationStack.current.publicKey} />;
-      }
-      case "conversation": {
-        if (currentAccountPublicKey) {
-          return (
-            <ConversationScreen
-              myPublicKey={currentAccountPublicKey}
-              otherPublicKey={navigationStack.current.otherPublicKey}
-            />
-          );
-        } else {
-          return <SelectAccountScreen onSelect={setCurrentAccount} />;
-        }
-      }
-      case "conversation-list": {
-        if (currentAccountPublicKey) {
-          return <ConversationListScreen myPublicKey={currentAccountPublicKey} />;
-        } else {
-          return <SelectAccountScreen onSelect={setCurrentAccount} />;
-        }
-      }
-      case "select-account": {
-        return (
-          <SelectAccountScreen
-            onSelect={(publicKey: string) => {
-              setCurrentAccount(publicKey);
-              navigationStack.pop();
-            }}
-          />
-        );
-      }
-      case "select-contact": {
-        return (
-          <SelectContactScreen
-            onSelect={(publicKey: string) => {
-              navigationStack.pop();
-              navigationStack.push({ screen: "conversation", otherPublicKey: publicKey });
-            }}
-          />
-        );
-      }
-      case "conversation-detail": {
-        if (currentAccountPublicKey) {
-          return (
-            <ConversationDetailScreen
-              myPublicKey={currentAccountPublicKey}
-              otherPublicKey={navigationStack.current.otherPublicKey}
-            />
-          );
-        } else {
-          return <SelectAccountScreen onSelect={setCurrentAccount} />;
-        }
-      }
-    }
-  }, [navigationStack, currentAccountPublicKey, setCurrentAccount]);
   const showLeftPanel =
-    styleProviderValue.showLeftPanel &&
-    ["home", "conversation"].includes(navigationStack.current.screen) &&
-    currentAccountPublicKey;
+    styleProviderValue.showLeftPanel && routing.screen !== "conversation-list" && currentAccountPublicKey;
   return (
     <StyleContext.Provider value={styleProviderValue}>
       <NavigationContext.Provider value={navigationStack}>
@@ -128,7 +48,7 @@ export function App() {
                 css={css`
                   grid-column: 1;
                   grid-row: 1;
-                  border-right: 1px solid ${styleProviderValue.theme.colors.background.active};
+                  border-right: 1px solid ${theme.colors.background.active};
                   width: 350px;
                 `}
               >
@@ -141,7 +61,14 @@ export function App() {
                 grid-row: 1;
               `}
             >
-              {screen}
+              <Transitionate enterFrom={({ push: "right", pop: "left" } as const)[navigationStack.lastAction]}>
+                {React.useMemo(
+                  () => (
+                    <Screen routing={routing} />
+                  ),
+                  [routing]
+                )}
+              </Transitionate>
             </div>
           </div>
         </WholeScreen>
@@ -154,3 +81,84 @@ export type Preferences = {
   currentAccountPublicKey?: string;
   conversationScrollPosition?: Record<string, number>;
 };
+
+type ScreenProps = { routing: Routing };
+function Screen({ routing }: ScreenProps) {
+  const navigationStack = React.useContext(NavigationContext);
+  const preferences = FrontendFacade.usePreferences();
+  const currentAccountPublicKey = FrontendFacade.useAccountByPublicKey(preferences?.currentAccountPublicKey ?? "")
+    ? preferences?.currentAccountPublicKey
+    : null;
+  const setCurrentAccount = React.useCallback(
+    (accountPublickKey: string) => {
+      FrontendFacade.doUpdatePreferences({ ...preferences, currentAccountPublicKey: accountPublickKey });
+    },
+    [preferences]
+  );
+  switch (routing.screen) {
+    case "home": {
+      return <HomeScreen />;
+    }
+    case "account-list": {
+      return <AccountListScreen />;
+    }
+    case "create-account": {
+      return <CreateAccountScreen />;
+    }
+    case "account": {
+      return <AccountScreen publicKey={routing.publicKey} onUse={setCurrentAccount} />;
+    }
+    case "contact-list": {
+      return <ContactListScreen />;
+    }
+    case "create-contact": {
+      return <CreateContactScreen />;
+    }
+    case "contact": {
+      return <ContactScreen publicKey={routing.publicKey} />;
+    }
+    case "conversation": {
+      if (currentAccountPublicKey) {
+        return <ConversationScreen myPublicKey={currentAccountPublicKey} otherPublicKey={routing.otherPublicKey} />;
+      } else {
+        return <SelectAccountScreen onSelect={setCurrentAccount} />;
+      }
+    }
+    case "conversation-list": {
+      if (currentAccountPublicKey) {
+        return <ConversationListScreen myPublicKey={currentAccountPublicKey} />;
+      } else {
+        return <SelectAccountScreen onSelect={setCurrentAccount} />;
+      }
+    }
+    case "select-account": {
+      return (
+        <SelectAccountScreen
+          onSelect={(publicKey: string) => {
+            setCurrentAccount(publicKey);
+            navigationStack.pop();
+          }}
+        />
+      );
+    }
+    case "select-contact": {
+      return (
+        <SelectContactScreen
+          onSelect={(publicKey: string) => {
+            navigationStack.pop();
+            navigationStack.push({ screen: "conversation", otherPublicKey: publicKey });
+          }}
+        />
+      );
+    }
+    case "conversation-detail": {
+      if (currentAccountPublicKey) {
+        return (
+          <ConversationDetailScreen myPublicKey={currentAccountPublicKey} otherPublicKey={routing.otherPublicKey} />
+        );
+      } else {
+        return <SelectAccountScreen onSelect={setCurrentAccount} />;
+      }
+    }
+  }
+}
