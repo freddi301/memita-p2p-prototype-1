@@ -66,6 +66,9 @@ export function CreateContactScreen(props: CreateContactScreenProps) {
                   }
                 }
               }}
+              onError={() => {
+                setShowQrReader(false);
+              }}
             />
           )}
         </div>

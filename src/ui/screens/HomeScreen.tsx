@@ -7,13 +7,16 @@ import { NavigationContext } from "../NavigationStack";
 import { FrontendFacade } from "../FrontendFacade";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
+import { PostItem } from "../components/PostItem";
+import { EmptyListPlaceholder } from "../components/EmptyListPlaceholder";
+import { Virtuoso } from "react-virtuoso";
 
-type HomeScreenProps = {};
-export function HomeScreen(props: HomeScreenProps) {
-  const { theme } = React.useContext(StyleContext);
+type HomeScreenProps = { myAccountPublicKey: string | null };
+export function HomeScreen({ myAccountPublicKey }: HomeScreenProps) {
   const navigationStack = React.useContext(NavigationContext);
   const accountCount = FrontendFacade.useAccountListSize();
   const contactsCount = FrontendFacade.useContactListSize();
+  const postCount = FrontendFacade.usePostFeedSize(myAccountPublicKey ?? "") ?? 0;
   const onContacts = () => {
     navigationStack.push({ screen: "contact-list" });
   };
@@ -29,14 +32,38 @@ export function HomeScreen(props: HomeScreenProps) {
       content={
         <div
           css={css`
-            display: grid;
-            grid-auto-flow: row;
-            grid-auto-rows: auto;
-            grid-row-gap: ${theme.spacing.gap};
+            height: 100%;
+            display: flex;
+            justify-content: center;
           `}
         >
-          {accountCount === 0 && <CreateAccountHint />}
-          {contactsCount === 0 && <AddContactHint />}
+          <div
+            css={css`
+              width: 600px;
+              display: flex;
+              flex-direction: column;
+            `}
+          >
+            {accountCount === 0 && <CreateAccountHint />}
+            {contactsCount === 0 && <AddContactHint />}
+            {postCount === 0 && (
+              <div
+                css={css`
+                  flex-grow: 1;
+                `}
+              >
+                <EmptyListPlaceholder>No posts</EmptyListPlaceholder>
+              </div>
+            )}
+            {postCount !== 0 && myAccountPublicKey && (
+              <Virtuoso
+                style={{ flexGrow: 1, overflow: "overlay overlay" }}
+                totalCount={postCount}
+                increaseViewportBy={5000}
+                itemContent={(index) => <FeedItem index={index} myAccountPublicKey={myAccountPublicKey} />}
+              />
+            )}
+          </div>
         </div>
       }
       controls={
@@ -119,4 +146,21 @@ function AddContactHint() {
       </div>
     </div>
   );
+}
+
+type FeedItemProps = {
+  index: number;
+  myAccountPublicKey: string;
+};
+function FeedItem({ index, myAccountPublicKey }: FeedItemProps) {
+  const postHash = FrontendFacade.usePostFeedAtIndex(myAccountPublicKey, index);
+  if (!postHash)
+    return (
+      <div
+        css={css`
+          height: 50px;
+        `}
+      ></div>
+    );
+  return <PostItem hash={postHash} />;
 }

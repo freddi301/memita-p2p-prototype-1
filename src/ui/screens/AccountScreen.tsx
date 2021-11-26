@@ -38,6 +38,9 @@ export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
     FrontendFacade.doDeleteAccount(publicKey);
     navigationStack.pop();
   };
+  const onPosts = () => {
+    navigationStack.push({ screen: "wall", authorPublicKey: publicKey });
+  };
   return (
     <HeaderContentControlsLayout
       header={
@@ -74,6 +77,7 @@ export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
           <Button label="Delete" icon="Delete" onClick={onDelete} enabled={isLoaded} showLabel={false} />
           <Button label="Export" icon="Export" onClick={() => {}} enabled={false} showLabel={true} />
           <Button label="Save" icon="Save" onClick={onSave} enabled={true} showLabel={false} />
+          <Button label="Posts" icon="Posts" onClick={onPosts} enabled={true} showLabel={true} />
         </ButtonGroup>
       }
     />

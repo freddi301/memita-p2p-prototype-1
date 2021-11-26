@@ -40,6 +40,9 @@ export function ContactScreen({ publicKey }: ContactScreenProps) {
   const onConversation = () => {
     navigationStack.push({ screen: "conversation", otherPublicKey: publicKey });
   };
+  const onPosts = () => {
+    navigationStack.push({ screen: "wall", authorPublicKey: publicKey });
+  };
   return (
     <HeaderContentControlsLayout
       header={
@@ -75,7 +78,8 @@ export function ContactScreen({ publicKey }: ContactScreenProps) {
         <ButtonGroup>
           <Button label="Delete" icon="Delete" onClick={onDelete} enabled={isLoaded} showLabel={false} />
           <Button label="Save" icon="Save" onClick={onSave} enabled={isLoaded} showLabel={false} />
-          <Button label="Conversation" icon="Conversation" onClick={onConversation} enabled={true} showLabel={true} />
+          <Button label="Posts" icon="Posts" onClick={onPosts} enabled={true} showLabel={true} />
+          <Button label="Conversation" icon="Conversation" onClick={onConversation} enabled={true} showLabel={false} />
         </ButtonGroup>
       }
     />

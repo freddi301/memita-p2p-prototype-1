@@ -19,6 +19,7 @@ import { ConversationDetailScreen } from "./screens/ConversationDetailScreen";
 import { SelectContactScreen } from "./screens/SelectContactScreen";
 import { Transitionate } from "./components/Transitionate";
 import { Routing } from "./Routing";
+import { WallScreen } from "./screens/WallScreen";
 
 export function App() {
   const styleProviderValue = useStyleProvider();
@@ -97,7 +98,7 @@ function Screen({ routing }: ScreenProps) {
   );
   switch (routing.screen) {
     case "home": {
-      return <HomeScreen />;
+      return <HomeScreen myAccountPublicKey={currentAccountPublicKey ?? null} />;
     }
     case "account-list": {
       return <AccountListScreen />;
@@ -159,6 +160,9 @@ function Screen({ routing }: ScreenProps) {
       } else {
         return <SelectAccountScreen onSelect={setCurrentAccount} />;
       }
+    }
+    case "wall": {
+      return <WallScreen authorPublicKey={routing.authorPublicKey} />;
     }
   }
 }

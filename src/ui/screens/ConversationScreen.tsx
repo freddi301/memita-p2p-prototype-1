@@ -6,12 +6,12 @@ import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { Clickable } from "../components/Clickable";
 import { css } from "styled-components/macro";
 import { StyleContext } from "../StyleProvider";
-import { FrontendFacade } from "../FrontendFacade";
+import { FrontendFacade, useSrcFromHash } from "../FrontendFacade";
 import "emoji-mart/css/emoji-mart.css";
 import { MessageEditor } from "../components/MessageEditor";
 import { NavigationContext } from "../NavigationStack";
+import { EmptyListPlaceholder } from "../components/EmptyListPlaceholder";
 import { FileView } from "../components/FileView";
-import { fileSrc } from "../../other/fileSrc/fileSrc";
 
 type ConversationScreenProps = {
   myPublicKey: string;
@@ -33,7 +33,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
   };
   const [scrollPosition, setScrollPosition] = useConversationScrollPosition(myPublicKey, otherPublicKey);
   const onConversationDetail = () => {
-    navigationStack.push({ screen: "conversation-detail", otherPublicKey });
+    navigationStack.push({ screen: "wall", authorPublicKey: otherPublicKey });
   };
   return (
     <HeaderContentControlsLayout
@@ -62,7 +62,16 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
             flex-direction: column;
           `}
         >
-          {scrollPosition !== null && (
+          {conversationCount === 0 && (
+            <div
+              css={css`
+                flex-grow: 1;
+              `}
+            >
+              <EmptyListPlaceholder>No messages</EmptyListPlaceholder>
+            </div>
+          )}
+          {scrollPosition !== null && conversationCount !== 0 && (
             <Virtuoso
               ref={virtuosoRef}
               style={{ flexGrow: 1 }}
@@ -83,6 +92,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
               rangeChanged={(range) => {
                 setScrollPosition(range.startIndex);
               }}
+              increaseViewportBy={5000}
             />
           )}
           <div
@@ -110,7 +120,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
               />
             </div>
           </div>
-          <MessageEditor onSend={onSend} />
+          <MessageEditor onSend={onSend} submitOnEnter={true} />
         </div>
       }
       controls={null}
@@ -221,18 +231,9 @@ type FileHashViewProps = {
   name: string;
   hash: string;
 };
-function FileHashView({ name, hash }: FileHashViewProps) {
+export function FileHashView({ name, hash }: FileHashViewProps) {
   const { theme } = React.useContext(StyleContext);
-  const [src, setSrc] = React.useState<string | null>(null);
-  React.useEffect(() => {
-    let isActive = true;
-    fileSrc(hash).then((src) => {
-      if (isActive) setSrc(src);
-    });
-    return () => {
-      isActive = false;
-    };
-  }, [hash]);
+  const src = useSrcFromHash(hash);
   return (
     <div
       css={css`

@@ -10,8 +10,9 @@ import { fileHash } from "../../other/fileHash/fileHash";
 
 type MessageEditorProps = {
   onSend: (text: string, attachments: Array<{ name: string; contentHash: string }>) => void;
+  submitOnEnter: boolean;
 };
-export function MessageEditor({ onSend }: MessageEditorProps) {
+export function MessageEditor({ onSend, submitOnEnter }: MessageEditorProps) {
   const { theme } = React.useContext(StyleContext);
   const [text, setText] = React.useState("");
   const [attachments, setAttachments] = React.useState<
@@ -218,10 +219,12 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
               margin-bottom: ${theme.spacing.text.vertical};
             `}
             onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                send();
-                event.currentTarget.focus();
+              if (submitOnEnter) {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  send();
+                  event.currentTarget.focus();
+                }
               }
             }}
           />

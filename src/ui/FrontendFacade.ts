@@ -1,11 +1,12 @@
 import React from "react";
 import { frontendStore } from "..";
 import { Commands, Queries } from "../other/domain";
+import { fileSrc } from "../other/fileSrc/fileSrc";
 
-// frontend machinery
 type CommandFacade = {
   [Key in keyof Commands as `do${Key}`]: (...args: Parameters<Commands[Key]>) => Promise<ReturnType<Commands[Key]>>;
 };
+
 type QueryFacade = {
   [Key in keyof Queries as `use${Key}`]: (...args: Parameters<Queries[Key]>) => ReturnType<Queries[Key]> | null;
 };
@@ -26,12 +27,14 @@ export const FrontendFacade: CommandFacade & QueryFacade = new Proxy(
     },
   }
 ) as any;
+
 const dispatchSingletonsByKey = makeSingletonByKey(
   <Key extends keyof Commands>(name: Key) =>
     (...args: Parameters<Commands[Key]>) => {
       (frontendStore.command[name] as any)(...args);
     }
 );
+
 const subscribeSingletonByKey = makeSingletonByKey(
   <Key extends keyof Queries>(key: Key) =>
     (...args: Parameters<Queries[Key]>): ReturnType<Queries[Key]> | null => {
@@ -43,6 +46,7 @@ const subscribeSingletonByKey = makeSingletonByKey(
       return state;
     }
 );
+
 function makeSingletonByKey<Key, Value>(factory: (key: Key) => Value) {
   const cache = new Map<Key, Value>();
   return (key: Key) => {
@@ -52,4 +56,18 @@ function makeSingletonByKey<Key, Value>(factory: (key: Key) => Value) {
     cache.set(key, created);
     return created;
   };
+}
+
+export function useSrcFromHash(hash: string) {
+  const [src, setSrc] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    let isActive = true;
+    fileSrc(hash).then((src) => {
+      if (isActive) setSrc(src);
+    });
+    return () => {
+      isActive = false;
+    };
+  }, [hash]);
+  return src;
 }

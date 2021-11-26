@@ -16,6 +16,12 @@ export type Commands = {
     text: string,
     attachments: Array<{ name: string; contentHash: string }>
   ): void;
+  Post(
+    authorPublicKey: string,
+    createdAtEpoch: number,
+    text: string,
+    attachments: Array<{ name: string; contentHash: string }>
+  ): void;
   UpdatePreferences(preferences: Preferences): void;
 };
 export type Queries = {
@@ -52,6 +58,16 @@ export type Queries = {
     };
   } | null;
   Preferences(): Preferences;
+  PostByHash(postHash: string): {
+    authorPublicKey: string;
+    createdAtEpoch: number;
+    text: string;
+    attachments: Array<{ name: string; contentHash: string }>;
+  } | null;
+  PostListSize(authorPublicKey: string): number;
+  PostListAtIndex(authorPublicKey: string, index: number): string | null;
+  PostFeedSize(myPublicKey: string): number;
+  PostFeedAtIndex(myPublicKey: string, index: number): string | null;
 };
 
 export const store = makeStore(
@@ -120,9 +136,35 @@ export const store = makeStore(
         },
       };
     },
+    postMap(
+      postMap: Record<
+        string,
+        {
+          authorPublicKey: string;
+          text: string;
+          createdAtEpoch: number;
+          attachments: Array<{ name: string; contentHash: string }>;
+        }
+      >
+    ) {
+      return {
+        Post(authorPublicKey, createdAtEpoch, text, attachments) {
+          const postHash = calculatePostHash({
+            authorPublicKey,
+            createdAtEpoch,
+            text,
+            attachments,
+          });
+          return {
+            ...postMap,
+            [postHash]: { authorPublicKey, text, createdAtEpoch, attachments },
+          };
+        },
+      };
+    },
   },
-  { contactMap: {}, accountMap: {}, messageMap: {}, preferences: {} },
-  ({ contactMap, accountMap, messageMap, preferences }) => {
+  { contactMap: {}, accountMap: {}, messageMap: {}, preferences: {}, postMap: {} },
+  ({ contactMap, accountMap, messageMap, preferences, postMap }) => {
     const contactList = Object.entries(contactMap)
       .map(([publicKey, { name, notes }]) => ({ publicKey, name, notes }))
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -171,6 +213,18 @@ export const store = makeStore(
         lastMessage,
       }));
     };
+    function getPostList(authorPublicKey: string) {
+      return Object.entries(postMap)
+        .filter(([hash, post]) => post.authorPublicKey === authorPublicKey)
+        .sort(([, a], [, b]) => b.createdAtEpoch - a.createdAtEpoch)
+        .map(([hash]) => hash);
+    }
+    function getPostFeed(myPublicKey: string) {
+      return Object.entries(postMap)
+        .filter(([hash, post]) => true /* TODO filter only from contacts of this account */)
+        .sort(([, a], [, b]) => b.createdAtEpoch - a.createdAtEpoch)
+        .map(([hash]) => hash);
+    }
     return {
       ContactListSize() {
         return contactList.length;
@@ -211,11 +265,26 @@ export const store = makeStore(
       ConversationsListAtIndex(myPublicKey, index) {
         return getConversations(myPublicKey)[index] ?? null;
       },
+      PostByHash(hash) {
+        return postMap[hash] ?? null;
+      },
+      PostListSize(authorPublicKey) {
+        return getPostList(authorPublicKey).length;
+      },
+      PostListAtIndex(authorPublicKey, index) {
+        return getPostList(authorPublicKey)[index] ?? null;
+      },
+      PostFeedSize(myPublicKey) {
+        return getPostFeed(myPublicKey).length;
+      },
+      PostFeedAtIndex(myPublicKey, index) {
+        return getPostFeed(myPublicKey)[index] ?? null;
+      },
     };
   }
 );
 
-export function calculateMessageHash({
+function calculateMessageHash({
   senderPublicKey,
   recipientPublicKey,
   text,
@@ -231,6 +300,28 @@ export function calculateMessageHash({
   const state = libsodium.crypto_generichash_init("message", libsodium.crypto_generichash_KEYBYTES);
   libsodium.crypto_generichash_update(state, senderPublicKey);
   libsodium.crypto_generichash_update(state, recipientPublicKey);
+  libsodium.crypto_generichash_update(state, createdAtEpoch.toString());
+  libsodium.crypto_generichash_update(state, text);
+  for (const attachment of attachments) {
+    libsodium.crypto_generichash_update(state, attachment.name);
+    libsodium.crypto_generichash_update(state, attachment.contentHash);
+  }
+  return libsodium.crypto_generichash_final(state, libsodium.crypto_generichash_KEYBYTES, "hex");
+}
+
+export function calculatePostHash({
+  authorPublicKey,
+  text,
+  createdAtEpoch,
+  attachments,
+}: {
+  authorPublicKey: string;
+  text: string;
+  createdAtEpoch: number;
+  attachments: Array<{ name: string; contentHash: string }>;
+}) {
+  const state = libsodium.crypto_generichash_init("post", libsodium.crypto_generichash_KEYBYTES);
+  libsodium.crypto_generichash_update(state, authorPublicKey);
   libsodium.crypto_generichash_update(state, createdAtEpoch.toString());
   libsodium.crypto_generichash_update(state, text);
   for (const attachment of attachments) {

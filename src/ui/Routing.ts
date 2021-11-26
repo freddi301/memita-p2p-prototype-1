@@ -32,6 +32,10 @@ export type Routing =
   | {
       screen: "conversation-detail";
       otherPublicKey: string;
+    }
+  | {
+      screen: "wall";
+      authorPublicKey: string;
     };
 
 export const rootRouting: Routing = { screen: "home" };
