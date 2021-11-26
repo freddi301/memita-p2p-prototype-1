@@ -30,7 +30,13 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
       )
     );
   };
-  const textRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const textRef = React.useRef<HTMLTextAreaElement>(null);
+  React.useLayoutEffect(() => {
+    if (textRef.current) {
+      textRef.current.style.height = "";
+      textRef.current.style.height = textRef.current.scrollHeight + "px";
+    }
+  }, [text]);
   const [showEmojis, setShowEmojis] = React.useState(false);
   const canSend = text.trim() !== "" || attachments.length > 0;
   return (
@@ -195,9 +201,9 @@ export function MessageEditor({ onSend }: MessageEditorProps) {
             ref={textRef}
             value={text}
             onChange={(event) => setText(event.currentTarget.value)}
-            rows={text.split("\n").length}
             autoComplete="off"
             spellCheck={false}
+            rows={1}
             css={css`
               flex-grow: 1;
               color: ${theme.colors.text.primary};

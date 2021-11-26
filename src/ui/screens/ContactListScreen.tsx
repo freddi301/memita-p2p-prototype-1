@@ -73,7 +73,7 @@ function ContactItem({ index, onContact }: ContactItemProps) {
         `}
       >
         <Text color="primary" size="normal" weight="bold" text={contact?.name ?? "..."} />
-        <Text color="secondary" size="normal" weight="normal" text={contact?.publicKey ?? "..."} />
+        <Text color="secondary" size="normal" weight="normal" text={contact?.publicKey ?? "..."} truncatedLine={true} />
       </div>
     </Clickable>
   );

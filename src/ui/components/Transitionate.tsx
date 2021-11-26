@@ -10,7 +10,7 @@ export function Transitionate({ children, enterFrom }: TransitionateProps) {
   const duration = 0.3;
   const [queue, setQueue] = React.useState<Array<{ element: HTMLDivElement; portal: React.ReactPortal }>>([]);
   const lastItemRef = React.useRef<HTMLDivElement | null>(null);
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
   React.useLayoutEffect(() => {
     const key = Math.random().toString();
     const entering = document.createElement("div");

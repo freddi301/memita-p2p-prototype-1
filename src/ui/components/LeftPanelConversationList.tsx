@@ -47,7 +47,7 @@ export function LeftPanelConversationList({ currentAccountPublicKey }: LeftPanel
             `}
           >
             <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
-            <Text color="secondary" size="normal" weight="normal" text={currentAccountPublicKey} />
+            <Text color="secondary" size="normal" weight="normal" text={currentAccountPublicKey} truncatedLine={true} />
           </div>
         </Clickable>
       </div>

@@ -10,6 +10,7 @@ import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
 import { SimpleHeader } from "../components/SimpleHeader";
+import { ContactQRcode } from "../components/ContactQRCode";
 
 type AccountScreenProps = {
   publicKey: string;
@@ -33,10 +34,6 @@ export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
   const onSave = React.useCallback(() => {
     FrontendFacade.doUpdateAccount(publicKey, name, notes);
   }, [name, notes, publicKey]);
-  const setCurrentAccount = () => {
-    onUse(publicKey);
-    navigationStack.pop();
-  };
   const onDelete = () => {
     FrontendFacade.doDeleteAccount(publicKey);
     navigationStack.pop();
@@ -59,17 +56,24 @@ export function AccountScreen({ publicKey, onUse }: AccountScreenProps) {
           `}
         >
           <Input label="Name" value={name} onChange={setName} />
-          <Input label="Public Key" value={publicKey} />
-          <Textarea label="Notes" value={notes} onChange={setNotes} rows={5} />
+          <div
+            css={css`
+              display: grid;
+              grid-template-columns: 1fr auto;
+              grid-column-gap: ${theme.spacing.gap};
+            `}
+          >
+            <Textarea label="Public Key" value={publicKey} />
+            <ContactQRcode text={publicKey} />
+          </div>
+          <Textarea label="Notes" value={notes} onChange={setNotes} />
         </div>
       }
       controls={
         <ButtonGroup>
           <Button label="Delete" icon="Delete" onClick={onDelete} enabled={isLoaded} showLabel={false} />
-          <Button label="Share" icon="Share" onClick={() => {}} enabled={false} showLabel={false} />
-          <Button label="Export" icon="Export" onClick={() => {}} enabled={false} showLabel={false} />
+          <Button label="Export" icon="Export" onClick={() => {}} enabled={false} showLabel={true} />
           <Button label="Save" icon="Save" onClick={onSave} enabled={true} showLabel={false} />
-          <Button label="Use" icon="UseAccount" onClick={setCurrentAccount} enabled={true} showLabel={true} />
         </ButtonGroup>
       }
     />

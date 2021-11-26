@@ -31,14 +31,43 @@ export class AccountPublicKey {
 }
 
 export class AccountSecretKey {
-  readonly publicKey: AccountPublicKey;
   private privateKey: Uint8Array;
+  private constructor(privateKey: Uint8Array) {
+    if (privateKey.length !== libsodium.crypto_box_SECRETKEYBYTES) throw new Error();
+    this.privateKey = privateKey;
+  }
+  toUint8Array() {
+    return this.privateKey;
+  }
+  static fromUint8Array(uint8Array: Uint8Array) {
+    return new AccountSecretKey(uint8Array);
+  }
+  toBase64(): string {
+    return libsodium.to_base64(this.privateKey);
+  }
+  static fromBase64(Base64: string) {
+    return new AccountSecretKey(libsodium.from_base64(Base64));
+  }
+  toHex(): string {
+    return libsodium.to_hex(this.privateKey);
+  }
+  static fromHex(hex: string) {
+    return new AccountSecretKey(libsodium.from_hex(hex));
+  }
+  equals(other: AccountSecretKey) {
+    return compareBuffers(this.privateKey.buffer, other.privateKey.buffer);
+  }
+}
+
+export class AccountKeyPair {
+  readonly publicKey: AccountPublicKey;
+  readonly privateKey: AccountSecretKey;
   private constructor(keyPair: libsodium.KeyPair) {
     this.publicKey = AccountPublicKey.fromUint8Array(keyPair.publicKey);
-    this.privateKey = keyPair.privateKey;
+    this.privateKey = AccountSecretKey.fromUint8Array(keyPair.privateKey);
   }
   static create() {
-    return new AccountSecretKey(libsodium.crypto_box_keypair());
+    return new AccountKeyPair(libsodium.crypto_box_keypair());
   }
 }
 

@@ -1,7 +1,7 @@
+- encrypt private keys with password
+- encrypt / decrypt messages
 - view pending messages with attachments
 - fix conversation scrolling with long messages
-- use libsodium to create accounts
-- encrypt / decrypt messages
 - refactor hyperswarm sincronisation
 - better persistance
 - search

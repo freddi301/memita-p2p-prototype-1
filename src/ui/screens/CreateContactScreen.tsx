@@ -10,6 +10,7 @@ import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
 import { SimpleHeader } from "../components/SimpleHeader";
+import { AccountPublicKey } from "../../other/AccountCryptography";
 
 type CreateContactScreenProps = {};
 
@@ -23,6 +24,7 @@ export function CreateContactScreen(props: CreateContactScreenProps) {
     FrontendFacade.doUpdateContact(publicKey, name, notes);
     navigationStack.pop();
   };
+  const canCreate = name.trim().length > 0 && !!tryElse(() => AccountPublicKey.fromHex(publicKey), false);
   return (
     <HeaderContentControlsLayout
       header={
@@ -40,16 +42,24 @@ export function CreateContactScreen(props: CreateContactScreenProps) {
             row-gap: ${theme.spacing.gap};
           `}
         >
-          <Input label="Name" value={name} onChange={setName} />
-          <Textarea label="Notes" value={notes} onChange={setNotes} rows={5} />
-          <Textarea label="Public Key" value={publicKey} onChange={setPublicKey} rows={5} />
+          <Input label="Name" value={name} onChange={setName} required />
+          <Textarea label="Notes" value={notes} onChange={setNotes} />
+          <Textarea label="Public Key" value={publicKey} onChange={setPublicKey} required />
         </div>
       }
       controls={
         <ButtonGroup>
-          <Button label="Create" icon="Save" onClick={onCreate} enabled={true} showLabel={false} />
+          <Button label="Create" icon="Save" onClick={onCreate} enabled={canCreate} showLabel={false} />
         </ButtonGroup>
       }
     />
   );
+}
+
+function tryElse<R, O>(fun: () => R, otherwise: O) {
+  try {
+    return fun();
+  } catch (error) {
+    return otherwise;
+  }
 }

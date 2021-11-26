@@ -44,7 +44,7 @@ export function ConversationListScreen({ myPublicKey }: ConversationListScreenPr
             `}
           >
             <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
-            <Text color="secondary" size="normal" weight="normal" text={myPublicKey} />
+            <Text color="secondary" size="normal" weight="normal" text={myPublicKey} truncatedLine={true} />
           </div>
         </Clickable>
       }

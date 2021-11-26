@@ -10,6 +10,7 @@ import { StyleContext } from "../StyleProvider";
 import { FrontendFacade } from "../FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
 import { SimpleHeader } from "../components/SimpleHeader";
+import { ContactQRcode } from "../components/ContactQRCode";
 
 type ContactScreenProps = {
   publicKey: string;
@@ -57,14 +58,22 @@ export function ContactScreen({ publicKey }: ContactScreenProps) {
           `}
         >
           <Input label="Name" value={name} onChange={setName} />
-          <Textarea label="Notes" value={notes} onChange={setNotes} rows={5} />
-          <Input label="Public Key" value={publicKey} />
+          <div
+            css={css`
+              display: grid;
+              grid-template-columns: 1fr auto;
+              grid-column-gap: ${theme.spacing.gap};
+            `}
+          >
+            <Textarea label="Public Key" value={publicKey} />
+            <ContactQRcode text={publicKey} />
+          </div>
+          <Textarea label="Notes" value={notes} onChange={setNotes} />
         </div>
       }
       controls={
         <ButtonGroup>
           <Button label="Delete" icon="Delete" onClick={onDelete} enabled={isLoaded} showLabel={false} />
-          <Button label="Share" icon="Share" onClick={() => {}} enabled={true} showLabel={false} />
           <Button label="Save" icon="Save" onClick={onSave} enabled={isLoaded} showLabel={false} />
           <Button label="Conversation" icon="Conversation" onClick={onConversation} enabled={true} showLabel={true} />
         </ButtonGroup>

@@ -27,7 +27,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
   const me = FrontendFacade.useAccountByPublicKey(myPublicKey);
   const other = FrontendFacade.useContactByPublicKey(otherPublicKey);
   const [isAtBottom, setIsAtBottom] = React.useState(false);
-  const virtuosoRef = React.useRef<VirtuosoHandle | null>(null);
+  const virtuosoRef = React.useRef<VirtuosoHandle>(null);
   const scrollToBottom = () => {
     virtuosoRef.current?.scrollToIndex({ index: conversationCount + 1, behavior: "smooth" });
   };
@@ -50,7 +50,7 @@ export function ConversationScreen({ myPublicKey, otherPublicKey }: Conversation
             `}
           >
             <Text color="primary" size="normal" weight="bold" text={other?.name ?? "..."} />
-            <Text color="secondary" size="normal" weight="normal" text={otherPublicKey} />
+            <Text color="secondary" size="normal" weight="normal" text={otherPublicKey} truncatedLine={true} />
           </div>
         </Clickable>
       }

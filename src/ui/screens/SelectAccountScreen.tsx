@@ -79,7 +79,7 @@ function AccountItem({ index, onAccount }: AccountItemProps) {
         `}
       >
         <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
-        <Text color="secondary" size="normal" weight="normal" text={account?.publicKey ?? "..."} />
+        <Text color="secondary" size="normal" weight="normal" text={account?.publicKey ?? "..."} truncatedLine={true} />
       </div>
     </Clickable>
   );

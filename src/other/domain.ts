@@ -1,6 +1,7 @@
 import { makeStore } from "./plumbing";
 import libsodium from "libsodium-wrappers";
 import { Preferences } from "../ui/App";
+import { AccountKeyPair } from "./AccountCryptography";
 
 export type Commands = {
   UpdateContact(publicKey: string, name: string, notes: string): void;
@@ -69,9 +70,8 @@ export const store = makeStore(
     accountMap(accountMap: Record<string, { privateKey: string; name: string; notes: string }>) {
       return {
         CreateAccount(name, notes) {
-          const publicKey = Math.random().toString(16);
-          const privateKey = Math.random().toString(16);
-          return { ...accountMap, [publicKey]: { name, notes, privateKey } };
+          const { publicKey, privateKey } = AccountKeyPair.create();
+          return { ...accountMap, [publicKey.toHex()]: { name, notes, privateKey: privateKey.toHex() } };
         },
         UpdateAccount(publicKey, name, notes) {
           const existing = accountMap[publicKey];

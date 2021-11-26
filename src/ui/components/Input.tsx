@@ -7,9 +7,10 @@ type InputProps = {
   value: string;
   label?: string;
   onChange?(value: string): void;
+  required?: boolean;
 };
 
-function Input({ value, label, onChange }: InputProps) {
+function Input({ value, label, onChange, required }: InputProps) {
   const { theme } = React.useContext(StyleContext);
   const readOnly = onChange === undefined;
   return (
@@ -48,6 +49,7 @@ function Input({ value, label, onChange }: InputProps) {
         value={value}
         onChange={(event) => onChange?.(event.currentTarget.value)}
         readOnly={readOnly}
+        required={required}
         autoComplete="off"
         spellCheck={false}
         css={css`
@@ -62,6 +64,15 @@ function Input({ value, label, onChange }: InputProps) {
           margin: 0px;
         `}
       />
+      {required && (
+        <div
+          css={css`
+            color: ${value === "" ? theme.colors.text.primary : theme.colors.text.secondary};
+          `}
+        >
+          <Icon icon="Required" />
+        </div>
+      )}
       {readOnly && (
         <div
           css={css`

@@ -4,6 +4,7 @@ import {
   faAddressBook,
   faAngleDoubleDown,
   faAngleLeft,
+  faAsterisk,
   faCheck,
   faCommentAlt,
   faEnvelope,
@@ -26,7 +27,7 @@ export type IconName = keyof typeof theme["icons"];
 export const theme = {
   colors: {
     text: {
-      primary: `hsl(0, 0%, 80%)`,
+      primary: `hsl(0, 0%, 90%)`,
       secondary: `hsl(0, 0%, 55%)`,
     },
     background: {
@@ -77,6 +78,7 @@ export const theme = {
     Conversation: <FontAwesomeIcon icon={faEnvelope} />,
     Conversations: <FontAwesomeIcon icon={faCommentAlt} />,
     ReadOnly: <FontAwesomeIcon icon={faLock} />,
+    Required: <FontAwesomeIcon icon={faAsterisk} />,
     Close: <FontAwesomeIcon icon={faTimes} />,
     UseAccount: <FontAwesomeIcon icon={faCheck} />,
     ScrollToBottom: <FontAwesomeIcon icon={faAngleDoubleDown} />,

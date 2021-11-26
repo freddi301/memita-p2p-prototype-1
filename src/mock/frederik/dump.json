@@ -1,0 +1,19 @@
+{
+  "contactMap": {
+    "7684cd41bd06b76c3d7fe549fc08499e1aa1a80e490c88a12ad6cb3c0166fc0b": {
+      "name": "Alice",
+      "notes": ""
+    }
+  },
+  "accountMap": {
+    "54a44fdc3031fd37e75e8a8572bdd7d4bdcb0800ca752c9f64533c2917db4379": {
+      "name": "Frederik (Me)",
+      "notes": "",
+      "privateKey": "8de4346f51f1bfdb62d72b68e89756755a320140a79f2387a63ca674d3c4a00e"
+    }
+  },
+  "messageMap": {},
+  "preferences": {
+    "currentAccountPublicKey": "54a44fdc3031fd37e75e8a8572bdd7d4bdcb0800ca752c9f64533c2917db4379"
+  }
+}

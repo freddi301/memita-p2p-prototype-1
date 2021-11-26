@@ -42,7 +42,7 @@ export function AccountListScreen(props: AccountListScreenProps) {
       }
       controls={
         <ButtonGroup>
-          <Button label="Import" icon="Import" onClick={() => {}} enabled={false} showLabel={false} />
+          <Button label="Import" icon="Import" onClick={() => {}} enabled={false} showLabel={true} />
           <Button label="Create" icon="Create" onClick={onCreate} enabled={true} showLabel={false} />
         </ButtonGroup>
       }
@@ -74,7 +74,7 @@ function AccountItem({ index, onAccount }: AccountItemProps) {
         `}
       >
         <Text color="primary" size="normal" weight="bold" text={account?.name ?? "..."} />
-        <Text color="secondary" size="normal" weight="normal" text={account?.publicKey ?? "..."} />
+        <Text color="secondary" size="normal" weight="normal" text={account?.publicKey ?? "..."} truncatedLine={true} />
       </div>
     </Clickable>
   );

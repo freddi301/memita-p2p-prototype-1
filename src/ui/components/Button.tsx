@@ -14,7 +14,7 @@ type ButtonProps = {
 
 function Button({ label, icon, onClick, enabled, showLabel }: ButtonProps) {
   const { theme } = React.useContext(StyleContext);
-  const ref = React.useRef<HTMLButtonElement | null>(null);
+  const ref = React.useRef<HTMLButtonElement>(null);
   return (
     <button
       ref={ref}
