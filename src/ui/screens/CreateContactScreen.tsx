@@ -11,6 +11,7 @@ import { FrontendFacade } from "../FrontendFacade";
 import { NavigationContext } from "../NavigationStack";
 import { SimpleHeader } from "../components/SimpleHeader";
 import { AccountPublicKey } from "../../other/AccountCryptography";
+import QrReader from "react-qr-reader";
 
 type CreateContactScreenProps = {};
 
@@ -20,6 +21,7 @@ export function CreateContactScreen(props: CreateContactScreenProps) {
   const [publicKey, setPublicKey] = React.useState("");
   const [name, setName] = React.useState("");
   const [notes, setNotes] = React.useState("");
+  const [showQrReader, setShowQrReader] = React.useState(Boolean);
   const onCreate = () => {
     FrontendFacade.doUpdateContact(publicKey, name, notes);
     navigationStack.pop();
@@ -45,6 +47,27 @@ export function CreateContactScreen(props: CreateContactScreenProps) {
           <Input label="Name" value={name} onChange={setName} required />
           <Textarea label="Notes" value={notes} onChange={setNotes} />
           <Textarea label="Public Key" value={publicKey} onChange={setPublicKey} required />
+          <Button
+            label="Scan"
+            icon="QRCode"
+            enabled={true}
+            onClick={() => setShowQrReader(!showQrReader)}
+            showLabel={true}
+          />
+          {showQrReader && (
+            <QrReader
+              style={{ borderRadius: `calc(${theme.sizes.vertical} / 2)`, overflow: "hidden" }}
+              onScan={(data) => {
+                if (data) {
+                  const publicKey = tryElse(() => AccountPublicKey.fromHex(data), null);
+                  if (publicKey) {
+                    setPublicKey(publicKey.toHex());
+                    setShowQrReader(false);
+                  }
+                }
+              }}
+            />
+          )}
         </div>
       }
       controls={

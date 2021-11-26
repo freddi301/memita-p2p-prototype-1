@@ -14,6 +14,7 @@ import {
   faPaperclip,
   faPaperPlane,
   faPlus,
+  faQrcode,
   faSave,
   faShareAlt,
   faSmile,
@@ -85,6 +86,7 @@ export const theme = {
     Send: <FontAwesomeIcon icon={faPaperPlane} />,
     Emoji: <FontAwesomeIcon icon={faSmile} />,
     Attachment: <FontAwesomeIcon icon={faPaperclip} />,
+    QRCode: <FontAwesomeIcon icon={faQrcode} />,
     Back: <FontAwesomeIcon icon={faAngleLeft} />,
   },
 };
