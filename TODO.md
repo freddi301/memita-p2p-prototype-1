@@ -29,6 +29,9 @@
 - put in QR code contact or account avatar
 - add avatars everywhere
 - get multimedia clipping right
+- modify/delete posts messages
+- notifications feed
+- articles feed (with mardown)
 
 ## Build
 - windows

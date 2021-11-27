@@ -7,3 +7,4 @@ tsconfig.tsbuildinfo
 yarn-error.log
 user-data
 out/
+*.derived.ts
