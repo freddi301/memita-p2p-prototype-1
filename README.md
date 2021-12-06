@@ -6,9 +6,9 @@ No bug fix or new features will be added.
 
 To support the next iteration of the project star this github repo.
 
-- [Windows](https://github.com/freddi301/memita-p2p-prototype-1/releases/download/release/p2p-apps-chat-desktop-0.0.0.Setup.exe)
+- download for [Windows](https://github.com/freddi301/memita-p2p-prototype-1/releases/download/release/p2p-apps-chat-desktop-0.0.0.Setup.exe)
 
-![screenshot](screenshot.png)
+![screenshot](screenshot.PNG)
 
 # Develop
 
